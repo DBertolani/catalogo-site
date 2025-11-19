@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <base target="_top">
+  <title><?= product.nome ?> — Produto</title>
+  <style>
+    /* Base */
+    body { font-family: sans-serif; margin: 20px; background: #f4f4f4; color: #333; }
+    .card { max-width: 1100px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .grid { display: flex; gap: 20px; flex-wrap: wrap; align-items: flex-start; }
+    .image { flex: 1 1 380px; min-width: 260px; }
+    .image .placeholder { background: #eee; height: 320px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #999; }
+    .image img { width: 100%; height: auto; border-radius: 6px; object-fit: cover; }
+    .info { flex: 1 1 420px; }
+
+    /* Tipografia e meta */
+    h1 { margin: 0 0 10px; font-size: 1.5rem; }
+    .price { color: #28a745; font-weight: 700; font-size: 1.25rem; margin-bottom: 10px; }
+    .meta { color: #666; margin-bottom: 12px; }
+
+    /* Botões no padrão do modal do Index */
+    .btns { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+    .btn { display: inline-block; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; text-align: center; }
+    .btn-buy { background-color: #28a745; color: #fff; }
+    .btn-buy:hover { background-color: #218838; }
+    .btn-back { background-color: #6c757d; color: #fff; }
+    .btn-back:hover { background-color: #5a6268; }
+    .btn-share { background-color: #007bff; color: #fff; }
+    .btn-share:hover { background-color: #0056b3; }
+
+    /* Link pequeno */
+    .small-link { color: #007bff; text-decoration: none; cursor: pointer; }
+
+    /* Modal descrição (mesmo padrão do Index) */
+    .modal { display: none; position: fixed; z-index: 1000; inset: 0; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center; padding: 10px; box-sizing: border-box; }
+    .modal-content { background-color: #fff; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); position: relative; width: 95%; max-width: 600px; max-height: 98vh; display: flex; flex-direction: column; box-sizing: border-box; padding: 20px; overflow-y: auto; }
+    .close-button { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; background: none; border: none; padding: 0 8px; position: absolute; top: 5px; right: 15px; z-index: 1001; }
+    .close-button:hover, .close-button:focus { color: #333; text-decoration: none; }
+
+    /* Descrição truncada */
+    .desc-truncated { white-space: pre-wrap; line-height: 1.5; margin-bottom: 8px; color: #333; }
+
+    @media(max-width:760px) {
+      .grid { flex-direction: column; }
+      .image .placeholder { height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="grid">
+      <div class="image">
+        <? if (product.imagem && product.imagem.trim()) { ?>
+          <img id="productImage" src="<?= product.imagem ?>" alt="<?= product.nome ?>"
+               onerror="this.style.display='none';document.getElementById('imagePlaceholder').style.display='flex'">
+          <div id="imagePlaceholder" class="placeholder" style="display:none">Sem imagem disponível</div>
+        <? } else { ?>
+          <div id="imagePlaceholder" class="placeholder">Sem imagem disponível</div>
+        <? } ?>
+      </div>
+
+      <div class="info">
+        <h1><?= product.nome ?></h1>
+        <? if (product.preco) { ?><div class="price"><?= product.preco ?></div><? } ?>
+        <div class="meta"><strong>Loja:</strong> <?= product.lojaParceira ?> &nbsp; | &nbsp; <strong>Marca:</strong> <?= product.marca ?></div>
+
+        <div id="descContainer">
+          <div id="descTruncated" class="desc-truncated"></div>
+          <a id="readMoreLink" class="small-link" style="display:none">Ler mais</a>
+        </div>
+
+        <div class="btns">
+          <!-- Usa seu domínio com rota de redirect -->
+              <a id="buyBtn" class="btn btn-buy"
+                href="<?= WEBAPP_URL ?>?r=redirect&id=<?= product.id ?>"
+                target="_top" rel="noopener noreferrer">
+                <?= product.textoBotao ?>
+              </a>
+
+
+          <a class="btn btn-back" href="<?= ScriptApp.getService().getUrl() ?>">Voltar ao Catálogo</a>
+          <a id="shareBtn" class="btn btn-share" href="javascript:void(0)">Compartilhar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal descrição completa -->
+  <div id="descModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+      <button class="close-button" id="closeDescModal">&times;</button>
+      <h2>Descrição completa</h2>
+      <div id="fullDescription" style="white-space:pre-wrap;line-height:1.5;color:#333;margin-top:10px"></div>
+      <div style="margin-top:14px">
+        <button class="btn btn-back" onclick="closeDesc()">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  (function(){
+    const MAX_DESC = 250;
+    const rawDesc = <?= JSON.stringify(product.descricao || '') ?>;
+    const truncatedEl = document.getElementById('descTruncated');
+    const readMoreLink = document.getElementById('readMoreLink');
+    const fullDescription = document.getElementById('fullDescription');
+    const descModal = document.getElementById('descModal');
+    const closeBtn = document.getElementById('closeDescModal');
+
+    function showTruncated() {
+      if (!rawDesc) {
+        truncatedEl.textContent = 'Descrição não disponível.';
+        readMoreLink.style.display = 'none';
+        return;
+      }
+      if (rawDesc.length > MAX_DESC) {
+        truncatedEl.textContent = rawDesc.substring(0, MAX_DESC).trim() + '...';
+        readMoreLink.style.display = 'inline';
+      } else {
+        truncatedEl.textContent = rawDesc;
+        readMoreLink.style.display = 'none';
+      }
+    }
+
+    readMoreLink.addEventListener('click', function(){
+      fullDescription.textContent = rawDesc;
+      descModal.style.display = 'flex';
+      descModal.setAttribute('aria-hidden','false');
+    });
+
+    function closeDesc(){
+      descModal.style.display = 'none';
+      descModal.setAttribute('aria-hidden','true');
+    }
+    window.closeDesc = closeDesc;
+    closeBtn.addEventListener('click', closeDesc);
+    descModal.addEventListener('click', function(e){
+      if (e.target === descModal) closeDesc();
+    });
+
+    // Compartilhar (fallback WhatsApp) com URL do seu domínio
+    document.getElementById('shareBtn').addEventListener('click', function(){
+      const productUrl = `${location.origin}${location.pathname}?id=${encodeURIComponent(<?= JSON.stringify(product.id) ?>)}`;
+      const title = "Confira este produto: <?= product.nome ?>";
+      const text = `${title}\nPreço: <?= product.preco ?>\n${productUrl}`;
+      if (navigator.share) {
+        navigator.share({ title: title, text: text }).catch(()=>{
+          window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+        });
+      } else {
+        window.open('https://wa.me/?text='+encodeURIComponent(text), '_blank');
+      }
+    });
+
+    // Inicia
+    showTruncated();
+
+    // Imagem fallback
+    const img = document.getElementById('productImage');
+    if (img) {
+      img.addEventListener('error', function(){
+        const ph = document.getElementById('imagePlaceholder');
+        if (ph) { ph.style.display = 'flex'; img.style.display = 'none'; }
+      });
+    }
+  })();
+</script>
+</body>
+</html>
