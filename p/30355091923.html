@@ -2,7 +2,7 @@
   async function carregarProduto() {
     const id = "30355091923";
     try {
-      const resp = await fetch("https://script.google.com/macros/s/SEU_ID/exec?api=produto&id=" + id);
+      const resp = await fetch("https://script.google.com/macros/s/AKfycbyXe7CcYsJecfV7pjhtmkeDE8hMzSx9EaGNDiqSv_GYXKEvlitDqOCec0YtgX-D_RYVSw/exec?api=produto&id=" + id);
       const produto = await resp.json();
 
       document.getElementById("nome").textContent = produto.nome;
