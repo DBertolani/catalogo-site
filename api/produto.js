@@ -1,50 +1,27 @@
-
-export async function onRequest(context) {
+export default async function handler(req, res) {
   try {
-    const url = new URL(context.request.url);
-    const id = url.searchParams.get("id");
+    const { id } = req.query;
 
     if (!id) {
-      return new Response(JSON.stringify({ error: "ID ausente" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" }
-      });
+      return res.status(400).json({ error: "ID ausente" });
     }
 
-    // URL do seu Apps Script WebApp
     const apiUrl = `https://script.google.com/macros/s/AKfycbyXe7CcYsJecfV7pjhtmkeDE8hMzSx9EaGNDiqSv_GYXKEvlitDqOCec0YtgX-D_RYVSw/exec?api=produto&id=${encodeURIComponent(id)}`;
 
-    const resposta = await fetch(apiUrl, {
-      method: "GET",
-      headers: {
-        "Accept": "application/json"
-      }
-    });
+    const resposta = await fetch(apiUrl);
 
     if (!resposta.ok) {
-      return new Response(JSON.stringify({
+      return res.status(500).json({
         error: "Erro na API Apps Script",
         status: resposta.status
-      }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" }
       });
     }
 
     const dados = await resposta.json();
 
-    return new Response(JSON.stringify(dados), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "*"
-      }
-    });
+    return res.status(200).json(dados);
 
   } catch (e) {
-    return new Response(JSON.stringify({ error: `Falha: ${e.message}` }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" }
-    });
+    return res.status(500).json({ error: `Falha: ${e.message}` });
   }
 }
