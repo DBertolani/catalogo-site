@@ -1,40 +1,18 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <title id="title">Produto</title>
-  <meta name="description" id="description" content="">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-  <h1 id="nome">Carregando produto...</h1>
-  <img id="imagem" width="300" alt="">
-  <p id="descricao"></p>
-  <p id="preco"></p>
-  <p><a id="link" target="_blank" rel="nofollow noopener">👉 Comprar agora</a></p>
+<script>
+  async function carregarProduto() {
+    const id = "30355091923";
+    try {
+      const resp = await fetch("https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiEy_NM-r66Z5RKu9Llkh9pzjAyVERwo1mIPuDkX3oK-_sMbgfNcZRz528g23fhrdBgsSprr6pcyXwILI6UfF6kXHEifk3MFRxVsJVgTNkQIFe9JkuEKRJ1srI7a8c-mN9AyQOyz6_u7twUtNoMXC8RweOmJXz0C5LmRKxwojNF__X18DjfwgP643u1DCZw_E-n7ZM8Zjp3SJyM5lx6IAqVD2g3oKhNl8bQi7yrUVLTg_uaa_6xTwtUkUhZ55z5Hfa4bF2wq5Jus9yjK1cxFVrzw_hR2vcmp_OhPIB8Zlk86oPfrbQrUmW0E_Ce5xMuy384dz_t&lib=MPJ8UFYd5qcGf0ATjpyRuXrOnLUQeUuv2&api=produto&id=" + id);
+      const produto = await resp.json();
 
-  <script>
-    async function carregarProduto() {
-      const id = "30355091923";
-      try {
-        const resp = await fetch("https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLiEy_NM-r66Z5RKu9Llkh9pzjAyVERwo1mIPuDkX3oK-_sMbgfNcZRz528g23fhrdBgsSprr6pcyXwILI6UfF6kXHEifk3MFRxVsJVgTNkQIFe9JkuEKRJ1srI7a8c-mN9AyQOyz6_u7twUtNoMXC8RweOmJXz0C5LmRKxwojNF__X18DjfwgP643u1DCZw_E-n7ZM8Zjp3SJyM5lx6IAqVD2g3oKhNl8bQi7yrUVLTg_uaa_6xTwtUkUhZ55z5Hfa4bF2wq5Jus9yjK1cxFVrzw_hR2vcmp_OhPIB8Zlk86oPfrbQrUmW0E_Ce5xMuy384dz_t&lib=MPJ8UFYd5qcGf0ATjpyRuXrOnLUQeUuv2&api=produto&id=" + id);
-        const produto = await resp.json();
-
-        // Preenche os elementos da página
-        document.getElementById("nome").textContent = produto.nome;
-        document.getElementById("imagem").src = produto.imagem;
-        document.getElementById("descricao").textContent = produto.descricao;
-        document.getElementById("preco").textContent = "Preço: " + produto.preco;
-        document.getElementById("link").href = produto.linkAfiliado || "#";
-
-        // SEO dinâmico
-        document.getElementById("title").textContent = produto.nome + " - " + produto.lojaParceira;
-        document.getElementById("description").setAttribute("content", produto.descricao);
-      } catch (e) {
-        document.getElementById("nome").textContent = "Erro ao carregar: " + e;
-      }
+      document.getElementById("nome").textContent = produto.nome;
+      document.getElementById("imagem").src = produto.imagem;
+      document.getElementById("descricao").textContent = produto.descricao;
+      document.getElementById("preco").textContent = "Preço: " + produto.preco;
+      document.getElementById("link").href = produto.linkAfiliado || "#";
+    } catch (e) {
+      document.getElementById("nome").textContent = "Erro ao carregar: " + e;
     }
-    carregarProduto();
-  </script>
-</body>
-</html>
+  }
+  carregarProduto();
+</script>
