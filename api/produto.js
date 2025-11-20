@@ -6,7 +6,7 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "ID ausente" });
     }
 
-    const apiUrl = `https://script.google.com/macros/s/AKfycbyXe7CcYsJecfV7pjhtmkeDE8hMzSx9EaGNDiqSv_GYXKEvlitDqOCec0YtgX-D_RYVSw/exec?api=produto&id=${encodeURIComponent(id)}`;
+    const apiUrl = `https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?api=produto&id=${encodeURIComponent(id)}`;
 
     const resposta = await fetch(apiUrl);
 
