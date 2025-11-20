@@ -9,7 +9,6 @@ export async function onRequest(context) {
     });
   }
 
-  // URL do seu Apps Script
   const apiUrl = "https://script.google.com/macros/s/AKfycbyXe7CcYsJecfV7pjhtmkeDE8hMzSx9EaGNDiqSv_GYXKEvlitDqOCec0YtgX-D_RYVSw/exec?api=produto&id=" + id;
 
   try {
