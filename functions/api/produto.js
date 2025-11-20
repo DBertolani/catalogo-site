@@ -12,7 +12,7 @@ export async function onRequest(context) {
     }
 
     // URL do seu Apps Script WebApp
-    const apiUrl = `https://script.google.com/macros/s/AKfycbyJ4JE...SUA_URL_AQUI...?api=produto&id=${encodeURIComponent(id)}`;
+    const apiUrl = `https://script.google.com/macros/s/AKfycbyXe7CcYsJecfV7pjhtmkeDE8hMzSx9EaGNDiqSv_GYXKEvlitDqOCec0YtgX-D_RYVSw/exec?api=produto&id=${encodeURIComponent(id)}`;
 
     const resposta = await fetch(apiUrl, {
       method: "GET",
