@@ -1,7 +1,7 @@
 export async function onRequest(context) {
   const { request } = context;
 
-  // Responder preflight OPTIONS
+  // Preflight OPTIONS
   if (request.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -13,12 +13,23 @@ export async function onRequest(context) {
     });
   }
 
-  // Resposta normal
-  return new Response(JSON.stringify({ ok: true }), {
+  // GET normal
+  if (request.method === "GET") {
+    return new Response(JSON.stringify({ ok: true }), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+  }
+
+  // Outros métodos → 405
+  return new Response(JSON.stringify({ error: "Method not allowed" }), {
+    status: 405,
     headers: {
-      "Content-Type": "application/json",
+      "Content-Type": "application/json; charset=utf-8",
       "Access-Control-Allow-Origin": "*",
     },
-    status: 200,
   });
 }
