@@ -13,13 +13,13 @@ export async function onRequest(context) {
   const apiUrl = "https://script.google.com/macros/s/AKfycbyXe7CcYsJecfV7pjhtmkeDE8hMzSx9EaGNDiqSv_GYXKEvlitDqOCec0YtgX-D_RYVSw/exec?api=produto&id=" + id;
 
   try {
-    const resp = await fetch(apiUrl);
-    const data = await resp.text();
-
-    return new Response(data, {
-      headers: { "Content-Type": "application/json" },
-      status: 200,
-    });
+      const resp = await fetch(apiUrl);
+      const data = await resp.json(); // já interpreta como JSON
+      
+      return new Response(JSON.stringify(data), {
+        headers: { "Content-Type": "application/json" },
+        status: 200,
+      });
   } catch (err) {
     return new Response(JSON.stringify({ error: String(err) }), {
       headers: { "Content-Type": "application/json" },
