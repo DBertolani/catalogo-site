@@ -17,8 +17,9 @@
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
 
-      const resp = await fetch("https://script.google.com/macros/s/SEU_ID/exec");
-      const produtos = await resp.json();
+        const resp = await fetch("/api/produto?id=" + id);
+        const produto = await resp.json();
+
 
       const produto = produtos.find(p => p.id == id);
       if (!produto) {
@@ -40,3 +41,4 @@
   </script>
 </body>
 </html>
+
