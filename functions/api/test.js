@@ -1,7 +1,7 @@
 export async function onRequest(context) {
   const { request } = context;
 
-  // Preflight OPTIONS
+  // Responder preflight OPTIONS
   if (request.method === "OPTIONS") {
     return new Response(null, {
       status: 204,
@@ -13,7 +13,7 @@ export async function onRequest(context) {
     });
   }
 
-  // GET normal
+  // Resposta normal para GET
   if (request.method === "GET") {
     return new Response(JSON.stringify({ ok: true }), {
       status: 200,
