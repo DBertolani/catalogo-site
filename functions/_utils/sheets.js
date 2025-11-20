@@ -1,4 +1,3 @@
-// utils/sheets.js
 export async function fetchProducts() {
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSt4X52USWS4EzuI7V2GvtePpZSSgNKeYdCPGhlAFKrC09XwVcoYmLeRBh5XszmfGV6_RC5J1Avw-WD/pub?gid=155082964&single=true&output=csv";
 
@@ -9,20 +8,19 @@ export async function fetchProducts() {
   const lines = text.trim().split("\n");
   const headers = lines[0].split(",").map(h => h.trim().toLowerCase());
 
-  // mapa de sinônimos → chave padrão
+  // mapa de colunas → chave padrão
   const columnMap = {
-    id: ["id", "codigo", "produto_id"],
-    nome: ["title", "nome", "produto", "product_name"],
+    id: ["id"],
+    nome: ["title", "nome", "product_name"],
     descricao: ["description", "descricao", "detalhes"],
-    preco: ["price", "preco", "valor", "sale_price"],
-    linkAfiliado: ["link", "url", "deeplink"],
-    imagem: ["image_link", "foto", "imagem", "picture"],
-    lojaParceira: ["custom_label_1", "loja", "store"],
+    preco: ["sale_price", "price", "valor"],
+    linkAfiliado: ["link", "deeplink", "url"],
+    imagem: ["image_link", "foto", "imagem"],
+    lojaParceira: ["custom_label_1", "store", "loja"],
     categoria: ["categoria_web", "categoria", "category"],
     marca: ["brand", "marca"]
   };
 
-  // função para achar índice de cada coluna
   function findIndex(aliases) {
     for (const alias of aliases) {
       const idx = headers.indexOf(alias.toLowerCase());
@@ -36,19 +34,24 @@ export async function fetchProducts() {
     idx[key] = findIndex(columnMap[key]);
   }
 
-  // transformar linhas em objetos
   const products = lines.slice(1).map(line => {
     const cols = line.split(",");
+
+    // preço: se tiver sale_price válido, usa ele; senão usa price
+    let preco = cols[idx.preco] || "";
+    if (!preco && idx.price !== -1) preco = cols[idx.price];
+
     return {
       id: cols[idx.id] || "",
       nome: cols[idx.nome] || "",
       descricao: cols[idx.descricao] || "",
-      preco: cols[idx.preco] || "",
+      preco: preco,
       linkAfiliado: cols[idx.linkAfiliado] || "",
       imagem: cols[idx.imagem] || "",
       lojaParceira: cols[idx.lojaParceira] || "",
       categoria: cols[idx.categoria] || "",
-      marca: cols[idx.marca] || ""
+      marca: cols[idx.marca] || "",
+      textoBotao: `Compre na Loja: ${cols[idx.lojaParceira] || "Parceiro"}`
     };
   });
 
