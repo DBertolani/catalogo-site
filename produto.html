@@ -7,38 +7,49 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <h1 id="nome"></h1>
-  <img id="imagem" width="300">
+  <h1 id="nome">Carregando produto...</h1>
+  <img id="imagem" width="300" alt="">
+  <p id="descricao"></p>
   <p id="preco"></p>
   <p><a id="link" target="_blank" rel="nofollow noopener">👉 Comprar agora</a></p>
 
   <script>
     async function carregarProduto() {
+      // Pega o parâmetro ?id= da URL
       const params = new URLSearchParams(window.location.search);
       const id = params.get("id");
 
-        const resp = await fetch("/api/produto?id=" + id);
-        const produto = await resp.json();
-
-
-      const produto = produtos.find(p => p.id == id);
-      if (!produto) {
-        document.body.innerHTML = "<p>Produto não encontrado</p>";
+      if (!id) {
+        document.getElementById("nome").textContent = "ID do produto não informado.";
         return;
       }
 
-      document.getElementById("nome").textContent = produto.nome;
-      document.getElementById("imagem").src = produto.imagem;
-      document.getElementById("preco").textContent = "Preço: " + produto.preco;
-      document.getElementById("link").href = produto.link;
+      try {
+        // Chama o proxy no Cloudflare Pages
+        const resp = await fetch("/api/produto?id=" + id);
+        const produto = await resp.json();
 
-      // SEO dinâmico
-      document.getElementById("title").textContent = produto.nome + " - Oferta";
-      document.getElementById("description").setAttribute("content", "Compre " + produto.nome + " com desconto especial.");
+        if (produto.error) {
+          document.getElementById("nome").textContent = "Erro: " + produto.error;
+          return;
+        }
+
+        // Preenche os elementos da página
+        document.getElementById("nome").textContent = produto.nome;
+        document.getElementById("imagem").src = produto.imagem;
+        document.getElementById("descricao").textContent = produto.descricao;
+        document.getElementById("preco").textContent = "Preço: " + produto.preco;
+        document.getElementById("link").href = produto.linkAfiliado || "#";
+
+        // SEO dinâmico
+        document.getElementById("title").textContent = produto.nome + " - " + (produto.lojaParceira || "");
+        document.getElementById("description").setAttribute("content", produto.descricao);
+      } catch (e) {
+        document.getElementById("nome").textContent = "Erro ao carregar: " + e;
+      }
     }
 
     carregarProduto();
   </script>
 </body>
 </html>
-
