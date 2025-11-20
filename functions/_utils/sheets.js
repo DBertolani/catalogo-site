@@ -71,44 +71,6 @@ export async function fetchProducts() {
   return products;
 }
 
-
-// Função para parsear CSV respeitando aspas
-function parseCSV(text) {
-  const rows = [];
-  let current = [];
-  let field = "";
-  let insideQuotes = false;
-
-  for (let i = 0; i < text.length; i++) {
-    const char = text[i];
-    if (char === '"') {
-      if (insideQuotes && text[i + 1] === '"') {
-        field += '"';
-        i++;
-      } else {
-        insideQuotes = !insideQuotes;
-      }
-    } else if (char === "," && !insideQuotes) {
-      current.push(field);
-      field = "";
-    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
-      if (field || current.length > 0) {
-        current.push(field);
-        rows.push(current);
-        current = [];
-        field = "";
-      }
-    } else {
-      field += char;
-    }
-  }
-  if (field || current.length > 0) {
-    current.push(field);
-    rows.push(current);
-  }
-  return rows;
-}
-
 export async function fetchProductById(targetId) {
   const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSt4X52USWS4EzuI7V2GvtePpZSSgNKeYdCPGhlAFKrC09XwVcoYmLeRBh5XszmfGV6_RC5J1Avw-WD/pub?gid=155082964&single=true&output=csv";
 
