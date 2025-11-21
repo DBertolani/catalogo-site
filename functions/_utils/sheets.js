@@ -45,6 +45,7 @@ function normalizeProduct(obj) {
     lojaParceira: obj["custom_label_1"] || "",
     categoria: obj["categoria_web"] || "",
     marca: obj["brand"] || "",
+    facebookLink: obj["facebook_link"] || "",   // <-- novo campo
     textoBotao: `Compre na Loja: ${obj["custom_label_1"] || "Parceiro"}`
   };
 }
@@ -58,12 +59,11 @@ function matchesFilters(prod, q, store, cat, brand) {
   const catV = toStr(cat);
   const brandV = toStr(brand);
 
-  // Busca (query) em campos relevantes
   const haystack = [
     toStr(prod["title"]),
     toStr(prod["description"]),
     toStr(prod["brand"]),
-    toStr(prod["custom_label_1"]), // loja
+    toStr(prod["custom_label_1"]),
     toStr(prod["categoria_web"]),
     toStr(prod["id"])
   ].join(" ");
@@ -76,7 +76,7 @@ function matchesFilters(prod, q, store, cat, brand) {
   return passesQuery && passesStore && passesCat && passesBrand;
 }
 
-// Lê a planilha, aplica filtros, pula offset e coleta limit — contando total filtrado
+// Lê a planilha, aplica filtros, pula offset e coleta limit
 export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store = "", cat = "", brand = "" }) {
   const cacheKey = `${offset}:${limit}:${q}:${store}:${cat}:${brand}`;
   const cached = PAGE_CACHE.get(cacheKey);
@@ -88,7 +88,7 @@ export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store 
   if (!res.ok) throw new Error("Falha ao baixar CSV da planilha");
   const text = await res.text();
 
-  const lines = text.split("\n").map(l => l.replace(/\r$/, "")); // trata CRLF
+  const lines = text.split("\n").map(l => l.replace(/\r$/, ""));
   if (lines.length < 2) return { totalCount: 0, products: [], headers: [] };
 
   const headersRow = parseCSVLine(lines[0]);
@@ -97,10 +97,9 @@ export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store 
   let collected = [];
   let totalFiltered = 0;
 
-  // Varre linha a linha sem montar tudo em memória
   for (let i = 1; i < lines.length; i++) {
     const row = parseCSVLine(lines[i]);
-    if (row.length === 1 && row[0].trim() === "") continue; // linha vazia
+    if (row.length === 1 && row[0].trim() === "") continue;
 
     const obj = {};
     headers.forEach((h, idx) => {
@@ -109,20 +108,12 @@ export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store 
 
     if (!matchesFilters(obj, q, store, cat, brand)) continue;
 
-    // Conta total que passou nos filtros
     totalFiltered++;
-
-    // Se ainda estamos "pulando" até offset, segue
     if (totalFiltered <= offset) continue;
 
-    // Coleta até limite
     if (collected.length < limit) {
       collected.push(normalizeProduct(obj));
     }
-
-    // Ao atingir limite, podemos continuar só para contar totalFiltered (para saber total)
-    // ou parar aqui se quiser performance máxima sem total exato.
-    // Mantemos a contagem exata (continua loop), pois 30k linhas é aceitável em CPU.
   }
 
   const result = { totalCount: totalFiltered, products: collected, headers };
@@ -130,7 +121,7 @@ export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store 
   return result;
 }
 
-// Busca direta por ID (streaming) com cache de 1 dia por ID
+// Busca direta por ID
 export async function fetchProductById(targetId) {
   const idKey = String(targetId).trim();
   const cached = ID_CACHE.get(idKey);
