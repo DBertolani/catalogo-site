@@ -8,7 +8,11 @@ export async function onRequest() {
     const categories = [...new Set(produtos.map(p => p.categoria).filter(Boolean))].sort();
     const brands = [...new Set(produtos.map(p => p.marca).filter(Boolean))].sort();
 
-    return new Response(JSON.stringify({ stores, categories, brands }), {
+    return new Response(JSON.stringify({
+      stores,
+      categories,
+      brands
+    }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });
   } catch (err) {
