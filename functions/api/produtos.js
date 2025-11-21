@@ -1,11 +1,11 @@
 import { fetchProductsPage } from "../_utils/sheets.js";
 
 export async function onRequest(context) {
-  const url = new URL(context.request.url);
-  const offset = parseInt(url.searchParams.get("offset") || "0", 10);
-  const limit = parseInt(url.searchParams.get("limit") || "50", 10);
-
   try {
+    const url = new URL(context.request.url);
+    const offset = parseInt(url.searchParams.get("offset") || "0", 10);
+    const limit = parseInt(url.searchParams.get("limit") || "50", 10);
+
     const { totalCount, products } = await fetchProductsPage({ offset, limit });
 
     return new Response(JSON.stringify({
