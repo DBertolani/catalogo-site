@@ -196,15 +196,17 @@ export async function fetchFilterOptions() {
       obj[h] = row[idx] || "";
     });
 
-    // Pegando direto das colunas corretas
-    if (obj["custom_label_1"]) {
-      stores.add(obj["custom_label_1"].trim());
+    // Usa o normalizador para garantir consistência
+    const p = normalizeProduct(obj);
+
+    if (p.lojaParceira) {
+      stores.add(p.lojaParceira.trim());
     }
-    if (obj["categoria_web"]) {
-      categories.add(obj["categoria_web"].trim());
+    if (p.categoria) {
+      categories.add(p.categoria.trim());
     }
-    if (obj["brand"]) {
-      brands.add(obj["brand"].trim());
+    if (p.marca) {
+      brands.add(p.marca.trim());
     }
   }
 
@@ -220,3 +222,4 @@ export async function fetchFilterOptions() {
 
   return result;
 }
+
