@@ -1,6 +1,5 @@
 import { fetchProducts } from "../_utils/sheets.js";
 
-// Alterna entre lojas, pegando 1 produto de cada até completar o limite
 function pickAlternatingByStore(produtos, limit = 50) {
   const grupos = {};
   produtos.forEach(p => {
@@ -23,14 +22,13 @@ function pickAlternatingByStore(produtos, limit = 50) {
   return resultado;
 }
 
-export async function onRequest(context) {
+export async function onRequest() {
   try {
     const produtos = await fetchProducts();
 
-    // Embaralha a lista de lojas para variar a ordem a cada chamada
+    // embaralha para variar a ordem
     const shuffled = produtos.sort(() => Math.random() - 0.5);
 
-    // Seleciona alternando por loja
     const selecionados = pickAlternatingByStore(shuffled, 50);
 
     return new Response(JSON.stringify({
