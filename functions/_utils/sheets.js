@@ -16,10 +16,41 @@ function normalizeProduct(obj) {
   };
 }
 
-// Utilitário simples (split por vírgula) — suficiente para destravar o build.
-// Se sua planilha tiver vírgulas dentro de campos com aspas, considere trocar por um parser com suporte a aspas.
-function splitCSVLine(line) {
-  return line.split(",");
+// Parser robusto de CSV que respeita aspas e vírgulas dentro de campos
+function parseCSV(text) {
+  const rows = [];
+  let current = [];
+  let field = "";
+  let insideQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    if (char === '"') {
+      if (insideQuotes && text[i + 1] === '"') {
+        field += '"';
+        i++;
+      } else {
+        insideQuotes = !insideQuotes;
+      }
+    } else if (char === "," && !insideQuotes) {
+      current.push(field);
+      field = "";
+    } else if ((char === "\n" || char === "\r") && !insideQuotes) {
+      if (field || current.length > 0) {
+        current.push(field);
+        rows.push(current);
+        current = [];
+        field = "";
+      }
+    } else {
+      field += char;
+    }
+  }
+  if (field || current.length > 0) {
+    current.push(field);
+    rows.push(current);
+  }
+  return rows;
 }
 
 // Export 1: retorna TODOS os produtos (necessário para api/filters.js)
@@ -28,15 +59,13 @@ export async function fetchProducts() {
   if (!res.ok) throw new Error("Falha ao baixar CSV da planilha");
   const text = await res.text();
 
-  const lines = text.split("\n").map(l => l.replace(/\r$/, ""));
-  if (lines.length < 2) return [];
+  const rows = parseCSV(text);
+  if (rows.length < 2) return [];
 
-  const headersRow = lines[0].split(",");
-  const headers = headersRow.map(h => h.trim().toLowerCase());
+  const headers = rows[0].map(h => h.trim().toLowerCase());
 
-  const products = lines.slice(1).map(line => {
-    if (!line.trim()) return null;
-    const row = line.split(",");
+  const products = rows.slice(1).map(row => {
+    if (row.length === 1 && !row[0].trim()) return null;
     const obj = {};
     headers.forEach((h, idx) => obj[h] = row[idx] || "");
     return normalizeProduct(obj);
@@ -45,22 +74,19 @@ export async function fetchProducts() {
   return products;
 }
 
-
 // Export 2: paginação simples (carrega tudo e corta os primeiros N)
 export async function fetchProductsPage({ offset = 0, limit = 50 }) {
   const res = await fetch(SHEET_URL);
   if (!res.ok) throw new Error("Falha ao baixar CSV da planilha");
   const text = await res.text();
 
-  const lines = text.split("\n").map(l => l.replace(/\r$/, ""));
-  if (lines.length < 2) return { totalCount: 0, products: [], headers: [] };
+  const rows = parseCSV(text);
+  if (rows.length < 2) return { totalCount: 0, products: [], headers: [] };
 
-  const headersRow = splitCSVLine(lines[0]);
-  const headers = headersRow.map(h => h.trim().toLowerCase());
+  const headers = rows[0].map(h => h.trim().toLowerCase());
 
-  const productsAll = lines.slice(1).map(line => {
-    if (!line.trim()) return null;
-    const row = splitCSVLine(line);
+  const productsAll = rows.slice(1).map(row => {
+    if (row.length === 1 && !row[0].trim()) return null;
     const obj = {};
     headers.forEach((h, idx) => obj[h] = row[idx] || "");
     return normalizeProduct(obj);
@@ -78,17 +104,15 @@ export async function fetchProductById(targetId) {
   if (!res.ok) throw new Error("Falha ao baixar CSV da planilha");
   const text = await res.text();
 
-  const lines = text.split("\n").map(l => l.replace(/\r$/, ""));
-  if (lines.length < 2) return null;
+  const rows = parseCSV(text);
+  if (rows.length < 2) return null;
 
-  const headersRow = splitCSVLine(lines[0]);
-  const headers = headersRow.map(h => h.trim().toLowerCase());
+  const headers = rows[0].map(h => h.trim().toLowerCase());
 
-  for (let i = 1; i < lines.length; i++) {
-    const line = lines[i];
-    if (!line.trim()) continue;
+  for (let i = 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (row.length === 1 && !row[0].trim()) continue;
 
-    const row = splitCSVLine(line);
     const obj = {};
     headers.forEach((h, idx) => obj[h] = row[idx] || "");
 
