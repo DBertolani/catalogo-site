@@ -44,4 +44,23 @@ Confira este produto!
     .btn-share { background:#6c757d; color:#fff; }
     .btn-share:hover { background:#5a6268; }
   </style>
-</head
+</head>
+<body>
+  <div class="modal-content">
+    ${produto.imagem ? `<img src="${produto.imagem}" alt="${produto.nome}" />` : ""}
+    <h2>${produto.nome}</h2>
+    <p id="modalPrice">R$ ${produto.preco}</p>
+    <p class="meta"><strong>Loja:</strong> ${produto.lojaParceira || "-"} | <strong>Marca:</strong> ${produto.marca || "-"}</p>
+    <p>${produto.descricao || "Descrição não disponível."}</p>
+    <div class="modal-buttons-container">
+      <a href="${produto.linkAfiliado}" target="_blank" class="btn btn-buy">${produto.textoBotao || "Compre na Loja"}</a>
+      <a href="https://wa.me/?text=${encodeURIComponent(mensagemWhatsApp)}" target="_blank" class="btn btn-share">Compartilhar Produto</a>
+    </div>
+  </div>
+</body>
+</html>`;
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  } catch (err) {
+    return new Response(`Erro ao carregar produto: ${err.message}`, { status: 500 });
+  }
+}
