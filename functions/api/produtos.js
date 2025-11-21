@@ -12,13 +12,14 @@ export async function onRequest(context) {
   const brand = (url.searchParams.get("brand") || "").trim();
 
   try {
-    const { totalCount, products } = await fetchProductsPage({ offset, limit, q, store, cat, brand });
+    const { totalCount, products, headers } = await fetchProductsPage({ offset, limit, q, store, cat, brand });
 
     return new Response(JSON.stringify({
       total: totalCount,
       offset,
       limit,
-      products
+      products,
+      headers
     }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });
