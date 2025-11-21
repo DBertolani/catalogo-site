@@ -1,24 +1,41 @@
-import { fetchProductsPage } from "../_utils/sheets.js";
+import { fetchProducts } from "../_utils/sheets.js";
+
+// Alterna entre lojas, pegando 1 produto de cada até completar o limite
+function pickAlternatingByStore(produtos, limit = 50) {
+  const grupos = {};
+  produtos.forEach(p => {
+    const loja = p.lojaParceira || "Desconhecida";
+    if (!grupos[loja]) grupos[loja] = [];
+    grupos[loja].push(p);
+  });
+
+  const lojas = Object.keys(grupos);
+  let resultado = [];
+  let i = 0;
+
+  while (resultado.length < limit && lojas.length > 0) {
+    const loja = lojas[i % lojas.length];
+    if (grupos[loja].length > 0) {
+      resultado.push(grupos[loja].shift());
+    }
+    i++;
+  }
+  return resultado;
+}
 
 export async function onRequest(context) {
-  const url = new URL(context.request.url);
-
-  const offset = parseInt(url.searchParams.get("offset") || "0", 10);
-  const limit = parseInt(url.searchParams.get("limit") || "50", 10);
-
-  const q = (url.searchParams.get("query") || "").trim();
-  const store = (url.searchParams.get("store") || "").trim();
-  const cat = (url.searchParams.get("category") || "").trim();
-  const brand = (url.searchParams.get("brand") || "").trim();
-
   try {
-    const { totalCount, products } = await fetchProductsPage({ offset, limit, q, store, cat, brand });
+    const produtos = await fetchProducts();
+
+    // Embaralha a lista de lojas para variar a ordem a cada chamada
+    const shuffled = produtos.sort(() => Math.random() - 0.5);
+
+    // Seleciona alternando por loja
+    const selecionados = pickAlternatingByStore(shuffled, 50);
 
     return new Response(JSON.stringify({
-      total: totalCount,
-      offset,
-      limit,
-      products
+      total: produtos.length,
+      produtos: selecionados
     }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });
