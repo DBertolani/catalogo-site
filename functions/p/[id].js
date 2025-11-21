@@ -10,6 +10,16 @@ export async function onRequest(context) {
       return new Response("Produto não encontrado", { status: 404 });
     }
 
+    // Mensagem padrão para WhatsApp
+    const mensagemWhatsApp = `
+Confira este produto!
+
+*${produto.nome}*
+*Preço:* R$ ${produto.preco}
+*Loja:* ${produto.lojaParceira || "-"}
+*Compre agora:* ${produto.facebookLink || produto.linkAfiliado}
+    `.trim();
+
     const html = `
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -34,23 +44,4 @@ export async function onRequest(context) {
     .btn-share { background:#6c757d; color:#fff; }
     .btn-share:hover { background:#5a6268; }
   </style>
-</head>
-<body>
-  <div class="modal-content">
-    ${produto.imagem ? `<img src="${produto.imagem}" alt="${produto.nome}" />` : ""}
-    <h2>${produto.nome}</h2>
-    <p id="modalPrice">${produto.preco}</p>
-    <p class="meta"><strong>Loja:</strong> ${produto.lojaParceira || "-"} | <strong>Marca:</strong> ${produto.marca || "-"}</p>
-    <p>${produto.descricao || "Descrição não disponível."}</p>
-    <div class="modal-buttons-container">
-      <a href="${produto.linkAfiliado}" target="_blank" class="btn btn-buy">${produto.textoBotao || "Compre na Loja"}</a>
-      <a href="https://wa.me/?text=${encodeURIComponent("Confira este produto: " + produto.nome + " - " + produto.linkAfiliado)}" target="_blank" class="btn btn-share">Compartilhar Produto</a>
-    </div>
-  </div>
-</body>
-</html>`;
-    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-  } catch (err) {
-    return new Response(`Erro ao carregar produto: ${err.message}`, { status: 500 });
-  }
-}
+</head
