@@ -208,10 +208,29 @@ export async function fetchFilterOptions() {
     stores: Array.from(stores).sort(),
     categories: Array.from(categories).sort(),
     brands: Array.from(brands).sort(),
+    // DEBUG: incluir headers e 3 amostras para validação
+    debug: {
+      headers,
+      samples: Array.from({ length: 3 }).map((_, idx) => {
+        // pega as primeiras 3 linhas válidas (se existirem)
+        return [
+          // só nomes limpos para checar
+          resultSample(stores, idx),
+          resultSample(categories, idx),
+          resultSample(brands, idx),
+        ];
+      })
+    }
   };
 
   FILTERS_CACHE.ts = Date.now();
   FILTERS_CACHE.data = result;
-
   return result;
 }
+
+// helper simples para pegar amostras sem quebrar
+function resultSample(setArray, index) {
+  if (!Array.isArray(setArray) || setArray.length === 0) return null;
+  return setArray[index] || setArray[0] || null;
+}
+
