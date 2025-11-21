@@ -1,49 +1,31 @@
-export async function onRequest() {
-  // Resposta mínima para validar rota sem tocar na planilha
-  return new Response(JSON.stringify({
-    total: 3,
-    products: [
-      {
-        id: "1",
-        nome: "Produto Exemplo A",
-        descricao: "Descrição curta",
-        preco: "R$ 99,90",
-        linkAfiliado: "https://exemplo.com/a",
-        imagem: "https://via.placeholder.com/600x400",
-        lojaParceira: "Loja A",
-        categoria: "Categoria X",
-        marca: "Marca 1",
-        textoBotao: "Compre na Loja: Loja A"
-      },
-      {
-        id: "2",
-        nome: "Produto Exemplo B",
-        descricao: "Descrição curta",
-        preco: "R$ 149,90",
-        linkAfiliado: "https://exemplo.com/b",
-        imagem: "https://via.placeholder.com/600x400",
-        lojaParceira: "Loja B",
-        categoria: "Categoria Y",
-        marca: "Marca 2",
-        textoBotao: "Compre na Loja: Loja B"
-      },
-      {
-        id: "3",
-        nome: "Produto Exemplo C",
-        descricao: "Descrição curta",
-        preco: "R$ 59,90",
-        linkAfiliado: "https://exemplo.com/c",
-        imagem: "https://via.placeholder.com/600x400",
-        lojaParceira: "Loja C",
-        categoria: "Categoria Z",
-        marca: "Marca 3",
-        textoBotao: "Compre na Loja: Loja C"
-      }
-    ]
-  }), {
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*"
-    }
-  });
+import { fetchProductsPage } from "../_utils/sheets.js";
+
+export async function onRequest(context) {
+  const url = new URL(context.request.url);
+
+  const offset = parseInt(url.searchParams.get("offset") || "0", 10);
+  const limit = parseInt(url.searchParams.get("limit") || "50", 10);
+
+  const q = (url.searchParams.get("query") || "").trim();
+  const store = (url.searchParams.get("store") || "").trim();
+  const cat = (url.searchParams.get("category") || "").trim();
+  const brand = (url.searchParams.get("brand") || "").trim();
+
+  try {
+    const { totalCount, products } = await fetchProductsPage({ offset, limit, q, store, cat, brand });
+
+    return new Response(JSON.stringify({
+      total: totalCount,
+      offset,
+      limit,
+      products
+    }), {
+      headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
+  }
 }
