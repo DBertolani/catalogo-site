@@ -157,3 +157,67 @@ export async function fetchProductById(targetId) {
 
   return null;
 }
+
+// Cache para opções de filtro (24h)
+const FILTERS_CACHE = { ts: 0, data: null };
+
+// Retorna todas as opções únicas de filtros (lojas, categorias, marcas)
+export async function fetchFilterOptions() {
+  // Se cache em memória estiver fresco, retorna
+  if (FILTERS_CACHE.data && (Date.now() - FILTERS_CACHE.ts) < ONE_DAY_MS) {
+    return FILTERS_CACHE.data;
+  }
+
+  const res = await fetch(SHEET_URL, { cf: { cacheTtl: 300, cacheEverything: true } });
+  if (!res.ok) throw new Error("Falha ao baixar CSV da planilha");
+  const text = await res.text();
+
+  const lines = text.split("\n").map(l => l.replace(/\r$/, ""));
+  if (lines.length < 2) {
+    const empty = { stores: [], categories: [], brands: [] };
+    FILTERS_CACHE.ts = Date.now();
+    FILTERS_CACHE.data = empty;
+    return empty;
+  }
+
+  const headersRow = parseCSVLine(lines[0]);
+  const headers = headersRow.map(h => h.trim().toLowerCase());
+
+  const idxStore = headers.indexOf("custom_label_1");
+  const idxCat = headers.indexOf("categoria_web");
+  const idxBrand = headers.indexOf("brand");
+
+  const stores = new Set();
+  const categories = new Set();
+  const brands = new Set();
+
+  for (let i = 1; i < lines.length; i++) {
+    const row = parseCSVLine(lines[i]);
+    if (row.length === 1 && row[0].trim() === "") continue;
+
+    if (idxStore !== -1) {
+      const v = (row[idxStore] || "").trim();
+      if (v) stores.add(v);
+    }
+    if (idxCat !== -1) {
+      const v = (row[idxCat] || "").trim();
+      if (v) categories.add(v);
+    }
+    if (idxBrand !== -1) {
+      const v = (row[idxBrand] || "").trim();
+      if (v) brands.add(v);
+    }
+  }
+
+  const result = {
+    stores: Array.from(stores).sort(),
+    categories: Array.from(categories).sort(),
+    brands: Array.from(brands).sort(),
+  };
+
+  // Armazena em cache por 24h
+  FILTERS_CACHE.ts = Date.now();
+  FILTERS_CACHE.data = result;
+
+  return result;
+}
