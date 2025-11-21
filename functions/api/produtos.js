@@ -1,5 +1,6 @@
 import { fetchProducts } from "../_utils/sheets.js";
 
+// Alterna entre lojas, pegando 1 produto de cada até completar o limite
 function pickAlternatingByStore(produtos, limit = 50) {
   const grupos = {};
   produtos.forEach(p => {
@@ -33,7 +34,7 @@ export async function onRequest() {
 
     return new Response(JSON.stringify({
       total: produtos.length,
-      products: selecionados
+      products: selecionados   // <-- chave em inglês
     }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });
