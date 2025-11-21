@@ -163,7 +163,7 @@ const FILTERS_CACHE = { ts: 0, data: null };
 
 // Retorna todas as opções únicas de filtros (lojas, categorias, marcas)
 export async function fetchFilterOptions() {
-  // Se cache em memória estiver fresco, retorna
+  // Cache em memória (24h)
   if (FILTERS_CACHE.data && (Date.now() - FILTERS_CACHE.ts) < ONE_DAY_MS) {
     return FILTERS_CACHE.data;
   }
@@ -183,10 +183,6 @@ export async function fetchFilterOptions() {
   const headersRow = parseCSVLine(lines[0]);
   const headers = headersRow.map(h => h.trim().toLowerCase());
 
-  const idxStore = headers.indexOf("custom_label_1");
-  const idxCat = headers.indexOf("categoria_web");
-  const idxBrand = headers.indexOf("brand");
-
   const stores = new Set();
   const categories = new Set();
   const brands = new Set();
@@ -195,18 +191,17 @@ export async function fetchFilterOptions() {
     const row = parseCSVLine(lines[i]);
     if (row.length === 1 && row[0].trim() === "") continue;
 
-    if (idxStore !== -1) {
-      const v = (row[idxStore] || "").trim();
-      if (v) stores.add(v);
-    }
-    if (idxCat !== -1) {
-      const v = (row[idxCat] || "").trim();
-      if (v) categories.add(v);
-    }
-    if (idxBrand !== -1) {
-      const v = (row[idxBrand] || "").trim();
-      if (v) brands.add(v);
-    }
+    const obj = {};
+    headers.forEach((h, idx) => {
+      obj[h] = row[idx] || "";
+    });
+
+    // Usa o normalizador para garantir campos corretos
+    const p = normalizeProduct(obj);
+
+    if (p.lojaParceira && p.lojaParceira.trim()) stores.add(p.lojaParceira.trim());
+    if (p.categoria && p.categoria.trim()) categories.add(p.categoria.trim());
+    if (p.marca && p.marca.trim()) brands.add(p.marca.trim());
   }
 
   const result = {
@@ -215,7 +210,6 @@ export async function fetchFilterOptions() {
     brands: Array.from(brands).sort(),
   };
 
-  // Armazena em cache por 24h
   FILTERS_CACHE.ts = Date.now();
   FILTERS_CACHE.data = result;
 
