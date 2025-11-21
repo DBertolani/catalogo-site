@@ -551,53 +551,50 @@
         adjustIframeHeight();
     }
 
-    // Preenche datalists com base nos produtos carregados (mantém seu HTML)
-    function populateFilterOptionsFromProducts(products) {
-        const stores = new Set();
-        const categories = new Set();
-        const brands = new Set();
+// SUBSTITUIR A FUNÇÃO populateFilterOptionsFromProducts POR ESTA:
+    function loadGlobalFilters() {
+        // Chama seu endpoint de filtros
+        fetch('https://teste-api.deab.com.br/api/filtros')
+            .then(res => res.json())
+            .then(data => {
+                // data = { stores: [], categories: [], brands: [] }
+                
+                // Renderiza o HTML dos filtros com as listas completas
+                filterOptionsContainer.innerHTML = `
+                  <div class="filter-group">
+                      <label for="storeFilterInput">Loja Parceira:</label>
+                      <input list="storeDatalist" id="storeFilterInput" type="text" placeholder="Digite ou selecione a loja" value="${currentStoreFilter}">
+                      <datalist id="storeDatalist">
+                          <option value="">Todas as Lojas</option>
+                          ${data.stores.map(store => `<option value="${store}">`).join('')}
+                      </datalist>
+                  </div>
 
-        products.forEach(p => {
-            if (p.lojaParceira) stores.add(p.lojaParceira);
-            if (p.categoria) categories.add(p.categoria);
-            if (p.marca) brands.add(p.marca);
-        });
+                  <div class="filter-group">
+                      <label for="categoryFilterInput">Categoria:</label>
+                      <input list="categoryDatalist" id="categoryFilterInput" type="text" placeholder="Digite ou selecione a categoria" value="${currentCategoryFilter}">
+                      <datalist id="categoryDatalist">
+                          <option value="">Todas as Categorias</option>
+                          ${data.categories.map(cat => `<option value="${cat}">`).join('')}
+                      </datalist>
+                  </div>
 
-        const storesArr = Array.from(stores).sort();
-        const categoriesArr = Array.from(categories).sort();
-        const brandsArr = Array.from(brands).sort();
-
-        filterOptionsContainer.innerHTML = `
-          <div class="filter-group">
-              <label for="storeFilterInput">Loja Parceira:</label>
-              <input list="storeDatalist" id="storeFilterInput" type="text" placeholder="Digite ou selecione a loja" value="${currentStoreFilter}">
-              <datalist id="storeDatalist">
-                  <option value="">Todas as Lojas</option>
-                  ${storesArr.map(store => `<option value="${store}">`).join('')}
-              </datalist>
-          </div>
-
-          <div class="filter-group">
-              <label for="categoryFilterInput">Categoria:</label>
-              <input list="categoryDatalist" id="categoryFilterInput" type="text" placeholder="Digite ou selecione a categoria" value="${currentCategoryFilter}">
-              <datalist id="categoryDatalist">
-                  <option value="">Todas as Categorias</option>
-                  ${categoriesArr.map(cat => `<option value="${cat}">`).join('')}
-              </datalist>
-          </div>
-
-          <div class="filter-group">
-              <label for="brandFilterInput">Marca:</label>
-              <input list="brandDatalist" id="brandFilterInput" type="text" placeholder="Digite ou selecione a marca" value="${currentBrandFilter}">
-              <datalist id="brandDatalist">
-                  <option value="">Todas as Marcas</option>
-                  ${brandsArr.map(brand => `<option value="${brand}">`).join('')}
-              </datalist>
-          </div>
-        `;
-        adjustIframeHeight();
+                  <div class="filter-group">
+                      <label for="brandFilterInput">Marca:</label>
+                      <input list="brandDatalist" id="brandFilterInput" type="text" placeholder="Digite ou selecione a marca" value="${currentBrandFilter}">
+                      <datalist id="brandDatalist">
+                          <option value="">Todas as Marcas</option>
+                          ${data.brands.map(brand => `<option value="${brand}">`).join('')}
+                      </datalist>
+                  </div>
+                `;
+                adjustIframeHeight();
+            })
+            .catch(err => {
+                console.error("Erro ao carregar filtros:", err);
+                filterOptionsContainer.innerHTML = '<p>Erro ao carregar opções de filtro.</p>';
+            });
     }
-
     // Carregamento paginado usando sua API, mantendo layout
     function loadProducts(append) {
         append = typeof append === 'undefined' ? true : append;
@@ -615,8 +612,6 @@
             hideLoader();
             const products = response.products || [];
 
-            // Preenche os datalists com base nos produtos carregados
-            populateFilterOptionsFromProducts(products);
 
             totalProductsFound = response.total || 0;
 
@@ -816,13 +811,16 @@ Confira este produto!
       window.addEventListener('resize', adjustIframeHeight);
     });
 
-    /* CARREGAMENTO INICIAL */
-    window.onload = function() {
-        loadProducts(true);
-    };
+   
+        /* CARREGAMENTO INICIAL */
+            window.onload = function() {
+                loadGlobalFilters(); // <--- ADICIONE ESTA LINHA (carrega as opções do select)
+                loadProducts(true);  // <--- MANTENHA ESTA (carrega os produtos)
+            };
 </script>
 
 </body>
 </html>
+
 
 
