@@ -163,7 +163,7 @@ const FILTERS_CACHE = { ts: 0, data: null };
 
 // Retorna todas as opções únicas de filtros (lojas, categorias, marcas)
 export async function fetchFilterOptions() {
-  // Cache em memória (24h)
+  // Se cache em memória estiver fresco, retorna
   if (FILTERS_CACHE.data && (Date.now() - FILTERS_CACHE.ts) < ONE_DAY_MS) {
     return FILTERS_CACHE.data;
   }
@@ -196,57 +196,27 @@ export async function fetchFilterOptions() {
       obj[h] = row[idx] || "";
     });
 
-    // Usa o normalizador para garantir campos corretos
-    const p = normalizeProduct(obj);
-
-function cleanValue(v) {
-  if (!v) return "";
-  // remove URLs e números, deixa só texto
-  return v.replace(/https?:\/\/\S+/g, "").replace(/\d+/g, "").trim();
-}
-
-if (p.lojaParceira) {
-  const val = cleanValue(p.lojaParceira);
-  if (val) stores.add(val);
-}
-if (p.categoria) {
-  const val = cleanValue(p.categoria);
-  if (val) categories.add(val);
-}
-if (p.marca) {
-  const val = cleanValue(p.marca);
-  if (val) brands.add(val);
-}
-
+    // Pegando direto das colunas corretas
+    if (obj["custom_label_1"]) {
+      stores.add(obj["custom_label_1"].trim());
+    }
+    if (obj["categoria_web"]) {
+      categories.add(obj["categoria_web"].trim());
+    }
+    if (obj["brand"]) {
+      brands.add(obj["brand"].trim());
+    }
   }
 
   const result = {
     stores: Array.from(stores).sort(),
     categories: Array.from(categories).sort(),
     brands: Array.from(brands).sort(),
-    // DEBUG: incluir headers e 3 amostras para validação
-    debug: {
-      headers,
-      samples: Array.from({ length: 3 }).map((_, idx) => {
-        // pega as primeiras 3 linhas válidas (se existirem)
-        return [
-          // só nomes limpos para checar
-          resultSample(stores, idx),
-          resultSample(categories, idx),
-          resultSample(brands, idx),
-        ];
-      })
-    }
   };
 
+  // Armazena em cache por 24h
   FILTERS_CACHE.ts = Date.now();
   FILTERS_CACHE.data = result;
+
   return result;
 }
-
-// helper simples para pegar amostras sem quebrar
-function resultSample(setArray, index) {
-  if (!Array.isArray(setArray) || setArray.length === 0) return null;
-  return setArray[index] || setArray[0] || null;
-}
-
