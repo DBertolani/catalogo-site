@@ -33,7 +33,7 @@ export async function onRequest() {
 
     return new Response(JSON.stringify({
       total: produtos.length,
-      produtos: selecionados
+      products: selecionados
     }), {
       headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
     });
