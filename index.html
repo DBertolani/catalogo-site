@@ -781,22 +781,21 @@
       });
     }
 
-    function shareProduct() {
-      if (!currentProduct) return;
-      const message = `
+function shareProduct() {
+  if (!currentProduct) return;
+  const message = `
 Confira este produto!
 
 *${currentProduct.nome}*
-*Preço:* ${currentProduct.preco}
-*Loja:* ${currentProduct.lojaParceira}
-*Compre agora:* ${currentProduct.linkAfiliado}
-      `.trim();
+*Preço:* R$ ${currentProduct.preco}
+*Loja:* ${currentProduct.lojaParceira || "-"}
+*Compre agora:* ${currentProduct.facebookLink || currentProduct.linkAfiliado}
+  `.trim();
 
-      if (navigator.share) {
-        navigator.share({ title: currentProduct.nome, text: message }).catch(() => {
-          const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-          window.open(url, '_blank');
-        });
+  const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
       } else {
         const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
         window.open(url, '_blank');
@@ -831,3 +830,4 @@ Confira este produto!
 
 </body>
 </html>
+
