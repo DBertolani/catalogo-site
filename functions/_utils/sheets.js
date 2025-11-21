@@ -31,12 +31,12 @@ export async function fetchProducts() {
   const lines = text.split("\n").map(l => l.replace(/\r$/, ""));
   if (lines.length < 2) return [];
 
-  const headersRow = splitCSVLine(lines[0]);
+  const headersRow = lines[0].split(",");
   const headers = headersRow.map(h => h.trim().toLowerCase());
 
   const products = lines.slice(1).map(line => {
     if (!line.trim()) return null;
-    const row = splitCSVLine(line);
+    const row = line.split(",");
     const obj = {};
     headers.forEach((h, idx) => obj[h] = row[idx] || "");
     return normalizeProduct(obj);
@@ -44,6 +44,7 @@ export async function fetchProducts() {
 
   return products;
 }
+
 
 // Export 2: paginação simples (carrega tudo e corta os primeiros N)
 export async function fetchProductsPage({ offset = 0, limit = 50 }) {
