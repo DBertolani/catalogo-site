@@ -1,20 +1,20 @@
-import { fetchProducts } from "../_utils/sheets.js";
+import { fetchFilters } from "../_utils/sheets.js";
 
 export async function onRequest() {
   try {
-    const produtos = await fetchProducts();
-
-    const stores = [...new Set(produtos.map(p => p.lojaParceira).filter(Boolean))].sort();
-    const categories = [...new Set(produtos.map(p => p.categoria).filter(Boolean))].sort();
-    const brands = [...new Set(produtos.map(p => p.marca).filter(Boolean))].sort();
+    const { stores, categories, brands } = await fetchFilters();
 
     return new Response(JSON.stringify({ stores, categories, brands }), {
-      headers: { "Content-Type": "application/json; charset=utf-8", "Access-Control-Allow-Origin": "*" }
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "public, max-age=300",
+        "Access-Control-Allow-Origin": "*"
+      }
     });
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: err.message || "internal error" }), {
       status: 500,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json; charset=utf-8" }
     });
   }
 }
