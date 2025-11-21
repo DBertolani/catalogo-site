@@ -199,9 +199,25 @@ export async function fetchFilterOptions() {
     // Usa o normalizador para garantir campos corretos
     const p = normalizeProduct(obj);
 
-    if (p.lojaParceira && p.lojaParceira.trim()) stores.add(p.lojaParceira.trim());
-    if (p.categoria && p.categoria.trim()) categories.add(p.categoria.trim());
-    if (p.marca && p.marca.trim()) brands.add(p.marca.trim());
+function cleanValue(v) {
+  if (!v) return "";
+  // remove URLs e números, deixa só texto
+  return v.replace(/https?:\/\/\S+/g, "").replace(/\d+/g, "").trim();
+}
+
+if (p.lojaParceira) {
+  const val = cleanValue(p.lojaParceira);
+  if (val) stores.add(val);
+}
+if (p.categoria) {
+  const val = cleanValue(p.categoria);
+  if (val) categories.add(val);
+}
+if (p.marca) {
+  const val = cleanValue(p.marca);
+  if (val) brands.add(val);
+}
+
   }
 
   const result = {
