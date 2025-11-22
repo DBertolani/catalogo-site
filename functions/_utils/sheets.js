@@ -1,7 +1,7 @@
 // Configurações
 const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSt4X52USWS4EzuI7V2GvtePpZSSgNKeYdCPGhlAFKrC09XwVcoYmLeRBh5XszmfGV6_RC5J1Avw-WD/pub?gid=155082964&single=true&output=csv";
-const CACHE_DURATION_MS = 15 * 60 * 1000; // 15 minutos
-const HARD_ROW_LIMIT = 10000; // LIMITE CRÍTICO: Máximo de 10.000 linhas processadas para EVITAR ERRO 1102
+const CACHE_DURATION_MS = 30 * 60 * 1000; // AUMENTADO PARA 30 MINUTOS DE CACHE!
+const SAFE_BYTE_LIMIT = 4000000; // LIMITE CRÍTICO: Corta o texto em 4MB (aprox. 10.000 linhas)
 const MAX_DESC_STORAGE = 100; // Descrições curtas para salvar RAM.
 
 // Cache Global: Array de arrays (baixa memória)
@@ -60,7 +60,7 @@ function hydrateProduct(arr) {
   };
 }
 
-// --- CORE: CARREGAMENTO COMPACTO E LIMITADO ---
+// --- CORE: CARREGAMENTO COMPACTO E ESTÁVEL ---
 
 async function getCompactData() {
   const now = Date.now();
@@ -69,12 +69,24 @@ async function getCompactData() {
     return COMPACT_CACHE.data;
   }
 
-  const res = await fetch(SHEET_URL, { cf: { cacheTtl: 900, cacheEverything: true } });
+  const res = await fetch(SHEET_URL, { cf: { cacheTtl: 1800, cacheEverything: true } });
   if (!res.ok) throw new Error("Erro no Google Sheets");
   
   let text = await res.text();
-  let lines = text.split("\n");
-  text = null; 
+
+  // --- OTIMIZAÇÃO CRÍTICA: CORTE ANTES DO SPLIT ---
+  // Se o texto for gigante (30MB), cortamos ele antes do split para economizar CPU
+  if (text.length > SAFE_BYTE_LIMIT) {
+    // Acha a última quebra de linha segura antes do limite de bytes
+    const cutIndex = text.lastIndexOf('\n', SAFE_BYTE_LIMIT);
+    if (cutIndex > 0) {
+        // Corta o texto GIGANTE, trabalhando apenas com a parte segura.
+        text = text.substring(0, cutIndex); 
+    }
+  }
+  
+  let lines = text.split("\n"); // O split agora é feito em um texto muito menor
+  text = null; // Limpa string gigante da memória
 
   if (lines.length < 2) return [];
 
@@ -97,8 +109,7 @@ async function getCompactData() {
 
   const compactList = [];
   
-  // OTIMIZAÇÃO CRÍTICA: Limita o loop
-  const limitLoop = Math.min(lines.length, HARD_ROW_LIMIT);
+  const limitLoop = lines.length; // O limite já está no tamanho do array 'lines'
 
   for (let i = 1; i < limitLoop; i++) {
     let line = lines[i];
@@ -139,7 +150,7 @@ function getBalancedRandomMix(compactList, limit) {
   const storesMap = {};
   const SAMPLE_PER_STORE = 15; 
 
-  // 1. Amostragem por Loja (Scanner nas 10.000 linhas)
+  // 1. Amostragem por Loja (Scanner nos produtos lidos)
   for (let i = 0; i < compactList.length; i++) {
     const p = compactList[i];
     const store = p[5] || "Outros";
@@ -165,21 +176,21 @@ function getBalancedRandomMix(compactList, limit) {
     added = false;
     for(const name of storeNames) {
       if(result.length >= limit) break;
-      if(storesMap[name].length > 0) {
+      if (storesMap[name] && storesMap[name].length > 0) {
         result.push(storesMap[name].pop());
         added = true;
       }
     }
   }
   
-  return result; // Retorna o array compacto misturado
+  return result; 
 }
 
 // --- EXPORTS (API) ---
 
 export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store = "", cat = "", brand = "" }) {
   try {
-    const allCompact = await getCompactData(); // Pega apenas os 10k produtos
+    const allCompact = await getCompactData(); 
 
     const qStr = (q || "").toLowerCase();
     const sStr = (store || "").toLowerCase();
@@ -188,10 +199,9 @@ export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store 
 
     let filtered = allCompact;
 
-    // Filtragem Rápida (funciona apenas nos 10k produtos lidos)
+    // Filtragem Rápida (funciona apenas nos produtos lidos)
     if (qStr || sStr || cStr || bStr) {
       filtered = allCompact.filter(row => {
-        // Índices: 5=Loja, 6=Cat, 7=Marca, 1=Título
         if (sStr && (row[5] || "").toLowerCase() !== sStr) return false;
         if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
         if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
@@ -217,14 +227,18 @@ export async function fetchProductsPage({ offset = 0, limit = 50, q = "", store 
     }
 
     return {
-      totalCount: filtered.length, // Total Count é o total de produtos filtrados DENTRO dos 10k lidos
+      totalCount: filtered.length,
       products: selection,
       headers: []
     };
 
   } catch (e) {
-    console.error(e);
-    return { totalCount: 0, products: [], headers: [] };
+    // Retorna erro amigável (JSON) em vez de estourar HTML
+    console.error("Erro em fetchProductsPage:", e);
+    return new Response(JSON.stringify({ totalCount: 0, products: [], error: "Erro interno no servidor." }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
 
@@ -244,7 +258,6 @@ export async function fetchFilterOptions() {
     const categories = new Set();
     const brands = new Set();
     
-    // Apenas os 10k produtos lidos serão usados para gerar a lista de filtros
     for(const row of allCompact) {
       const s = row[5];
       const c = row[6];
@@ -261,6 +274,8 @@ export async function fetchFilterOptions() {
       brands: Array.from(brands).sort(),
     };
   } catch (e) {
-    return { stores: [], categories: [], brands: [] };
+    // Retorna JSON vazio em caso de erro na geração
+    console.error("Erro em fetchFilterOptions:", e);
+    return { stores: [], categories: [], brands: [], error: "Erro ao gerar filtros." };
   }
 }
