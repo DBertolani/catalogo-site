@@ -7,33 +7,49 @@ const MAX_DESC_STORAGE = 100; // Mantém descrições curtas para a função hyd
 // --- CORE: CARREGAMENTO COMPACTO E ESTÁVEL (AGORA VIA KV) ---
 
 /**
- * Lê os dados compactados do KV e retorna o array de produtos.
+ * LÊ OS DADOS SEGMENTADOS DO KV E RETORNA O ARRAY DE PRODUTOS COMPLETO.
  * @param {object} env O objeto de ambiente injetado pelo Cloudflare.
  * @returns {Array<Array<any>>} O array completo de produtos.
  */
 export async function getCompactData(env) {
-    // 1. Tenta acessar o KV Namespace
-    if (typeof env.CATALOGO_KV === 'undefined') {
-        console.error("ERRO CRÍTICO: Binding CATALOGO_KV ausente no Pages Project.");
-        return [];
-    }
+    // 1. Tenta acessar o KV Namespace
+    if (typeof env.CATALOGO_KV === 'undefined') {
+        console.error("ERRO CRÍTICO: Binding CATALOGO_KV ausente no Pages Project.");
+        return [];
+    }
 
-    // 2. A chave 'produtos_compactados' contém o array JSON completo
-    const compactJSON = await env.CATALOGO_KV.get('produtos_compactados');
-    
-    if (!compactJSON) {
-        console.error("Dados do KV não encontrados. O Worker Agendado rodou e salvou?");
-        return [];
-    }
-    
-    // 3. O parse é rápido
-    try {
-        return JSON.parse(compactJSON);
-    } catch (e) {
-        console.error("Erro ao fazer parse do JSON do KV:", e);
-        return [];
-    }
+    // 2. LÊ O NÚMERO DE CHUNKS
+    // Busca o total de pedaços que o Worker salvou.
+    const chunkCountStr = await env.CATALOGO_KV.get('produtos_chunk_count');
+    const chunkCount = parseInt(chunkCountStr) || 1; 
+    
+    let allCompactData = [];
+
+    // 3. Itera sobre todos os chunks e combina
+    for (let i = 0; i < chunkCount; i++) {
+        const chunkKey = `produtos_compactados_chunk_${i}`;
+        const compactJSON = await env.CATALOGO_KV.get(chunkKey);
+        
+        if (compactJSON) {
+            try {
+                // O parse é rápido para cada chunk individual
+                const chunkData = JSON.parse(compactJSON);
+                allCompactData = allCompactData.concat(chunkData);
+            } catch (e) {
+                console.error(`Erro ao fazer parse do JSON do Chunk ${i}:`, e);
+            }
+        }
+    }
+    
+    if (allCompactData.length === 0) {
+        console.warn("Dados do KV não encontrados ou vazios após tentar ler todos os chunks.");
+    }
+
+    return allCompactData;
 }
+
+// Mantenha o restante do seu arquivo sheets.js
+// ... (hydrateProduct, fetchProductsPage, fetchProductById, etc.)
 
 
 // --- HELPERS (Mantidos do seu código original) ---
