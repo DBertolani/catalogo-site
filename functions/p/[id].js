@@ -30,92 +30,108 @@ Confira este produto!
   <title>${produto.nome} — Catálogo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* CONFIGURAÇÃO GERAL: FONTE, MARGEM E COR DE FUNDO (Igual a body no Index.htmlHubAtual.txt) */
+    /* CONFIGURAÇÃO GERAL: FONTE, MARGEM E COR DE FUNDO (body - Index.htmlHubAtual.txt) */
     body { font-family: sans-serif; margin:0; padding:20px; background:#f4f4f4; color:#333; }
     
-    /* CONFIGURAÇÃO DO BOX PRINCIPAL (Baseado em .modal-content do Index.htmlHubAtual.txt) */
+    /* CONFIGURAÇÃO DO BOX PRINCIPAL (modal-content - Index.htmlHubAtual.txt) */
     .modal-content {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      max-width: 600px; /* Mantido o max-width para desktop */
-      margin: 20px auto; /* Centraliza na página */
-      padding: 20px;
+[cite_start]      background-color: #fff; [cite: 35]
+      [cite_start]border-radius: 8px; [cite: 35]
+      [cite_start]box-shadow: 0 4px 8px rgba(0,0,0,0.2); [cite: 35]
+      position: relative;
+      width: 95%; /* Para consistência em telas maiores/móveis */
+[cite_start]      max-width: 600px; [cite: 35]
+      max-height: 98vh; /* Para consistência com o modal real */
+      display: flex;
+      flex-direction: column;
+[cite_start]      box-sizing: border-box; [cite: 36]
+      [cite_start]padding: 20px; [cite: 36]
       overflow-y: auto;
-      display: flex; /* Adicionado para consistência */
-      flex-direction: column; /* Adicionado para consistência */
+      margin: 20px auto; /* Para centralizar a página estática */
     }
     
-    /* CONFIGURAÇÃO DE IMAGEM: TAMANHO E POSIÇÃO (Baseado em .modal-content img) */
+    /* CONFIGURAÇÃO DE IMAGEM: TAMANHO E POSIÇÃO (modal-content img - Index.htmlHubAtual.txt) */
     .modal-content img { 
-      max-width: 100%; 
-      height: auto; 
+[cite_start]      max-width: 100%; [cite: 37]
+      [cite_start]height: auto; [cite: 37]
       display: block; 
-      margin: 0 auto 15px; 
+[cite_start]      margin: 0 auto 15px; [cite: 37]
     }
     
-    /* CONFIGURAÇÃO DO TÍTULO (H2) */
+    /* CONFIGURAÇÃO DO TÍTULO (h2 e #modalTitle - Index.htmlHubAtual.txt) */
     h2 { font-size: 1.4em; margin-bottom: 10px; }
     
-    /* CONFIGURAÇÃO DO PARÁGRAFO DE DETALHES (Baseado em .modal-body) */
+    /* CONFIGURAÇÃO DO CORPO DA DESCRIÇÃO (modal-body - Index.htmlHubAtual.txt) */
     .modal-body {
-      line-height: 1.6;
-      margin-bottom: 15px;
+[cite_start]      line-height: 1.6; [cite: 41]
+      [cite_start]margin-bottom: 15px; [cite: 41]
     }
     
-    /* CONFIGURAÇÃO DO PREÇO: TAMANHO E COR VERDE (#28a745) */
+    /* CONFIGURAÇÃO DO PREÇO: TAMANHO E COR VERDE (#modalPrice - Index.htmlHubAtual.txt) */
     #modalPrice { 
-      font-size: 1.3em; 
-      font-weight: bold; 
-      color: #28a745;
-      margin-bottom: 10px; /* Adicionado para espaçamento, se necessário */
+[cite_start]      font-size: 1.3em; [cite: 42]
+      [cite_start]font-weight: bold; [cite: 42]
+      [cite_start]color: #28a745; [cite: 42]
     }
     
-    /* CONFIGURAÇÃO DO CONTAINER DOS BOTÕES: POSIÇÃO E ESPAÇAMENTO */
+    /* CONFIGURAÇÃO DO CONTAINER DOS BOTÕES (modal-buttons-container - Index.htmlHubAtual.txt) */
     .modal-buttons-container { 
       display: flex; 
       flex-direction: column; 
-      align-items: center; /* Alinha ao centro, como no modal */
-      gap: 10px; 
-      margin-top: 15px; 
+[cite_start]      align-items: center; [cite: 43]
+      [cite_start]gap: 10px; [cite: 43]
+      [cite_start]margin-top: 15px; [cite: 43]
     }
     
-    /* ESTILO BASE DOS BOTÕES (Usando a classe .modal-buy-button do seu Index.htmlHubAtual.txt) */
+    /* ESTILO BASE DOS BOTÕES (Propriedades comuns de #shareProductButton e #modalBuyButton) */
     .modal-buy-button {
       border: none;
-      padding: 10px 15px;
+[cite_start]      padding: 10px 15px; [cite: 45, 47]
       text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 0.9em;
+[cite_start]      border-radius: 5px; [cite: 45, 47]
+      [cite_start]font-weight: bold; [cite: 45, 47]
+      [cite_start]font-size: 0.9em; [cite: 45, 47]
       cursor: pointer;
-      transition: background-color 0.2s ease;
-      text-align: center;
-      width: 100%;
-      box-sizing: border-box;
+[cite_start]      transition: background-color 0.2s ease; [cite: 45, 47]
+      [cite_start]text-align: center; [cite: 45, 47]
+      [cite_start]width: 100%; [cite: 48]
+      [cite_start]box-sizing: border-box; [cite: 48]
     }
 
-    /* COR E ESTILO DO BOTÃO DE COMPARTILHAMENTO (Baseado em #shareProductButton - Cor Cinza) */
+    /* COR E ESTILO DO BOTÃO DE COMPARTILHAMENTO (#shareProductButton - Cor Cinza) */
     #shareProductButton {
-      background-color: #6c757d;
-      color: white;
+[cite_start]      background-color: #6c757d; [cite: 44]
+      [cite_start]color: white; [cite: 44]
     }
     #shareProductButton:hover { 
-      background-color: #5a6268; 
+[cite_start]      background-color: #5a6268; [cite: 46]
     }
     
-    /* COR E ESTILO DO BOTÃO DE COMPRA (Baseado em #modalBuyButton - Cor Verde) */
+    /* COR E ESTILO DO BOTÃO DE COMPRA (#modalBuyButton - Cor Verde) */
     #modalBuyButton {
-      background-color: #28a745;
-      color: white;
+[cite_start]      background-color: #28a745; [cite: 47]
+      [cite_start]color: white; [cite: 47]
     }
     #modalBuyButton:hover { 
-      background-color: #218838; 
+[cite_start]      background-color: #218838; [cite: 49]
     }
     
-    /* Media Query para Mobile (Baseado em @media (max-width: 768px) do modal) */
+    /* MEDIA QUERY PARA MOBILE (Baseado em @media (max-width: 768px) - Index.htmlHubAtual.txt) */
     @media (max-width: 768px) {
-      .modal-buy-button { padding: 10px 15px; font-size: 0.9em; }
+      .modal-content { 
+[cite_start]        width: 98%; [cite: 69]
+        [cite_start]max-width: none; [cite: 69]
+      }
+      h2 { 
+        font-size: 1.2em; [cite_start]/* Corresponde a #modalTitle [cite: 70] */
+      }
+      #modalPrice { 
+[cite_start]        font-size: 1.2em; [cite: 71]
+      }
+[cite_start]      .modal-buy-button { /* Aplica-se aos botões de compartilhamento e compra [cite: 72] */
+        padding: 10px 15px; 
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
@@ -124,13 +140,13 @@ Confira este produto!
         <div id="modalProductDetails">
       ${produto.imagem ? `<img id="modalImage" src="${produto.imagem}" alt="${produto.nome}" />` : ""}
       <h2 id="modalTitle">${produto.nome}</h2>
-            <p><strong>Preço:</strong> <span id="modalPrice">R$ ${produto.preco}</span></p>
+      <p><strong>Preço:</strong> <span id="modalPrice">R$ ${produto.preco}</span></p>
       <p><strong>Loja Parceira:</strong> <span id="modalStore">${produto.lojaParceira || "-"}</span></p>
       <p><strong>Marca:</strong> <span id="modalBrand">${produto.marca || "-"}</span></p>
 
       <div class="modal-body">
         <p id="modalDescription">${produto.descricao || "Descrição não disponível."}</p>
-              </div>
+      </div>
 
       <div class="modal-buttons-container">
                 <a href="https://wa.me/?text=${encodeURIComponent(mensagemWhatsApp)}" target="_blank" class="modal-buy-button" id="shareProductButton">Compartilhar Produto</a>
