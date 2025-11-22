@@ -1,29 +1,28 @@
 import { fetchProductById } from "../_utils/sheets.js";
 
 export async function onRequest(context) {
-    // CRÍTICO: Desestruturar 'params' e 'env' de context
-    const { params, env } = context;
-    const id = params.id;
+  // CRÍTICO: Adicione 'env' aqui para acessar o KV
+  const { params, env } = context;
+  const id = params.id;
 
-    try {
-        // PASSANDO 'env' como primeiro argumento para a função
-        const produto = await fetchProductById(env, id);
-        
-        if (!produto) {
-            return new Response("Produto não encontrado", { status: 404 });
-        }
+  try {
+    // CRÍTICO: Passe 'env' para a função
+    const produto = await fetchProductById(env, id); 
+    if (!produto) {
+      return new Response("Produto não encontrado", { status: 404 });
+    }
 
-        // Mensagem padrão para WhatsApp
-        const mensagemWhatsApp = `
+    // Mensagem padrão para WhatsApp
+    const mensagemWhatsApp = `
 Confira este produto!
 
 *${produto.nome}*
 *Preço:* R$ ${produto.preco}
 *Loja:* ${produto.lojaParceira || "-"}
 *Compre agora:* ${produto.facebookLink || produto.linkAfiliado}
-        `.trim();
+    `.trim();
 
-        const html = `
+    const html = `
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -62,9 +61,8 @@ Confira este produto!
   </div>
 </body>
 </html>`;
-        return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-    } catch (err) {
-        // Retorna o erro 500 para qualquer falha na API/KV
-        return new Response(`Erro ao carregar produto: ${err.message}`, { status: 500 });
-    }
+    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
+  } catch (err) {
+    return new Response(`Erro ao carregar produto: ${err.message}`, { status: 500 });
+  }
 }
