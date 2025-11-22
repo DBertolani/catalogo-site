@@ -37,20 +37,58 @@ Confira este produto!
     body {
         font-family: sans-serif;
         margin: 0;
-        padding: 20px;
+        padding: 0; /* Removido padding para centralização perfeita */
         background-color: #f4f4f4;
         color: #333;
-        display: flex; /* Para centralizar o modal-content */
-        justify-content: center;
-        align-items: flex-start; /* Alinha no topo, mas permite margem */
-        min-height: 100vh;
+        
+        /* CONFIGURAÇÃO DE POSICIONAMENTO E CENTRALIZAÇÃO COMPLETA */
+        display: flex;
+        justify-content: center; /* Centraliza horizontalmente */
+        align-items: center; /* Centraliza verticalmente */
+        min-height: 100vh; /* Ocupa toda a altura da viewport */
     }
+    
+    /* Overlay e Modal de Descrição */
+    .modal-overlay {
+        display: none; /* Inicia oculto */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content-description {
+        background-color: #fff;
+        margin: auto;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        width: 80%;
+        max-width: 600px;
+        position: relative;
+    }
+    .modal-close-button {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .modal-close-button:hover,
+    .modal-close-button:focus {
+        color: #000;
+        text-decoration: none;
+    }
+
 
     /* Estrutura Principal do Modal - Replicando .modal-content */
     .modal-content {
         background-color: #fff;
-        /* CONFIGURAÇÃO DE POSICIONAMENTO E CENTRALIZAÇÃO */
-        margin-top: 50px; /* Margem do topo para destaque na página estática */
         padding: 20px;
         border: 1px solid #888;
         width: 90%;
@@ -73,9 +111,9 @@ Confira este produto!
 
     #modalProductDetails {
         flex-grow: 1;
-        /* CONFIGURAÇÃO DE FONTES */
     }
 
+    /* CONFIGURAÇÃO DE FONTES (TÍTULO) */
     #modalTitle {
         font-size: 1.8em;
         margin-top: 0;
@@ -87,6 +125,14 @@ Confira este produto!
         font-size: 1.5em;
         font-weight: bold;
         color: #007bff; /* Cor de destaque para o preço */
+    }
+
+    /* Estilo para a descrição truncada */
+    #descriptionPreview {
+        margin-top: 10px;
+    }
+    #descriptionPreview p {
+        margin: 0;
     }
 
     /* CONTAINER DE BOTÕES */
@@ -113,7 +159,22 @@ Confira este produto!
         width: 100%;
         text-decoration: none;
         display: block;
+        box-sizing: border-box; /* Garante que padding não afete a largura total */
     }
+
+    /* Botão "Ler Mais" para a descrição */
+    #readMoreButton {
+        background-color: #007bff; /* Azul primário, replicando o estilo comum de link/ação */
+        color: white;
+        margin-top: 10px;
+        font-size: 0.9em;
+        padding: 8px 15px;
+        width: 100%;
+    }
+    #readMoreButton:hover {
+        background-color: #0056b3;
+    }
+
 
     /* CONFIGURAÇÃO DE CORES (Botão Comprar) */
     #modalBuyButton {
@@ -141,7 +202,13 @@ Confira este produto!
             flex-direction: column; /* Empilha imagem e detalhes */
             width: 95%;
             margin-top: 20px;
+            margin-bottom: 20px;
             gap: 0;
+        }
+
+        /* Alinha verticalmente no topo em telas pequenas, já que o modal é maior */
+        body {
+            align-items: flex-start;
         }
 
         #modalImage {
@@ -162,14 +229,18 @@ Confira este produto!
         /* Botões lado a lado em telas menores */
         .modal-buttons-container {
             flex-direction: row; 
-            flex-wrap: wrap; /* Permite quebras se necessário */
+            flex-wrap: wrap; 
         }
         
-        /* Ajuste de padding nos botões em telas menores */
+        /* Ajuste de largura nos botões em telas menores */
         .modal-button {
             padding: 10px 15px;
             font-size: 0.9em;
-            flex-basis: calc(50% - 5px); /* Divide o espaço igualmente - ajuste conforme a necessidade exata do modal original */
+            flex-basis: calc(50% - 5px); /* Divide o espaço igualmente */
+        }
+        
+        #readMoreButton {
+             flex-basis: 100%; /* Botão Ler Mais ocupa toda a largura */
         }
     }
 	</style>
@@ -183,9 +254,21 @@ Confira este produto!
             <p><strong>Preço:</strong> <span id="modalPrice">R$ ${produto.preco}</span></p>
             <p><strong>Loja Parceira:</strong> <span id="modalStore">${produto.lojaParceira || "-"}</span></p>
             <p><strong>Marca:</strong> <span id="modalBrand">${produto.marca || "-"}</span></p>
-            <p><strong>Descrição:</strong> <span id="modalDescription">${produto.descricao || "-"}</span></p>
             <p><strong>Categoria:</strong> <span id="modalCategory">${produto.categoria || "-"}</span></p>
-            <p><strong>Subcategoria:</strong> <span id="modalSubcategory">${produto.subCategoria || "-"}</span></p>
+            
+            <!-- Descrição Truncada + Botão Ler Mais -->
+            <div id="descriptionContainer">
+                <p><strong>Descrição:</strong></p>
+                <!-- Mostrar apenas o início da descrição (primeiras 100 letras) -->
+                <div id="descriptionPreview">
+                    <p>${produto.descricao ? produto.descricao.substring(0, 100) + (produto.descricao.length > 100 ? '...' : '') : '-'}</p>
+                </div>
+                
+                ${produto.descricao && produto.descricao.length > 100 ? `
+                    <button id="readMoreButton" class="modal-button">Ler Mais</button>
+                ` : ''}
+            </div>
+
 
             <!-- Container de Botões (Replicação Exata) -->
             <div class="modal-buttons-container">
@@ -200,6 +283,59 @@ Confira este produto!
             </div>
         </div>
     </div>
+
+    <!-- Modal de Descrição Completa (Simulação do descriptionModal) -->
+    <div id="descriptionModal" class="modal-overlay">
+        <div class="modal-content-description">
+            <span class="modal-close-button">&times;</span>
+            <h3>Descrição Completa de ${produto.nome}</h3>
+            <p id="fullDescription">${produto.descricao || "Descrição não disponível."}</p>
+        </div>
+    </div>
+
+    <script>
+        // Função para abrir o modal de descrição
+        function openDescriptionModal() {
+            const modal = document.getElementById('descriptionModal');
+            if (modal) {
+                modal.style.display = 'flex'; // Usar flex para centralizar
+            }
+        }
+
+        // Função para fechar o modal de descrição
+        function closeDescriptionModal() {
+            const modal = document.getElementById('descriptionModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        // Adiciona listeners ao carregar a página
+        document.addEventListener('DOMContentLoaded', function() {
+            const readMoreButton = document.getElementById('readMoreButton');
+            const closeButton = document.querySelector('.modal-close-button');
+            const descriptionModal = document.getElementById('descriptionModal');
+
+            // 1. Abre o modal ao clicar em "Ler Mais"
+            if (readMoreButton) {
+                readMoreButton.addEventListener('click', openDescriptionModal);
+            }
+
+            // 2. Fecha o modal ao clicar no 'x'
+            if (closeButton) {
+                closeButton.addEventListener('click', closeDescriptionModal);
+            }
+
+            // 3. Fecha o modal ao clicar fora dele
+            if (descriptionModal) {
+                descriptionModal.addEventListener('click', function(event) {
+                    if (event.target === descriptionModal) {
+                        closeDescriptionModal();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
     `;
