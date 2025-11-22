@@ -1,13 +1,13 @@
 import { fetchProductById } from "../_utils/sheets.js";
 
 export async function onRequest(context) {
-  // CRÍTICO: Adicione 'env' aqui para acessar o KV
+  // CORREÇÃO CRÍTICA: Desestruturar 'params' E 'env'. 'env' é necessário para acessar o KV.
   const { params, env } = context;
   const id = params.id;
 
   try {
-    // CRÍTICO: Passe 'env' para a função
-    const produto = await fetchProductById(env, id); 
+    // CORREÇÃO CRÍTICA: Passar 'env' para a função de busca
+    const produto = await fetchProductById(env, id);
     if (!produto) {
       return new Response("Produto não encontrado", { status: 404 });
     }
@@ -30,19 +30,38 @@ Confira este produto!
   <title>${produto.nome} — Catálogo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    /* CONFIGURAÇÃO GERAL: FONTE, MARGEM E COR DE FUNDO */
     body { font-family: sans-serif; margin:0; padding:20px; background:#f4f4f4; color:#333; }
+    
+    /* CONFIGURAÇÃO DO BOX PRINCIPAL: TAMANHO, SOMBRA, ARREDONDAMENTO */
     .modal-content {
       background:#fff; border-radius:8px; box-shadow:0 4px 8px rgba(0,0,0,0.2);
       max-width:600px; margin:20px auto; padding:20px; overflow-y:auto;
     }
+    
+    /* CONFIGURAÇÃO DE IMAGEM: TAMANHO, POSIÇÃO E ARREDONDAMENTO */
     .modal-content img { max-width:100%; height:auto; display:block; margin:0 auto 15px; border-radius:6px; }
+    
+    /* CONFIGURAÇÃO DO TÍTULO (H2) */
     h2 { font-size:1.4em; margin-bottom:10px; }
+    
+    /* CONFIGURAÇÃO DO PREÇO: TAMANHO E COR VERDE (#28a745) */
     #modalPrice { font-size:1.3em; font-weight:bold; color:#28a745; margin-bottom:10px; }
+    
+    /* CONFIGURAÇÃO DE METADADOS (LOJA/MARCA) */
     .meta { color:#666; margin-bottom:12px; }
+    
+    /* CONFIGURAÇÃO DO CONTAINER DOS BOTÕES: POSIÇÃO E ESPAÇAMENTO */
     .modal-buttons-container { display:flex; flex-direction:column; gap:10px; margin-top:15px; }
+    
+    /* ESTILO BASE DOS BOTÕES */
     .btn { padding:10px 15px; border-radius:5px; text-decoration:none; font-weight:bold; text-align:center; }
+    
+    /* COR E ESTILO DO BOTÃO DE COMPRA: COR VERDE (#28a745) */
     .btn-buy { background:#28a745; color:#fff; }
     .btn-buy:hover { background:#218838; }
+    
+    /* COR E ESTILO DO BOTÃO DE COMPARTILHAMENTO: COR CINZA (#6c757d) */
     .btn-share { background:#6c757d; color:#fff; }
     .btn-share:hover { background:#5a6268; }
   </style>
