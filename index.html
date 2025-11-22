@@ -551,79 +551,75 @@
         adjustIframeHeight();
     }
 
-// Localize a função loadGlobalFilters() no seu arquivo Index.htmlHubAtual.txt e substitua por esta:
+// Localize e substitua a função loadGlobalFilters() no seu Index.htmlHubAtual.txt por esta:
 
 async function loadGlobalFilters() {
-  const filterApiUrl = "https://teste-api.deab.com.br/api/filtros";
-  const storeSelect = document.getElementById('storeFilter');
-  const categorySelect = document.getElementById('categoryFilter');
-  const brandSelect = document.getElementById('brandFilter');
-
-  // Limpar opções antigas, exceto a primeira ("Todos")
-  [storeSelect, categorySelect, brandSelect].forEach(select => {
-    while (select.options.length > 1) {
-      select.remove(1);
-    }
-  });
-
-  try {
-    const response = await fetch(filterApiUrl);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+    const filterApiUrl = "https://teste-api.deab.com.br/api/filtros";
+    const container = document.getElementById('filterOptions');
     
-    // O JSON agora contém as três listas
-    const data = await response.json(); 
-    
-    // Garante que o objeto data tem as listas esperadas
-    if (!data.stores || !data.categories || !data.brands) {
-        console.error("Estrutura de dados da API de filtros inesperada:", data);
+    // Verificação de segurança: garantir que o container #filterOptions exista
+    if (!container) {
+        console.error("Elemento #filterOptions não encontrado no DOM. Verifique o HTML do modal.");
         return;
     }
 
-    // Preenche as Lojas
-    data.stores.forEach(store => {
-      if (store) {
-        const option = document.createElement('option');
-        option.value = store;
-        option.textContent = store;
-        storeSelect.appendChild(option);
-      }
-    });
+    try {
+        const response = await fetch(filterApiUrl);
+        
+        if (!response.ok) {
+            throw new Error(`Erro HTTP ao carregar filtros: status ${response.status}`);
+        }
+        
+        const data = await response.json(); 
+        
+        // Garante que o objeto data tem as listas esperadas (stores, categories, brands)
+        if (!data.stores || !data.categories || !data.brands) {
+            console.error("Estrutura de dados da API de filtros inesperada:", data);
+            container.innerHTML = '<p>Erro: Estrutura de filtros inválida.</p>';
+            adjustIframeHeight();
+            return;
+        }
 
-    // Preenche as Categorias
-    data.categories.forEach(category => {
-      if (category) {
-        const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
-        categorySelect.appendChild(option);
-      }
-    });
+        // Renderiza o HTML dos filtros com as listas completas (Usando DATALIST para inputs)
+        container.innerHTML = `
+          <div class="filter-group">
+              <label for="storeFilterInput">Loja Parceira:</label>
+              <input list="storeDatalist" id="storeFilterInput" type="text" placeholder="Digite ou selecione a loja" value="${currentStoreFilter}">
+              <datalist id="storeDatalist">
+                  <option value="">Todas as Lojas</option>
+                  ${data.stores.map(store => `<option value="${store}">`).join('')}
+              </datalist>
+          </div>
 
-    // Preenche as Marcas
-    data.brands.forEach(brand => {
-      if (brand) {
-        const option = document.createElement('option');
-        option.value = brand;
-        option.textContent = brand;
-        brandSelect.appendChild(option);
-      }
-    });
+          <div class="filter-group">
+              <label for="categoryFilterInput">Categoria:</label>
+              <input list="categoryDatalist" id="categoryFilterInput" type="text" placeholder="Digite ou selecione a categoria" value="${currentCategoryFilter}">
+              <datalist id="categoryDatalist">
+                  <option value="">Todas as Categorias</option>
+                  ${data.categories.map(cat => `<option value="${cat}">`).join('')}
+              </datalist>
+          </div>
 
-    // Restaurar filtros selecionados anteriormente (se houver)
-    storeSelect.value = currentStore;
-    categorySelect.value = currentCategory;
-    brandSelect.value = currentBrand;
+          <div class="filter-group">
+              <label for="brandFilterInput">Marca:</label>
+              <input list="brandDatalist" id="brandFilterInput" type="text" placeholder="Digite ou selecione a marca" value="${currentBrandFilter}">
+              <datalist id="brandDatalist">
+                  <option value="">Todas as Marcas</option>
+                  ${data.brands.map(brand => `<option value="${brand}">`).join('')}
+              </datalist>
+          </div>
+        `;
 
-    console.log("Filtros globais carregados e preenchidos com sucesso.");
+        // Ajuste o tamanho do iframe/página
+        adjustIframeHeight();
+        console.log("Filtros globais carregados e preenchidos com sucesso.");
 
-  } catch (error) {
-    console.error("Erro ao carregar filtros globais:", error);
-    // Exibir uma mensagem de erro na UI, se necessário
-  }
+    } catch (error) {
+        console.error("Erro ao carregar filtros globais:", error);
+        container.innerHTML = `<p class="no-products">Erro ao carregar filtros. Tente recarregar a página.</p>`;
+        adjustIframeHeight();
+    }
 }
-
     
     // Carregamento paginado usando sua API, mantendo layout
     function loadProducts(append) {
@@ -851,6 +847,7 @@ Confira este produto!
 
 </body>
 </html>
+
 
 
 
