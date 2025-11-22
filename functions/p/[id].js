@@ -1,163 +1,214 @@
 import { fetchProductById } from "../_utils/sheets.js";
 
 export async function onRequest(context) {
-  // CORREÇÃO CRÍTICA: Desestruturar 'params' E 'env'. 'env' é necessário para acessar o KV.
-  const { params, env } = context;
-  const id = params.id;
+	// 1. CORREÇÃO DE FUNCIONALIDADE: Desestruturar 'params' E 'env'. 'env' é necessário para acessar o KV.
+	const { params, env } = context;
+	const id = params.id;
 
-  try {
-    // CORREÇÃO CRÍTICA: Passar 'env' para a função de busca
-    const produto = await fetchProductById(env, id);
-    if (!produto) {
-      return new Response("Produto não encontrado", { status: 404 });
-    }
+	try {
+		// 1. CORREÇÃO DE FUNCIONALIDADE: Passar 'env' para a função de busca
+		const produto = await fetchProductById(env, id);
+		if (!produto) {
+			return new Response("Produto não encontrado", { status: 404 });
+		}
 
-    // Mensagem padrão para WhatsApp
-    const mensagemWhatsApp = `
+		// Mensagem padrão para WhatsApp, usada no botão Compartilhar
+		const mensagemWhatsApp = `
 Confira este produto!
 
 *${produto.nome}*
 *Preço:* R$ ${produto.preco}
 *Loja:* ${produto.lojaParceira || "-"}
 *Compre agora:* ${produto.facebookLink || produto.linkAfiliado}
-    `.trim();
+    `.trim();
 
-    const html = `
+		const html = `
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="utf-8" />
-  <title>${produto.nome} — Catálogo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-[cite_start]    /* CONFIGURAÇÃO GERAL: FONTE, MARGEM E COR DE FUNDO [cite: 1, 2] */
-    body { font-family: sans-serif; margin:0; padding:20px; background:#f4f4f4; color:#333; }
-    
-[cite_start]    /* CONFIGURAÇÃO DO BOX PRINCIPAL (modal-content) [cite: 34, 35, 36] */
-    .modal-content {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-      position: relative;
-      width: 95%; 
-      max-width: 600px;
-      max-height: 98vh; 
-      display: flex;
-      flex-direction: column;
-      box-sizing: border-box;
-      padding: 20px;
-      overflow-y: auto;
-      margin: 20px auto; /* Para centralizar a página estática */
-    }
-    
-[cite_start]    /* CONFIGURAÇÃO DE IMAGEM: TAMANHO E POSIÇÃO [cite: 37] */
-    .modal-content img { 
-      max-width: 100%;
-      height: auto;
-      display: block; 
-      margin: 0 auto 15px;
-    }
-    
-[cite_start]    /* CONFIGURAÇÃO DO TÍTULO (h2 e #modalTitle) [cite: 70] */
-    h2 { font-size: 1.4em; margin-bottom: 10px; }
-    
-[cite_start]    /* COR DO PREÇO: TAMANHO E COR VERDE (#28a745) [cite: 42] */
-    #modalPrice { 
-      font-size: 1.3em;
-      font-weight: bold;
-      color: #28a745;
-    }
-    
-[cite_start]    /* CONFIGURAÇÃO DA DESCRIÇÃO (modal-body) [cite: 41] */
-    .modal-body {
-      line-height: 1.6;
-      margin-bottom: 15px;
-    }
-    
-[cite_start]    /* POSIÇÃO DOS BOTÕES: Centraliza os itens (align-items: center) e define gap [cite: 43] */
-    .modal-buttons-container { 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      gap: 10px;
-      margin-top: 15px;
-    }
-    
-[cite_start]    /* ESTILO BASE DOS BOTÕES (modal-buy-button) - APLICA-SE AOS DOIS BOTÕES [cite: 44, 47, 48] */
-    .modal-buy-button {
-      border: none;
-      padding: 10px 15px;
-      text-decoration: none;
-      border-radius: 5px;
-      font-weight: bold;
-      font-size: 0.9em;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      text-align: center;
-      width: 100%; /* Garante que ocupem 100% do container */
-      box-sizing: border-box;
-    }
+	<meta charset="utf-8" />
+	<title>${produto.nome} — Catálogo</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+    /* ---------------------------------------------------------------------- */
+    /* REPLICAÇÃO INTEGRAL DO LAYOUT DO MODAL (Index.htmlHubAtual.txt) */
+    /* ---------------------------------------------------------------------- */
 
-[cite_start]    /* COR E ESTILO DO BOTÃO DE COMPARTILHAMENTO (#shareProductButton) - COR CINZA (#6c757d) [cite: 44, 46] */
-    #shareProductButton {
-      background-color: #6c757d;
-      color: white;
-    }
-    #shareProductButton:hover { 
-      background-color: #5a6268;
-    }
-    
-[cite_start]    /* COR E ESTILO DO BOTÃO DE COMPRA (#modalBuyButton) - COR VERDE (#28a745) [cite: 47, 49] */
-    #modalBuyButton {
-      background-color: #28a745;
-      color: white;
-    }
-    #modalBuyButton:hover { 
-      background-color: #218838;
-    }
-    
-[cite_start]    /* MEDIA QUERY PARA MOBILE [cite: 69, 70, 71, 72] */
-    @media (max-width: 768px) {
-      .modal-content { 
-        width: 98%;
-        max-width: none;
-      }
-      #modalTitle { 
-        font-size: 1.2em; 
-      }
-      #modalPrice { 
-        font-size: 1.2em;
-      }
-      .modal-buy-button { 
-        padding: 10px 15px; 
-        font-size: 0.9em;
-      }
-    }
-  </style>
+    body {
+        font-family: sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+        color: #333;
+        display: flex; /* Para centralizar o modal-content */
+        justify-content: center;
+        align-items: flex-start; /* Alinha no topo, mas permite margem */
+        min-height: 100vh;
+    }
+
+    /* Estrutura Principal do Modal - Replicando .modal-content */
+    .modal-content {
+        background-color: #fff;
+        /* CONFIGURAÇÃO DE POSICIONAMENTO E CENTRALIZAÇÃO */
+        margin-top: 50px; /* Margem do topo para destaque na página estática */
+        padding: 20px;
+        border: 1px solid #888;
+        width: 90%;
+        max-width: 800px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        display: flex;
+        gap: 20px;
+    }
+
+    /* Estilo da Imagem */
+    #modalImage {
+        width: 40%;
+        max-width: 300px;
+        height: auto;
+        object-fit: contain;
+        border-radius: 8px;
+        align-self: flex-start; /* Para alinhar a imagem no topo */
+    }
+
+    #modalProductDetails {
+        flex-grow: 1;
+        /* CONFIGURAÇÃO DE FONTES */
+    }
+
+    #modalTitle {
+        font-size: 1.8em;
+        margin-top: 0;
+        color: #333;
+    }
+
+    /* CONFIGURAÇÃO DE FONTES (PREÇO) */
+    #modalPrice {
+        font-size: 1.5em;
+        font-weight: bold;
+        color: #007bff; /* Cor de destaque para o preço */
+    }
+
+    /* CONTAINER DE BOTÕES */
+    .modal-buttons-container {
+        display: flex;
+        flex-direction: column; /* Coluna para empilhar em desktop */
+        gap: 10px;
+        margin-top: 25px;
+        /* CONFIGURAÇÃO DE CENTRALIZAÇÃO */
+        align-items: center; /* CENTRALIZAÇÃO de botões */
+        width: 100%;
+    }
+
+    /* Estilo Base dos Botões */
+    .modal-button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        font-weight: bold;
+        text-align: center;
+        transition: background-color 0.3s;
+        width: 100%;
+        text-decoration: none;
+        display: block;
+    }
+
+    /* CONFIGURAÇÃO DE CORES (Botão Comprar) */
+    #modalBuyButton {
+        background-color: #28a745; /* Cor: VERDE #28a745 */
+        color: white;
+    }
+    #modalBuyButton:hover {
+        background-color: #218838;
+    }
+
+    /* CONFIGURAÇÃO DE CORES (Botão Compartilhar) */
+    #shareProductButton {
+        background-color: #6c757d; /* Cor: CINZA #6c757d */
+        color: white;
+    }
+    #shareProductButton:hover {
+        background-color: #5a6268;
+    }
+
+    /* ---------------------------------------------------------------------- */
+    /* BLOCO RESPONSIVO */
+    /* ---------------------------------------------------------------------- */
+    @media (max-width: 768px) {
+        .modal-content {
+            flex-direction: column; /* Empilha imagem e detalhes */
+            width: 95%;
+            margin-top: 20px;
+            gap: 0;
+        }
+
+        #modalImage {
+            width: 100%;
+            max-width: none;
+            margin-bottom: 15px;
+        }
+
+        /* Redução de Fontes (modalTitle e modalPrice) */
+        #modalTitle {
+            font-size: 1.5em; 
+        }
+
+        #modalPrice {
+            font-size: 1.2em;
+        }
+
+        /* Botões lado a lado em telas menores */
+        .modal-buttons-container {
+            flex-direction: row; 
+            flex-wrap: wrap; /* Permite quebras se necessário */
+        }
+        
+        /* Ajuste de padding nos botões em telas menores */
+        .modal-button {
+            padding: 10px 15px;
+            font-size: 0.9em;
+            flex-basis: calc(50% - 5px); /* Divide o espaço igualmente - ajuste conforme a necessidade exata do modal original */
+        }
+    }
+	</style>
 </head>
 <body>
-  <div class="modal-content">
-        <div id="modalProductDetails">
-      ${produto.imagem ? `<img id="modalImage" src="${produto.imagem}" alt="${produto.nome}" />` : ""}
-      <h2 id="modalTitle">${produto.nome}</h2>
-      <p><strong>Preço:</strong> <span id="modalPrice">R$ ${produto.preco}</span></p>
-      <p><strong>Loja Parceira:</strong> <span id="modalStore">${produto.lojaParceira || "-"}</span></p>
-      <p><strong>Marca:</strong> <span id="modalBrand">${produto.marca || "-"}</span></p>
+    <!-- Estrutura HTML do Modal de Produto Replicada -->
+    <div class="modal-content">
+        ${produto.imagem ? `<img id="modalImage" src="${produto.imagem}" alt="${produto.nome}" />` : ""}
+        <div id="modalProductDetails">
+            <h2 id="modalTitle">${produto.nome}</h2>
+            <p><strong>Preço:</strong> <span id="modalPrice">R$ ${produto.preco}</span></p>
+            <p><strong>Loja Parceira:</strong> <span id="modalStore">${produto.lojaParceira || "-"}</span></p>
+            <p><strong>Marca:</strong> <span id="modalBrand">${produto.marca || "-"}</span></p>
+            <p><strong>Descrição:</strong> <span id="modalDescription">${produto.descricao || "-"}</span></p>
+            <p><strong>Categoria:</strong> <span id="modalCategory">${produto.categoria || "-"}</span></p>
+            <p><strong>Subcategoria:</strong> <span id="modalSubcategory">${produto.subCategoria || "-"}</span></p>
 
-      <div class="modal-body">
-        <p id="modalDescription">${produto.descricao || "Descrição não disponível."}</p>
-      </div>
-
-      <div class="modal-buttons-container">
-                <a href="https://wa.me/?text=${encodeURIComponent(mensagemWhatsApp)}" target="_blank" class="modal-buy-button" id="shareProductButton">Compartilhar Produto</a>
-                <a href="${produto.linkAfiliado}" target="_blank" class="modal-buy-button" id="modalBuyButton">${produto.textoBotao || "Compre na Loja"}</a>
-      </div>
-    </div>
-  </div>
+            <!-- Container de Botões (Replicação Exata) -->
+            <div class="modal-buttons-container">
+                <!-- Botão Compartilhar: cor cinza #6c757d -->
+                <a id="shareProductButton" class="modal-button" href="https://wa.me/?text=${encodeURIComponent(mensagemWhatsApp)}" target="_blank">
+                    Compartilhar
+                </a>
+                <!-- Botão Comprar: cor verde #28a745 -->
+                <a id="modalBuyButton" class="modal-button" href="${produto.linkAfiliado || produto.facebookLink}" target="_blank">
+                    Comprar Agora
+                </a>
+            </div>
+        </div>
+    </div>
 </body>
-</html>`;
-    return new Response(html, { headers: { "Content-Type": "text/html; charset=utf-8" } });
-  } catch (err) {
-    return new Response(`Erro ao carregar produto: ${err.message}`, { status: 500 });
-  }
+</html>
+    `;
+
+		return new Response(html, {
+			headers: { "Content-Type": "text/html" },
+		});
+	} catch (error) {
+		console.error("Erro ao buscar ou renderizar produto:", error);
+		return new Response(`Erro interno do servidor: ${error.message}`, { status: 500 });
+	}
 }
