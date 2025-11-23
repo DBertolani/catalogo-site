@@ -144,13 +144,24 @@ export async function fetchProductsPage(env, { offset = 0, limit = 50, q = "", s
                 if (sStr && (row[5] || "").toLowerCase() !== sStr) return false;
                 if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
                 if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
-                if (qStr) {
-                    const text = (row[1] + " " + row[7] + " " + row[5]).toLowerCase();
-                    if (!text.includes(qStr)) return false;
-                }
-                return true;
-            });
-        }
+                
+                
+                // Filtragem Rápida
+                        if (qStr || sStr || cStr || bStr) {
+                            filtered = allCompact.filter(row => {
+                                // ... (Sua lógica de filtragem existente)
+                                if (sStr && (row[5] || "").toLowerCase() !== sStr) return false;
+                                if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
+                                if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
+                                
+                                if (qStr) {
+                                    // CORREÇÃO AQUI: Adicionado row[0] (ID) na busca
+                                    const text = (row[0] + " " + row[1] + " " + row[7] + " " + row[5]).toLowerCase();
+                                    if (!text.includes(qStr)) return false;
+                                }
+                                return true;
+                            });
+                        }
 
         let selection = [];
         
