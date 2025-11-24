@@ -137,47 +137,41 @@ export async function fetchProductsPage(env, { offset = 0, limit = 50, q = "", s
 
         let filtered = allCompact;
 
-        // Filtragem Rápida
+        // Bloco Único de Filtragem
         if (qStr || sStr || cStr || bStr) {
             filtered = allCompact.filter(row => {
-                // ... (Sua lógica de filtragem existente)
+                // Filtro por Loja (índice 5)
                 if (sStr && (row[5] || "").toLowerCase() !== sStr) return false;
+                // Filtro por Categoria (índice 6)
                 if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
+                // Filtro por Marca (índice 7)
                 if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
                 
+                // Filtro por Busca (ID ou Texto)
+                if (qStr) {
+                    // Força o ID para string e verifica explicitamente
+                    const idStr = String(row[0] || "").toLowerCase().trim();
+                    
+                    // 1. Verifica se a busca é exatamente o ID (ou parte dele)
+                    if (idStr.includes(qStr)) return true;
+
+                    // 2. Se não for ID, procura no resto do texto (Título, Marca, Loja)
+                    const text = (row[1] + " " + row[7] + " " + row[5]).toLowerCase();
+                    if (!text.includes(qStr)) return false;
+                }
                 
-                // Filtragem Rápida
-                        if (qStr || sStr || cStr || bStr) {
-                            filtered = allCompact.filter(row => {
-                                // ... (Sua lógica de filtragem existente)
-                                if (sStr && (row[5] || "").toLowerCase() !== sStr) return false;
-                                if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
-                                if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
-                                
-                                        if (qStr) {
-                                        // Força o ID para string e verifica explicitamente
-                                        const idStr = String(row[0] || "").toLowerCase().trim();
-                                        
-                                        // 1. Verifica se a busca é exatamente o ID (ou parte dele)
-                                        if (idStr.includes(qStr)) return true;
-    
-                                        // 2. Se não for ID, procura no resto do texto (Título, Marca, Loja)
-                                        const text = (row[1] + " " + row[7] + " " + row[5]).toLowerCase();
-                                        if (!text.includes(qStr)) return false;
-                                    }
-                                
-                                return true;
-                            });
-                        }
+                return true;
+            });
+        }
 
         let selection = [];
         
-        // Modo Aleatório (Home)
+        // Modo Aleatório (Home) - Se não tiver busca nem filtros e offset for 0
         if (offset == 0 && !q && !store && !cat && !brand) {
             const randomCompact = getBalancedRandomMix(filtered, limit);
             selection = randomCompact.map(hydrateProduct);
         } 
-        // Modo Paginação / Busca
+        // Modo Paginação / Busca Normal
         else {
             const sliced = filtered.slice(offset, offset + limit);
             selection = sliced.map(hydrateProduct);
