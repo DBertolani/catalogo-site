@@ -10,13 +10,28 @@ export async function onRequest(context) {
 			return new Response("Produto não encontrado", { status: 404 });
 		}
 
-        // Função auxiliar de formatação de preço dentro do script
+        // Função auxiliar de formatação de preço
         const formatMoney = (val) => {
             let num = typeof val === 'string' ? parseFloat(val.replace('R$', '').replace(',', '.')) : val;
             if(isNaN(num)) return val;
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         };
         const precoFormatado = formatMoney(produto.preco);
+
+        // LINK DE COMPRA: Sempre link afiliado direto
+        const buyLink = produto.linkAfiliado || '#';
+        
+        // LINK DE COMPARTILHAMENTO: Preferência por facebookLink, senão afiliado
+        const shareLink = produto.facebookLink || produto.linkAfiliado;
+
+        // MENSAGEM WHATSAPP ATUALIZADA
+        const msgWhatsApp = `Olha que oferta!
+
+*${produto.nome}*
+Preço: _*${precoFormatado}*_
+Loja: _${produto.lojaParceira || "Parceiro"}_
+
+Link: ${shareLink}`;
 
 		const html = `
 <!DOCTYPE html>
@@ -29,6 +44,7 @@ export async function onRequest(context) {
     <meta property="og:description" content="Confira essa oferta incrível por ${precoFormatado}">
     <meta property="og:image" content="${produto.imagem}">
 	<style>
+        * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
@@ -169,10 +185,10 @@ export async function onRequest(context) {
             </p>
 
             <div class="buttons">
-                <a href="https://wa.me/?text=${encodeURIComponent(`Olha essa oferta: ${produto.nome} por ${precoFormatado}`)}" target="_blank" class="btn btn-share">
+                <a href="https://wa.me/?text=${encodeURIComponent(msgWhatsApp)}" target="_blank" class="btn btn-share">
                     Compartilhar
                 </a>
-                <a href="${produto.linkAfiliado || produto.facebookLink}" target="_blank" class="btn btn-buy">
+                <a href="${buyLink}" target="_blank" class="btn btn-buy">
                     Comprar na Loja
                 </a>
             </div>
