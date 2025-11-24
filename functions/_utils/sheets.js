@@ -154,11 +154,18 @@ export async function fetchProductsPage(env, { offset = 0, limit = 50, q = "", s
                                 if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
                                 if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
                                 
-                                if (qStr) {
-                                    // CORREÇÃO AQUI: Adicionado row[0] (ID) na busca
-                                    const text = (row[0] + " " + row[1] + " " + row[7] + " " + row[5]).toLowerCase();
-                                    if (!text.includes(qStr)) return false;
-                                }
+                                        if (qStr) {
+                                        // Força o ID para string e verifica explicitamente
+                                        const idStr = String(row[0] || "").toLowerCase().trim();
+                                        
+                                        // 1. Verifica se a busca é exatamente o ID (ou parte dele)
+                                        if (idStr.includes(qStr)) return true;
+    
+                                        // 2. Se não for ID, procura no resto do texto (Título, Marca, Loja)
+                                        const text = (row[1] + " " + row[7] + " " + row[5]).toLowerCase();
+                                        if (!text.includes(qStr)) return false;
+                                    }
+                                
                                 return true;
                             });
                         }
