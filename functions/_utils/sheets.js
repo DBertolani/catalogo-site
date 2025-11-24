@@ -128,36 +128,42 @@ function getBalancedRandomMix(compactList, limit) {
 
 export async function fetchProductsPage(env, { offset = 0, limit = 50, q = "", store = "", cat = "", brand = "" }) {
     try {
-        const allCompact = await getCompactData(env); // <-- USA KV
+        const allCompact = await getCompactData(env); // Lê os dados do KV
 
-        const qStr = (q || "").toLowerCase();
-        const sStr = (store || "").toLowerCase();
-        const cStr = (cat || "").toLowerCase();
-        const bStr = (brand || "").toLowerCase();
+        // Prepara os termos de busca uma única vez (Performance)
+        const qStr = (q || "").toLowerCase().trim();
+        const sStr = (store || "").toLowerCase().trim();
+        const cStr = (cat || "").toLowerCase().trim();
+        const bStr = (brand || "").toLowerCase().trim();
 
         let filtered = allCompact;
 
-        // Bloco Único de Filtragem
+        // Se houver qualquer filtro, iniciamos a varredura
         if (qStr || sStr || cStr || bStr) {
             filtered = allCompact.filter(row => {
-                // Filtro por Loja (índice 5)
+                
+                // 1. Filtros Rápidos (Loja, Categoria, Marca) - Se falhar, já descarta.
                 if (sStr && (row[5] || "").toLowerCase() !== sStr) return false;
-                // Filtro por Categoria (índice 6)
                 if (cStr && (row[6] || "").toLowerCase() !== cStr) return false;
-                // Filtro por Marca (índice 7)
                 if (bStr && (row[7] || "").toLowerCase() !== bStr) return false;
                 
-                // Filtro por Busca (ID ou Texto)
+                // 2. Filtro de Busca (Otimizado)
                 if (qStr) {
-                    // Força o ID para string e verifica explicitamente
-                    const idStr = String(row[0] || "").toLowerCase().trim();
-                    
-                    // 1. Verifica se a busca é exatamente o ID (ou parte dele)
-                    if (idStr.includes(qStr)) return true;
+                    // A. Verifica ID primeiro (É o mais rápido de todos)
+                    // Converte para string apenas para comparação, sem criar variáveis pesadas
+                    if (String(row[0] || "").toLowerCase().includes(qStr)) return true;
 
-                    // 2. Se não for ID, procura no resto do texto (Título, Marca, Loja)
-                    const text = (row[1] + " " + row[7] + " " + row[5]).toLowerCase();
-                    if (!text.includes(qStr)) return false;
+                    // B. Se não for ID, verifica Nome (Título)
+                    if ((row[1] || "").toLowerCase().includes(qStr)) return true;
+
+                    // C. Verifica Marca
+                    if ((row[7] || "").toLowerCase().includes(qStr)) return true;
+
+                    // D. Verifica Loja
+                    if ((row[5] || "").toLowerCase().includes(qStr)) return true;
+
+                    // Se não encontrou em nenhum lugar, descarta.
+                    return false;
                 }
                 
                 return true;
@@ -166,12 +172,12 @@ export async function fetchProductsPage(env, { offset = 0, limit = 50, q = "", s
 
         let selection = [];
         
-        // Modo Aleatório (Home) - Se não tiver busca nem filtros e offset for 0
+        // Modo Aleatório (Home)
         if (offset == 0 && !q && !store && !cat && !brand) {
             const randomCompact = getBalancedRandomMix(filtered, limit);
             selection = randomCompact.map(hydrateProduct);
         } 
-        // Modo Paginação / Busca Normal
+        // Modo Paginação / Busca
         else {
             const sliced = filtered.slice(offset, offset + limit);
             selection = sliced.map(hydrateProduct);
@@ -185,6 +191,7 @@ export async function fetchProductsPage(env, { offset = 0, limit = 50, q = "", s
 
     } catch (e) {
         console.error("Erro em fetchProductsPage:", e);
+        // Retorna array vazio em vez de erro fatal para não quebrar o front
         return new Response(JSON.stringify({ totalCount: 0, products: [], error: "Erro interno no servidor." }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }
