@@ -7,11 +7,16 @@
     <title>Catálogo de Afiliados</title>
 
 <style>
+    /* RESET GLOBAL PARA EVITAR ERROS DE TAMANHO */
+    * {
+        box-sizing: border-box;
+    }
+
     body {
         font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         margin: 0;
         padding: 20px;
-        background-color: #f8f9fa; /* Fundo levemente mais claro */
+        background-color: #f8f9fa;
         color: #333;
         overflow-x: hidden;
     }
@@ -83,11 +88,10 @@
     /* GRID DE PRODUTOS */
     .product-grid {
         display: grid;
-        /* auto-fill mantém o tamanho da coluna mesmo com poucos itens, centralizando-os se usado justify-content */
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
         gap: 25px;
-        justify-content: center; /* Centraliza os cards se houver poucos */
-        align-items: stretch; /* Garante que todos os cards na linha tenham a mesma altura */
+        justify-content: center;
+        align-items: stretch; 
     }
 
     .product-card {
@@ -101,7 +105,7 @@
         position: relative;
         transition: transform 0.2s, box-shadow 0.2s;
         border: 1px solid #eee;
-        height: 100%; /* Ocupa toda a altura da célula do grid */
+        height: 100%; 
     }
     
     .product-card:hover {
@@ -112,10 +116,10 @@
     .product-card-image-container {
         position: relative;
         width: 100%;
-        padding-top: 100%; /* Quadrado perfeito para melhor visualização */
+        padding-top: 100%;
         overflow: hidden;
         background-color: #fff;
-        flex-shrink: 0; /* Impede a imagem de encolher */
+        flex-shrink: 0; 
     }
 
     .product-card-image {
@@ -124,9 +128,8 @@
         left: 0;
         width: 100%;
         height: 100%;
-        object-fit: contain; /* Garante que a imagem apareça inteira */
-        padding: 15px; /* Respiro interno */
-        box-sizing: border-box;
+        object-fit: contain; 
+        padding: 15px; 
         transition: transform 0.3s ease-in-out;
     }
     
@@ -139,8 +142,8 @@
         padding: 15px;
         display: flex;
         flex-direction: column;
-        flex-grow: 1; /* Faz o conteúdo ocupar o espaço restante */
-        justify-content: space-between; /* Empurra os botões para o fundo */
+        flex-grow: 1; 
+        justify-content: space-between; 
     }
 
     .product-card-title {
@@ -149,16 +152,11 @@
         margin: 0 0 10px;
         line-height: 1.4;
         
-        /* ALTERAÇÃO AQUI: Título Flexível */
-        height: auto;           /* Altura automática para caber o texto todo */
-        min-height: 2.8em;      /* Mínimo de 2 linhas para alinhar produtos com nomes curtos */
-        overflow: visible;      /* Mostra todo o texto */
-        white-space: normal;    /* Permite quebra de linha normal */
-        
-        /* Removemos o corte de linha (...) */
-        /* display: -webkit-box; */
-        /* -webkit-line-clamp: 3; */
-        /* -webkit-box-orient: vertical; */
+        /* Título Flexível */
+        height: auto;           
+        min-height: 2.8em;      
+        overflow: visible;      
+        white-space: normal;    
     }
 
     .product-card-store {
@@ -170,7 +168,7 @@
     }
     
     .product-card-store span {
-        color: #6f42c1; /* Cor Roxo para destaque da loja */
+        color: #6f42c1; /* Cor Roxo */
         font-weight: bold;
     }
 
@@ -185,7 +183,7 @@
         display: flex;
         flex-direction: column;
         gap: 8px;
-        margin-top: auto; /* Garante que fique no rodapé do card */
+        margin-top: auto; 
     }
 
     .btn-details {
@@ -251,7 +249,7 @@
         background-color: rgba(0,0,0,0.6);
         align-items: center;
         justify-content: center;
-        padding: 15px;
+        padding: 10px; /* Reduzido padding externo */
         backdrop-filter: blur(3px);
     }
 
@@ -263,9 +261,11 @@
         max-width: 900px;
         max-height: 90vh;
         display: flex;
-        flex-direction: row; /* Desktop: Lado a lado */
+        flex-direction: row; 
         overflow: hidden;
         position: relative;
+        /* Correção para evitar overflow */
+        box-sizing: border-box; 
     }
 
     .modal-image-col {
@@ -294,15 +294,18 @@
 
     .close-button {
         position: absolute;
-        top: 15px;
-        right: 20px;
+        top: 10px;
+        right: 15px;
         font-size: 32px;
         color: #999;
         cursor: pointer;
         background: none;
         border: none;
-        z-index: 10;
+        z-index: 100; /* Aumentado Z-Index */
         line-height: 1;
+        padding: 5px;
+        background-color: rgba(255,255,255,0.8); /* Fundo semi-transparente para garantir visibilidade */
+        border-radius: 50%;
     }
     .close-button:hover { color: #333; }
 
@@ -311,6 +314,7 @@
         margin-top: 0;
         color: #222;
         line-height: 1.3;
+        margin-right: 30px; /* Espaço para o botão X não ficar em cima do texto */
     }
 
     #modalPrice {
@@ -392,16 +396,23 @@
         
         /* Card Mobile */
         .product-card-image-container { padding-top: 100%; }
-        /* Título Mobile: Deixa crescer livremente também ou mantém limite se preferir. Aqui deixei livre. */
         .product-card-title { font-size: 0.95em; min-height: 2.8em; height: auto; }
         .product-card-price { font-size: 1.1em; }
         
-        /* Modal Mobile */
-        .modal-content { flex-direction: column; max-height: 95vh; }
+        /* Modal Mobile - CORREÇÃO DE LARGURA */
+        .modal-content { 
+            flex-direction: column; 
+            max-height: 95vh; 
+            width: 90%; /* Deixa margem nas laterais */
+            margin: 0 auto;
+        }
+        
         .modal-image-col { width: 100%; height: 250px; border-right: none; border-bottom: 1px solid #eee; padding: 10px; }
         .modal-image-col img { max-height: 100%; }
+        
         .modal-details-col { width: 100%; padding: 20px; }
-        #modalTitle { font-size: 1.3em; }
+        
+        #modalTitle { font-size: 1.3em; margin-right: 0; }
         #modalPrice { font-size: 1.8em; }
         .modal-buttons-container { flex-direction: column; }
     }
@@ -486,7 +497,7 @@
 
     <!-- MODAL DE FILTROS -->
     <div id="filterModal" class="modal">
-        <div class="modal-content" style="max-width: 500px; flex-direction: column;">
+        <div class="modal-content" style="max-width: 500px; flex-direction: column; width: 90%;">
             <button class="close-button" onclick="closeFilterModal()">&times;</button>
             <div style="padding: 20px; width: 100%;">
                 <h3 style="margin-top: 0;">Refinar Busca</h3>
@@ -707,6 +718,8 @@
       modalStoreBadge.textContent = product.lojaParceira || 'Parceiro';
       modalBrand.textContent = product.marca || '-';
       modalCategory.textContent = product.categoria || '-';
+      
+      // LINK DO BOTÃO COMPRAR: Deep Link (Link afiliado direto)
       modalBuyButton.href = product.linkAfiliado || '#';
       modalBuyButton.textContent = `Comprar na Loja: ${product.lojaParceira}`;
 
@@ -740,7 +753,20 @@
 
     shareProductButton.addEventListener('click', function() {
       if (!currentProduct) return;
-      const msg = `Olha que oferta!\n\n*${currentProduct.nome}*\nPreço: ${formatMoney(currentProduct.preco)}\nLoja: ${currentProduct.lojaParceira}\n\nLink: ${currentProduct.linkAfiliado}`;
+      
+      // LINK DO WHATSAPP: Prioridade Facebook Link, depois Deep Link
+      const shareLink = currentProduct.facebookLink || currentProduct.linkAfiliado;
+      const formattedPrice = formatMoney(currentProduct.preco);
+      const loja = currentProduct.lojaParceira || "Parceiro";
+
+      const msg = `Olha que oferta!
+
+*${currentProduct.nome}*
+Preço: _*${formattedPrice}*_
+Loja: _${loja}_
+
+Link: ${shareLink}`;
+
       window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
     });
 
