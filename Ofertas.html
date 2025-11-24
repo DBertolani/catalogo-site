@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ofertas Relâmpago</title>
+    <style>
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* Cabeçalho */
+        header { text-align: center; margin-bottom: 40px; }
+        header h1 { color: #d32f2f; margin: 0; font-size: 2.2em; }
+        header p { color: #555; margin-top: 5px; }
+        .back-link { display: inline-block; margin-top: 15px; color: #1976d2; text-decoration: none; font-weight: 500; }
+        .back-link:hover { text-decoration: underline; }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+        
+        /* Cartão da Oferta */
+        .card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+            border-top: 5px solid #d32f2f;
+            display: flex; flex-direction: column;
+            transition: transform 0.2s;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .card.expired { opacity: 0.6; filter: grayscale(1); pointer-events: none; }
+        
+        /* Elementos Internos */
+        .store-badge { 
+            background: #eee; color: #555; padding: 4px 12px; border-radius: 20px; 
+            font-size: 0.75em; font-weight: 700; text-transform: uppercase;
+            align-self: flex-start; margin-bottom: 12px;
+        }
+        
+        h2 { font-size: 1.1em; margin: 0 0 15px 0; line-height: 1.4; color: #2c3e50; min-height: 3em; }
+        
+        .prices-box { margin: 10px 0; padding: 10px 0; border-top: 1px dashed #eee; border-bottom: 1px dashed #eee;}
+        .price-from { font-size: 0.9em; color: #999; text-decoration: line-through; display: block; }
+        .price-to { font-size: 1.8em; color: #2e7d32; font-weight: 800; display: block; margin-top: 2px;}
+        
+        /* Área do Cupom */
+        .coupon-container { 
+            background: #fff8e1; border: 2px dashed #ffb300; padding: 10px; 
+            border-radius: 8px; margin: 15px 0; display: flex; 
+            justify-content: space-between; align-items: center;
+        }
+        .coupon-code { font-family: monospace; font-weight: 700; font-size: 1.2em; color: #333; }
+        .copy-btn { 
+            cursor: pointer; color: #e65100; font-weight: 700; background: none; 
+            border: none; font-size: 0.85em; text-transform: uppercase;
+        }
+        .copy-btn:hover { text-decoration: underline; }
+        
+        .validity-info { font-size: 0.85em; color: #777; margin-bottom: 20px; display: flex; align-items: center; gap: 5px;}
+        
+        .btn-action { 
+            background: #d32f2f; color: white; text-align: center; padding: 14px; 
+            border-radius: 8px; text-decoration: none; font-weight: 700; 
+            margin-top: auto; display: block; transition: background 0.2s;
+        }
+        .btn-action:hover { background: #b71c1c; }
+        
+        /* Estados */
+        .loader { text-align: center; margin-top: 60px; font-size: 1.2em; color: #666; }
+        .empty-msg { text-align: center; width: 100%; color: #888; font-size: 1.2em; margin-top: 40px; }
+
+        /* Responsivo */
+        @media (max-width: 600px) {
+            .container { padding: 0 10px; }
+            h2 { min-height: auto; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>⚡ Achadinhos & Cupons</h1>
+        <p>As melhores promoções selecionadas manualmente para você.</p>
+        <a href="/" class="back-link">← Voltar para a Loja Principal</a>
+    </header>
+
+    <div id="loader" class="loader">
+        Buscando melhores ofertas...
+    </div>
+    
+    <div id="grid" class="grid"></div>
+</div>
+
+<script>
+    // --- URL CORRIGIDA: AGORA APONTA PARA SEU SCRIPT CORRETO ---
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
+
+    async function carregarOfertas() {
+        const grid = document.getElementById('grid');
+        const loader = document.getElementById('loader');
+
+        try {
+            // Faz a chamada para a sua planilha nova
+            const response = await fetch(SCRIPT_URL);
+            const data = await response.json();
+
+            loader.style.display = 'none';
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = '<div class="empty-msg">Nenhuma oferta ativa no momento. Volte mais tarde!</div>';
+                return;
+            }
+
+            // Ordena: Ativos primeiro, Expirados por último
+            data.sort((a, b) => a.expirado - b.expirado);
+
+            data.forEach(item => {
+                // Cria o elemento HTML do cartão
+                const card = document.createElement('div');
+                card.className = `card ${item.expirado ? 'expired' : ''}`;
+                
+                // Monta o preço
+                let htmlPreco = '';
+                if (item.por) {
+                    htmlPreco = `
+                        <div class="prices-box">
+                            ${item.de ? `<span class="price-from">De: ${item.de}</span>` : ''}
+                            <span class="price-to">Por: ${item.por}</span>
+                        </div>
+                    `;
+                }
+
+                // Monta o cupom se existir
+                let htmlCupom = '';
+                if (item.cupom && item.cupom !== '-' && item.cupom !== '') {
+                    htmlCupom = `
+                        <div class="coupon-container">
+                            <span class="coupon-code">${item.cupom}</span>
+                            <button class="copy-btn" onclick="copiarCupom(this, '${item.cupom}')">Copiar</button>
+                        </div>
+                    `;
+                }
+
+                // Monta o HTML final do card
+                card.innerHTML = `
+                    <div class="store-badge">${item.loja || 'Oferta'}</div>
+                    <h2>${item.titulo}</h2>
+                    ${htmlPreco}
+                    ${htmlCupom}
+                    <div class="validity-info">
+                        📅 Validade: ${item.validade || 'Indeterminado'}
+                    </div>
+                    <a href="${item.link}" target="_blank" class="btn-action">
+                        ${item.expirado ? 'OFERTA ENCERRADA' : 'PEGAR PROMOÇÃO ➤'}
+                    </a>
+                `;
+
+                grid.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error(error);
+            loader.innerHTML = "Erro ao carregar ofertas. Tente atualizar a página.";
+        }
+    }
+
+    function copiarCupom(btn, codigo) {
+        // CORRIGIDO: Usando navigator.clipboard.writeText para copiar o cupom
+        navigator.clipboard.writeText(codigo).then(() => {
+            const textoOriginal = btn.innerText;
+            btn.innerText = "COPIADO!";
+            btn.style.color = "green";
+            setTimeout(() => {
+                btn.innerText = textoOriginal;
+                btn.style.color = "#e65100";
+            }, 2000);
+        });
+    }
+
+    // Inicia o carregamento ao abrir a página
+    carregarOfertas();
+</script>
+
+</body>
+</html>
