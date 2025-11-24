@@ -24,7 +24,7 @@ export async function onRequest(context) {
         // LINK DE COMPARTILHAMENTO: Preferência por facebookLink, senão afiliado
         const shareLink = produto.facebookLink || produto.linkAfiliado;
 
-        // MENSAGEM WHATSAPP ATUALIZADA
+        // MENSAGEM WHATSAPP
         const msgWhatsApp = `Olha que oferta!
 
 *${produto.nome}*
@@ -32,6 +32,11 @@ Preço: _*${precoFormatado}*_
 Loja: _${produto.lojaParceira || "Parceiro"}_
 
 Link: ${shareLink}`;
+
+        // Lógica da Descrição: Cortar se for longa
+        const descCompleta = produto.descricao || '';
+        const isLongDesc = descCompleta.length > 200;
+        const descCurta = isLongDesc ? descCompleta.substring(0, 200) + '...' : descCompleta;
 
 		const html = `
 <!DOCTYPE html>
@@ -57,6 +62,8 @@ Link: ${shareLink}`;
             min-height: 100vh;
         }
 
+        .no-scroll { overflow: hidden; }
+
         .container {
             background-color: #fff;
             width: 95%;
@@ -67,6 +74,7 @@ Link: ${shareLink}`;
             display: flex;
             flex-direction: row;
             margin: 20px;
+            position: relative;
         }
 
         /* Coluna Imagem */
@@ -130,6 +138,25 @@ Link: ${shareLink}`;
         }
         .info-row strong { color: #333; }
 
+        .description-box {
+            margin-top: 20px;
+            color: #666;
+            line-height: 1.6;
+            font-size: 0.95em;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .read-more-link {
+            color: #007bff;
+            text-decoration: underline;
+            cursor: pointer;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
         .buttons {
             display: flex;
             gap: 15px;
@@ -152,6 +179,58 @@ Link: ${shareLink}`;
 
         .btn-buy { background-color: #28a745; color: white; }
         .btn-share { background-color: #6c757d; color: white; }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            inset: 0;
+            background-color: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            background: none;
+            border: none;
+            line-height: 1;
+        }
+        .close-modal:hover { color: #333; }
+
+        .modal-title {
+            margin-top: 0;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            padding-right: 30px;
+        }
+
+        .full-description {
+            white-space: pre-wrap;
+            line-height: 1.6;
+            color: #444;
+        }
 
         /* Responsividade */
         @media (max-width: 768px) {
@@ -180,9 +259,10 @@ Link: ${shareLink}`;
             <div class="info-row"><strong>Marca:</strong> ${produto.marca || "-"}</div>
             <div class="info-row"><strong>Categoria:</strong> ${produto.categoria || "-"}</div>
             
-            <p style="color:#666; line-height:1.5; margin-top:15px; font-size:0.95em;">
-                ${(produto.descricao || '').substring(0, 150)}...
-            </p>
+            <div class="description-box">
+                ${descCurta}
+                ${isLongDesc ? `<br><a id="openModalBtn" class="read-more-link">Ler mais</a>` : ''}
+            </div>
 
             <div class="buttons">
                 <a href="https://wa.me/?text=${encodeURIComponent(msgWhatsApp)}" target="_blank" class="btn btn-share">
@@ -198,6 +278,46 @@ Link: ${shareLink}`;
             </div>
         </div>
     </div>
+
+    <!-- MODAL DE DESCRIÇÃO -->
+    <div id="descriptionModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" id="closeModalBtn">&times;</button>
+            <h3 class="modal-title">Descrição Completa</h3>
+            <div class="full-description">${descCompleta}</div>
+            <button class="btn btn-share" style="margin-top:20px; padding:10px;" id="closeModalBtnBottom">Voltar</button>
+        </div>
+    </div>
+
+    <script>
+        // Lógica do Modal
+        const modal = document.getElementById('descriptionModal');
+        const openBtn = document.getElementById('openModalBtn');
+        const closeBtn = document.getElementById('closeModalBtn');
+        const closeBtnBottom = document.getElementById('closeModalBtnBottom');
+
+        if (openBtn) {
+            openBtn.addEventListener('click', function() {
+                modal.style.display = 'flex';
+                document.body.classList.add('no-scroll');
+            });
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.classList.remove('no-scroll');
+        }
+
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (closeBtnBottom) closeBtnBottom.addEventListener('click', closeModal);
+
+        // Fechar ao clicar fora
+        window.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+    </script>
 
 </body>
 </html>
