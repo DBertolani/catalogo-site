@@ -30,6 +30,15 @@
         }
         .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
         .card.expired { opacity: 0.6; filter: grayscale(1); pointer-events: none; }
+
+        /* --- NOVO ESTILO PARA IMAGEM --- */
+        .card-img {
+            width: 100%;
+            height: 200px; /* Altura fixa para manter alinhamento */
+            object-fit: contain; /* Garante que a imagem apareça inteira */
+            margin-bottom: 15px;
+            border-radius: 4px;
+        }
         
         /* Elementos Internos */
         .store-badge { 
@@ -74,6 +83,7 @@
         @media (max-width: 600px) {
             .container { padding: 0 10px; }
             h2 { min-height: auto; }
+            .card-img { height: 150px; } /* Imagem um pouco menor no celular */
         }
     </style>
 </head>
@@ -94,7 +104,7 @@
 </div>
 
 <script>
-    // --- URL CORRIGIDA: AGORA APONTA PARA SEU SCRIPT CORRETO ---
+    // URL DO SEU SCRIPT (Verifique se é a versão mais recente implantada)
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
 
     async function carregarOfertas() {
@@ -117,10 +127,17 @@
             data.sort((a, b) => a.expirado - b.expirado);
 
             data.forEach(item => {
-                // Cria o elemento HTML do cartão
                 const card = document.createElement('div');
                 card.className = `card ${item.expirado ? 'expired' : ''}`;
                 
+                // --- LÓGICA DA IMAGEM (ADICIONADO AQUI) ---
+                let htmlImagem = '';
+                // Se houver link de imagem, cria a tag img
+                if (item.imagem && item.imagem.trim() !== "") {
+                    htmlImagem = `<img src="${item.imagem}" alt="${item.titulo}" class="card-img" loading="lazy">`;
+                }
+                // -------------------------------------------
+
                 // Monta o preço
                 let htmlPreco = '';
                 if (item.por) {
@@ -143,8 +160,9 @@
                     `;
                 }
 
-                // Monta o HTML final do card
+                // Monta o HTML final do card (INCLUINDO A IMAGEM AGORA)
                 card.innerHTML = `
+                    ${htmlImagem}
                     <div class="store-badge">${item.loja || 'Oferta'}</div>
                     <h2>${item.titulo}</h2>
                     ${htmlPreco}
@@ -167,7 +185,6 @@
     }
 
     function copiarCupom(btn, codigo) {
-        // CORRIGIDO: Usando navigator.clipboard.writeText para copiar o cupom
         navigator.clipboard.writeText(codigo).then(() => {
             const textoOriginal = btn.innerText;
             btn.innerText = "COPIADO!";
