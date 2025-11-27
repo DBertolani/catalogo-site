@@ -5,39 +5,59 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ofertas Relâmpago</title>
     <style>
+        /* ESTILOS GERAIS */
         body { font-family: 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; margin: 0; padding: 15px; color: #333; }
         .container { max-width: 1100px; margin: 0 auto; }
         
+        /* CABEÇALHO */
         header { text-align: center; margin-bottom: 30px; }
         header h1 { color: #d32f2f; margin: 0; font-size: 2rem; }
-        
-        .nav-bar { margin-top: 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .nav-bar { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .nav-btn { text-decoration: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; transition: 0.2s; }
         .nav-btn.active { background: #d32f2f; color: white; }
         .nav-btn.inactive { background: white; color: #555; border: 1px solid #ddd; }
 
-        /* Filtro de Loja */
+        /* FILTRO */
         .filter-bar { margin: 20px 0; display: flex; justify-content: flex-end; }
         #storeFilter { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; min-width: 200px; }
 
-        /* Grid */
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-
-        /* Card */
+        /* GRID (2 COLUNAS NO MOBILE) */
+        .grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 20px; 
+        }
+        
+        /* CARD PRODUTO */
         .card { 
             background: white; border-radius: 12px; overflow: hidden;
             box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column;
-            transition: transform 0.2s; position: relative; height: 100%; cursor: pointer;
+            transition: transform 0.2s; position: relative; height: 100%;
         }
-        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
         .card.expired { opacity: 0.6; filter: grayscale(1); pointer-events: none; }
 
-        .card-img-box { width: 100%; padding-top: 100%; position: relative; background: #fff; }
-        .card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 15px; }
+        /* CORREÇÃO DE IMAGEM */
+        .card-img-box { 
+            width: 100%; 
+            padding-top: 100%; /* Quadrado perfeito */ 
+            position: relative; 
+            background: #fff; 
+            border-bottom: 1px solid #f0f0f0; /* Separação visual */
+        }
+        .card-img { 
+            position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            width: auto; height: auto; 
+            max-width: 90%; max-height: 90%; /* Margem de respiro interna */
+            margin: auto; /* Centralização absoluta */
+            object-fit: contain; 
+        }
 
         .card-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
         
-        .store-tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #6f42c1; margin-bottom: 5px; }
+        .store-tag { 
+            font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #6f42c1; margin-bottom: 8px; 
+        }
         
         h2 { 
             font-size: 1rem; margin: 0 0 10px; line-height: 1.3; color: #222;
@@ -49,39 +69,59 @@
         .price-from { font-size: 0.8rem; color: #999; text-decoration: line-through; }
         .price-to { font-size: 1.4rem; color: #28a745; font-weight: 800; display: block; }
         
-        .mini-coupon { background: #fff3e0; color: #e65100; padding: 5px; border: 1px dashed #ffb74d; border-radius: 4px; font-size: 0.85rem; text-align: center; margin-bottom: 10px; cursor: pointer; font-weight: bold; }
+        .mini-coupon {
+            background: #fff3e0; color: #e65100; padding: 5px; border: 1px dashed #ffb74d;
+            border-radius: 4px; font-size: 0.85rem; text-align: center; margin-bottom: 10px;
+            cursor: pointer; font-weight: bold;
+        }
 
-        .validity-info { font-size: 0.75rem; color: #777; margin-bottom: 10px; }
+        .validity-info { font-size: 0.75rem; color: #777; margin-bottom: 15px; }
 
-        .btn-buy { background: #28a745; color: white; text-align: center; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: bold; display: block; font-size: 0.9rem; margin-top: auto; }
+        /* BOTÕES DO CARD */
+        .card-actions {
+            display: flex; flex-direction: column; gap: 8px; margin-top: auto;
+        }
+        .btn-details {
+            background: #6c757d; color: white; text-align: center; padding: 8px; 
+            border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem;
+            cursor: pointer; border: none; width: 100%;
+        }
+        .btn-buy { 
+            background: #28a745; color: white; text-align: center; padding: 10px; 
+            border-radius: 6px; text-decoration: none; font-weight: bold; display: block; 
+            font-size: 0.9rem; 
+        }
         .btn-buy:hover { background: #218838; }
         
         .loader { text-align: center; padding: 50px; font-size: 1.2rem; color: #666; }
 
-        /* MODAL (Copiado do Index para consistência) */
+        /* --- ESTILOS DO MODAL (Copiados e Ajustados) --- */
         .modal { display: none; position: fixed; z-index: 1000; inset: 0; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(3px); }
-        .modal-content { background-color: #fff; border-radius: 12px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: row; overflow: hidden; position: relative; }
-        .modal-image-col { width: 45%; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background-color: #fff; border-radius: 12px; width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: row; overflow: hidden; position: relative; }
+        .modal-image-col { width: 45%; display: flex; align-items: center; justify-content: center; padding: 20px; background: #fff; }
         .modal-image-col img { max-width: 100%; max-height: 50vh; object-fit: contain; }
         .modal-details-col { width: 55%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
-        .close-button { position: absolute; top: 10px; right: 15px; font-size: 32px; cursor: pointer; background: none; border: none; z-index: 100; }
-        #modalTitle { font-size: 1.6em; margin-top: 0; }
-        #modalPrice { font-size: 2.2em; font-weight: 800; color: #28a745; margin: 15px 0; }
-        .modal-buttons-container { display: flex; gap: 15px; margin-top: auto; }
-        #modalBuyButton, #shareProductButton { flex: 1; padding: 15px; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; border:none; text-decoration:none; display:flex; align-items:center; justify-content:center;}
-        #shareProductButton { background-color: #6c757d; color: white; }
-        #modalBuyButton { background-color: #28a745; color: white; }
+        .close-button { position: absolute; top: 10px; right: 15px; font-size: 32px; cursor: pointer; background: none; border: none; z-index: 100; color: #999; }
+        #modalTitle { font-size: 1.5em; margin-top: 0; line-height: 1.3; }
+        #modalPrice { font-size: 2em; font-weight: 800; color: #28a745; margin: 15px 0; }
+        .modal-description-box { background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 20px 0; line-height: 1.6; color: #555; font-size: 0.95em; }
+        .modal-buttons-container { display: flex; gap: 10px; margin-top: auto; }
+        #modalBuyButton, #shareProductButton { flex: 1; padding: 12px; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; border:none; text-decoration:none; display:flex; align-items:center; justify-content:center; color: white;}
+        #shareProductButton { background-color: #6c757d; }
+        #modalBuyButton { background-color: #28a745; text-transform: uppercase; }
 
-        /* Mobile: 2 Colunas */
+        /* RESPONSIVIDADE */
         @media (max-width: 600px) {
             .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .card-body { padding: 10px; }
             h2 { font-size: 0.9rem; min-height: 3.6em; }
             .price-to { font-size: 1.2rem; }
-            .btn-buy { padding: 8px; font-size: 0.85rem; }
+            .btn-buy, .btn-details { padding: 8px; font-size: 0.8rem; }
+            
+            /* Modal Mobile */
             .modal-content { flex-direction: column; }
             .modal-image-col { width: 100%; height: 250px; }
-            .modal-details-col { width: 100%; }
+            .modal-details-col { width: 100%; padding: 20px; }
         }
     </style>
 </head>
@@ -112,16 +152,33 @@
         <button class="close-button" onclick="closeProductModal()">&times;</button>
         <div class="modal-image-col"><img id="modalImage" src=""></div>
         <div class="modal-details-col">
-            <span class="store-badge" id="modalStoreBadge" style="font-size:0.9em; padding:5px 10px;"></span>
+            <span class="store-tag" id="modalStoreBadge" style="display:inline-block; margin-bottom:10px;"></span>
             <h2 id="modalTitle"></h2>
             <div id="modalPrice"></div>
             <div class="validity-info" id="modalValidity"></div>
-            <p id="modalDescription" style="line-height:1.6; color:#555;"></p>
+            
+            <div class="modal-description-box">
+                <strong>Detalhes:</strong><br>
+                <span id="modalDescription"></span>
+                <a href="javascript:void(0)" id="readMoreLink" style="display: none; color: #007bff; text-decoration: underline;">Ler completa</a>
+            </div>
+            
+            <div id="modalCouponArea" style="margin-bottom: 15px;"></div>
+
             <div class="modal-buttons-container">
                 <button id="shareProductButton">Compartilhar</button>
-                <a href="#" target="_blank" id="modalBuyButton">Ver na Loja</a>
+                <a href="#" target="_blank" id="modalBuyButton">Ir para a Loja</a>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="descriptionModal" class="modal" style="z-index: 1100;">
+    <div class="modal-content" style="padding: 20px; flex-direction: column; max-width: 500px; height: auto; max-height: 80vh;">
+        <button class="close-button" onclick="closeDescriptionModal()">&times;</button>
+        <h3>Descrição Completa</h3>
+        <div id="fullDescriptionText" style="overflow-y: auto; line-height: 1.6; color: #444;"></div>
+        <button class="btn-details" onclick="closeDescriptionModal()" style="margin-top: 20px; background:#666; color:white; border:none; cursor:pointer; padding:10px;">Voltar</button>
     </div>
 </div>
 
@@ -141,11 +198,10 @@
             loader.style.display = 'none';
             if(!data.length) { grid.innerHTML = '<p style="text-align:center;width:100%">Sem ofertas.</p>'; return; }
 
-            // Ordena e salva em variável global para filtrar
             data.sort((a,b) => a.expirado - b.expirado);
             allOffers = data;
 
-            // Popula filtro de lojas
+            // Filtro de Lojas
             const stores = [...new Set(data.map(item => item.loja))].sort();
             stores.forEach(store => {
                 const opt = document.createElement('option');
@@ -153,9 +209,9 @@
                 opt.textContent = store;
                 storeSelect.appendChild(opt);
             });
-
             storeSelect.addEventListener('change', () => renderGrid(storeSelect.value));
-            renderGrid(); // Renderiza inicial
+            
+            renderGrid();
 
         } catch(e) { console.error(e); loader.innerHTML = "Erro ao carregar."; }
     }
@@ -171,11 +227,6 @@
             const card = document.createElement('div');
             card.className = `card ${item.expirado ? 'expired' : ''}`;
             
-            // Evento de clique para abrir modal (exceto se clicar no botão comprar/copiar)
-            card.onclick = (e) => {
-                if(!e.target.closest('.btn-buy') && !e.target.closest('.copy-btn')) openProductModal(item);
-            };
-
             let htmlPreco = '';
             if(item.por) {
                htmlPreco = `<div class="prices">${item.de ? `<span class="price-from">De ${item.de}</span>` : ''}<span class="price-to">Por ${item.por}</span></div>`;
@@ -183,7 +234,7 @@
             
             let htmlCupom = '';
             if(item.cupom) {
-                htmlCupom = `<div class="mini-coupon" onclick="event.stopPropagation(); navigator.clipboard.writeText('${item.cupom}');alert('Copiado!')">🎟️ ${item.cupom}</div>`;
+                htmlCupom = `<div class="mini-coupon" onclick="copiarCupom('${item.cupom}')">🎟️ ${item.cupom}</div>`;
             }
 
             card.innerHTML = `
@@ -193,35 +244,74 @@
                     <h2>${item.titulo}</h2>
                     ${htmlPreco}
                     ${htmlCupom}
-                    <div class="validity-info">📅 Validade: ${item.validade || 'Indeterminado'}</div>
-                    <a href="${item.link}" target="_blank" class="btn-buy">${item.expirado ? 'ENCERRADO' : 'VER OFERTA'}</a>
+                    <div class="validity-info">📅 ${item.validade || 'Indeterminado'}</div>
+                    
+                    <div class="card-actions">
+                        <button class="btn-details" onclick='openProductModal(${JSON.stringify(item).replace(/'/g, "&apos;")})'>Mais Detalhes</button>
+                        <a href="${item.link}" target="_blank" class="btn-buy">${item.expirado ? 'ENCERRADO' : 'PEGAR PROMOÇÃO ➤'}</a>
+                    </div>
                 </div>
             `;
             grid.appendChild(card);
         });
     }
 
-    // Lógica do Modal
+    // --- LÓGICA DOS MODAIS ---
     const modal = document.getElementById('productModal');
+    const descModal = document.getElementById('descriptionModal');
+
     function openProductModal(item) {
-        document.getElementById('modalImage').src = item.imagem || "";
+        if (typeof item === 'string') item = JSON.parse(item);
+        
+        document.getElementById('modalImage').src = item.imagem || "https://via.placeholder.com/300x300?text=Oferta";
         document.getElementById('modalTitle').textContent = item.titulo;
         document.getElementById('modalStoreBadge').textContent = item.loja;
         document.getElementById('modalPrice').textContent = item.por || "";
-        document.getElementById('modalDescription').textContent = item.descricao || "";
+        
+        // Descrição com "Ler Mais"
+        const desc = item.descricao || "Sem descrição.";
+        const MAX_LEN = 150;
+        if (desc.length > MAX_LEN) {
+            document.getElementById('modalDescription').textContent = desc.substring(0, MAX_LEN) + "...";
+            const readMore = document.getElementById('readMoreLink');
+            readMore.style.display = 'inline-block';
+            readMore.onclick = () => openDescriptionModal(desc);
+        } else {
+            document.getElementById('modalDescription').textContent = desc;
+            document.getElementById('readMoreLink').style.display = 'none';
+        }
+
         document.getElementById('modalValidity').textContent = "Validade: " + (item.validade || "Indeterminado");
         document.getElementById('modalBuyButton').href = item.link;
         
-        // Share button logic
+        // Botão de Compartilhar
         document.getElementById('shareProductButton').onclick = () => {
-            const msg = `Olha essa oferta!\n*${item.titulo}*\nPor: ${item.por}\nLink: ${item.link}`;
+            const msg = `Olha essa oferta!\n*${item.titulo}*\nPor: ${item.por}\nLoja: ${item.loja}\nLink: ${item.link}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         };
 
         modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden'; // Trava scroll
     }
-    function closeProductModal() { modal.style.display = 'none'; }
-    window.onclick = (e) => { if(e.target === modal) closeProductModal(); };
+
+    function closeProductModal() { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
+    
+    function openDescriptionModal(text) {
+        document.getElementById('fullDescriptionText').textContent = text;
+        descModal.style.display = 'flex';
+    }
+    function closeDescriptionModal() { descModal.style.display = 'none'; }
+
+    function copiarCupom(codigo) {
+        navigator.clipboard.writeText(codigo);
+        alert('Cupom ' + codigo + ' copiado!');
+    }
+
+    // Fechar ao clicar fora
+    window.onclick = (e) => {
+        if(e.target === modal) closeProductModal();
+        if(e.target === descModal) closeDescriptionModal();
+    };
 
     load();
 </script>
