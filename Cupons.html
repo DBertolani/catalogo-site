@@ -10,10 +10,14 @@
         
         header { text-align: center; margin-bottom: 30px; }
         header h1 { color: #007bff; margin: 0; font-size: 2rem; }
+        
         .nav-bar { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
         .nav-btn { text-decoration: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
         .nav-btn.active { background: #007bff; color: white; }
         .nav-btn.inactive { background: white; color: #555; border: 1px solid #ddd; }
+
+        .filter-bar { margin: 20px 0; display: flex; justify-content: flex-end; }
+        #storeFilter { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; min-width: 200px; }
 
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
         
@@ -22,6 +26,9 @@
             border-left: 5px solid #007bff; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             display: flex; flex-direction: column;
         }
+        /* Estilo Expirado (Desbotado) */
+        .card.expired { opacity: 0.5; filter: grayscale(1); background: #f9f9f9; border-left-color: #999; }
+        
         .store { font-size: 0.8rem; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
         h2 { font-size: 1.1rem; margin: 0 0 15px 0; color: #333; flex-grow: 1; }
 
@@ -35,11 +42,16 @@
             background: #007bff; color: white; border: none; padding: 8px; width: 100%; 
             border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px;
         }
+        .card.expired .btn-copy { background: #999; cursor: not-allowed; }
         
         .validity { font-size: 0.8rem; color: #888; text-align: center; margin-top: 10px; }
 
+        /* Mobile: 2 Colunas para Cupons também (Opcional, mas solicitado) */
         @media (max-width: 600px) {
-            .grid { grid-template-columns: 1fr; } /* 1 coluna para cupons no mobile */
+            .grid { grid-template-columns: repeat(2, 1fr); } 
+            .card { padding: 10px; }
+            h2 { font-size: 0.9rem; }
+            .code { font-size: 1rem; }
         }
     </style>
 </head>
@@ -47,57 +59,91 @@
 
 <div class="container">
     <header>
-        <h1>🎟️ Cupons Disponíveis</h1>
+        <h1>🎟️ Central de Cupons</h1>
         <div class="nav-bar">
             <a href="/" class="nav-btn inactive">Loja</a>
             <a href="/Ofertas" class="nav-btn inactive">Ofertas</a>
             <a href="#" class="nav-btn active">Cupons</a>
         </div>
     </header>
+    
+    <div class="filter-bar">
+        <select id="storeFilter">
+            <option value="">Todas as Lojas</option>
+        </select>
+    </div>
+
     <div id="grid" class="grid"></div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
+    let allCoupons = [];
 
     async function load() {
         const grid = document.getElementById('grid');
+        const storeSelect = document.getElementById('storeFilter');
+        
         try {
             const req = await fetch(`${SCRIPT_URL}?type=cupons`);
             const data = await req.json();
             
             if(!data.length) { grid.innerHTML = '<p style="text-align:center;width:100%">Sem cupons.</p>'; return; }
             
-            // Ordena por data de expiração
-            data.sort((a,b) => {
-                if(a.expirado) return 1;
-                if(b.expirado) return -1;
-                return 0;
+            allCoupons = data;
+            
+            // Ordena: Ativos primeiro
+            data.sort((a,b) => a.expirado - b.expirado);
+
+            // Popula filtro
+            const stores = [...new Set(data.map(item => item.loja))].sort();
+            stores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store;
+                opt.textContent = store;
+                storeSelect.appendChild(opt);
             });
 
-            data.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'card';
-                
-                card.innerHTML = `
-                    <div class="store">${item.loja}</div>
-                    <h2>${item.titulo}</h2>
-                    <div class="coupon-box">
-                        <div class="code">${item.cupom}</div>
-                        <button class="btn-copy" onclick="copy('${item.cupom}', this)">${item.expirado ? 'EXPIRADO' : 'COPIAR'}</button>
-                    </div>
-                    <a href="${item.link}" target="_blank" style="text-align:center;display:block;text-decoration:none;color:#007bff;font-weight:bold">Ir para a loja</a>
-                    <div class="validity">Validade: ${item.validade}</div>
-                `;
-                grid.appendChild(card);
-            });
+            storeSelect.addEventListener('change', () => renderGrid(storeSelect.value));
+            renderGrid();
+
         } catch(e) { console.log(e); }
+    }
+
+    function renderGrid(filterStore = "") {
+        const grid = document.getElementById('grid');
+        grid.innerHTML = "";
+        
+        const filtered = filterStore ? allCoupons.filter(i => i.loja === filterStore) : allCoupons;
+
+        filtered.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `card ${item.expirado ? 'expired' : ''}`;
+            const btnText = item.expirado ? 'EXPIRADO' : 'COPIAR CÓDIGO';
+            const btnState = item.expirado ? 'disabled' : '';
+
+            card.innerHTML = `
+                <div class="store">${item.loja}</div>
+                <h2>${item.titulo}</h2>
+                <div class="coupon-box">
+                    <div class="code">${item.cupom}</div>
+                    <button class="btn-copy" ${btnState} onclick="copy('${item.cupom}', this)">${btnText}</button>
+                </div>
+                <a href="${item.link}" target="_blank" style="text-align:center;display:block;text-decoration:none;color:#007bff;font-weight:bold;font-size:0.9rem">Ir para a loja ➤</a>
+                <div class="validity">Validade: ${item.validade || 'Indeterminado'}</div>
+            `;
+            grid.appendChild(card);
+        });
     }
 
     function copy(code, btn) {
         navigator.clipboard.writeText(code);
         btn.innerText = "COPIADO!";
-        setTimeout(() => btn.innerText = "COPIAR", 2000);
+        btn.style.background = "#28a745";
+        setTimeout(() => {
+            btn.innerText = "COPIAR CÓDIGO";
+            btn.style.background = "#007bff";
+        }, 2000);
     }
     load();
 </script>
