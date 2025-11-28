@@ -3,11 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEAB - Ofertas Incríveis</title>
+    
+    <title>DEAB - Ofertas Incríveis | Cupons e Promoções Diárias</title>
+    <meta name="description" content="Encontre as melhores ofertas relâmpago, cupons de desconto e promoções da Magalu, Amazon, Casas Bahia e muito mais. Consultoria gratuita para compras online seguras.">
+    <meta name="keywords" content="ofertas, cupons, desconto, promoção, magalu, amazon, achadinhos, barato">
+    <meta name="author" content="DEAB Ofertas">
+    <meta name="robots" content="index, follow">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ofertasincriveis.deab.com.br/">
+    <meta property="og:title" content="🔥 DEAB - As Melhores Ofertas e Cupons do Dia">
+    <meta property="og:description" content="Não compre antes de ver isso! Selecionei as melhores promoções e cupons para você economizar de verdade.">
+    <meta property="og:image" content="https://ofertasincriveis.deab.com.br/capa-zap.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    
+    <link rel="icon" href="/logo.png" type="image/png">
+
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- ESTILOS GERAIS --- */
+        /* ... (MANTENHA TODO O CSS ANTERIOR AQUI) ... */
+	        /* --- ESTILOS GERAIS --- */
         * { box-sizing: border-box; }
         body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; background-color: #fff; padding-top: 70px; }
         .container { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
@@ -18,10 +35,16 @@
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
         
         /* LOGO */
-        .logo-container { display: flex; align-items: center; gap: 10px; }
-        .logo-img { height: 40px; width: auto; }
-        .logo-text { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.4rem; color: #d32f2f; line-height: 1; }
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+				/* Ajuste fino para a logo não ficar distorcida */
+				.logo-img { 
+					height: 50px; 
+					width: auto; 
+					object-fit: contain;
+				}
+		.logo-text { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.4rem; color: #d32f2f; line-height: 1; }
         .logo-text span { font-size: 0.7rem; color: #555; display: block; letter-spacing: 1px; font-weight: 400; }
+       
 
         .nav-links { display: flex; gap: 20px; align-items: center; }
         .nav-item { text-decoration: none; color: #555; font-weight: 600; font-size: 0.9rem; padding: 8px 12px; border-radius: 6px; transition: 0.2s; }
@@ -183,17 +206,29 @@
             .modal-buttons-container { flex-direction: column; }
             #modalBuyButton, #shareProductButton { width: 100%; padding: 14px; }
         }
-    </style>
+		
+		        /* ADICIONEI ESTE CSS PARA MELHORAR O SEO VISUAL */
+				.hidden-seo { position: absolute; left: -9999px; }	
+		
+    </style>	
+		
+		
+		
+    
+
 </head>
+
 <body>
 
     <nav class="navbar">
         <div class="nav-container">
-            <a href="/" class="logo-container" style="text-decoration: none;">
-                <img src="https://drive.google.com/uc?export=view&id=1VJaOqvTUtQbP6mm_WkNZazfvM_PHamyL" alt="Logo DEAB" class="logo-img" style="height:50px; width:auto;">
+            <a href="/" class="logo-container" title="Ir para página inicial">
+                <img src="/logo.png" alt="Logo DEAB Ofertas" class="logo-img">
                 <div class="logo-text">DEAB<br><span>OFERTAS INCRÍVEIS</span></div>
             </a>
-            <button class="hamburger" onclick="document.getElementById('navLinks').classList.toggle('active')">☰</button>
+            
+            <button class="hamburger" aria-label="Abrir menu" onclick="document.getElementById('navLinks').classList.toggle('active')">☰</button>
+            
             <div class="nav-links" id="navLinks">
                 <a href="/" class="nav-item active">Início</a>
                 <a href="/catalogo" class="nav-item">Catálogo</a>
@@ -203,112 +238,33 @@
         </div>
     </nav>
 
-    <a href="https://wa.me/5527996962395?text=Olá! Vim pelo site DEAB e gostaria de uma consultoria de compra." class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/5527996962395?text=Olá! Vim pelo site DEAB e gostaria de uma consultoria de compra." class="whatsapp-float" target="_blank" aria-label="Falar no WhatsApp">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35" height="35" alt="WhatsApp">
     </a>
 
-    <div class="hero">
-        <div class="container">
-            <h1>Encontre o Preço Que <span>Você Merece</span></h1>
-            <p class="hero-text">
-                "O meu objetivo é buscar aquele produto ou serviço que você tanto precisa, com a qualidade, melhor preço ou desconto que você tanto merece."
-            </p>
-            <div class="cta-container">
-                <a href="/Ofertas" class="btn-big btn-ofertas">⚡ Ver Ofertas Relâmpago</a>
-                <a href="/Cupons" class="btn-big btn-cupons">🎟️ Pegar Cupons</a>
-                <a href="/catalogo" class="btn-big btn-catalogo">📂 Catálogo Completo</a>
+    <main>
+        <section class="hero">
+            <div class="container">
+                <h1>Seu Consultor de <span>Compras Online</span></h1>
+                <p class="hero-text">
+                    "O meu objetivo é buscar aquele produto ou serviço que você tanto precisa, com a qualidade, melhor preço ou desconto que você tanto merece."
+                </p>
+                <div class="cta-container">
+                    <a href="/Ofertas" class="btn-big btn-ofertas">⚡ Ver Ofertas Relâmpago</a>
+                    <a href="/Cupons" class="btn-big btn-cupons">🎟️ Pegar Cupons</a>
+                    <a href="/catalogo" class="btn-big btn-catalogo">📂 Catálogo Completo</a>
+                </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <div class="copy-section">
-        <div class="copy-box">
-            <h3>📉 Economia Real com Segurança</h3>
-            <p>Na hora de fazer uma compra online o que mais queremos é economizar e fazer isso com segurança, não é verdade?</p>
-            <p>Está cansado de bater perna por aí procurando o produto que você precisa e não consegue encontrar o preço que cabe no seu bolso?</p>
-            <p class="copy-highlight">Sabia que compras pela internet podem ser até 15% mais baratas? E quando se trata de eletrodomésticos e informática, essa diferença pode chegar a 46%!</p>
-            <p>Tenho parceria com várias lojas online como: <strong>Americanas, Casas Bahia, Magalu, Amazon, Shopee</strong>. Isso garante que você sempre terá acesso ao melhor preço com total segurança.</p>
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-            <h3>🤝 Minha Consultoria</h3>
-            <p>Não achou o que precisa? <strong>Eu vou atrás para você!</strong> Acompanho da escolha do produto até a chegada dele em sua casa.</p>
-            <p>Entre em contato comigo pelo botão do WhatsApp e tire suas dúvidas!</p>
-        </div>
-    </div>
-
-    <div class="partners">
-        <h3>Lojas Parceiras Oficiais</h3>
-        <div class="partner-list">
-            <span>MAGALU</span> • 
-            <span>AMAZON</span> • 
-            <span>CASAS BAHIA</span> • 
-            <span>SHOPEE</span> • 
-            <span>AMERICANAS</span> • 
-            <span>KABUM</span>
-        </div>
-    </div>
-
-    <div class="preview-section">
-        <div class="container">
-            <div class="preview-header">
-                <h2 style="color:#d32f2f;">🔥 Destaques de Hoje</h2>
-                <p>Algumas das ofertas relâmpago que separamos hoje.</p>
-            </div>
-            
-            <div id="preview-grid" class="preview-grid">
-                <p style="grid-column: 1/-1; text-align:center;">Carregando melhores ofertas...</p>
-            </div>
-            
-            <div style="text-align:center; margin-top:30px;">
-                <a href="/Ofertas" class="btn-big btn-ofertas" style="display:inline-flex; padding: 10px 25px;">Ver Todas as Ofertas</a>
-            </div>
-        </div>
-    </div>
+        <section class="preview-section">
+             </section>
+    </main>
 
     <footer>
         <p>DEAB - Ofertas Incríveis &copy; 2025</p>
-        <p style="font-size:0.9em; color:#aaa;">Participamos do Programa de Associados da Amazon, Magalu e Awin. Comprando pelos nossos links, você apoia nosso trabalho sem pagar nada a mais.</p>
+        <p style="font-size:0.9em; color:#aaa;">Participamos do Programa de Associados da Amazon, Magalu e Awin.</p>
     </footer>
-
-    <div id="productModal" class="modal">
-        <div class="modal-content">
-            <button class="close-button" onclick="closeProductModal()">&times;</button>
-            
-            <div class="modal-image-col">
-                <img id="modalImage" src="">
-            </div>
-            
-            <div class="modal-details-col">
-                <span class="store-tag" id="modalStoreBadge" style="display:inline-block; margin-bottom:10px; background: #eee;"></span>
-                <h2 id="modalTitle"></h2>
-                <div id="modalPrice"></div>
-                <div class="validity-info" id="modalValidity"></div>
-                
-                <div class="modal-description-box">
-                    <strong>Detalhes:</strong><br>
-                    <span id="modalDescription"></span>
-                    <a href="javascript:void(0)" id="readMoreLink" style="display: none; color: #007bff; text-decoration: underline; margin-top:5px; display:block;">Ler completa</a>
-                </div>
-                
-                <div style="margin-top:15px; text-align:left;">
-                    <a href="/Ofertas" style="font-size:0.9em; color:#007bff; font-weight:600; text-decoration:none;">&larr; Ver mais ofertas como esta</a>
-                </div>
-
-                <div class="modal-buttons-container">
-                    <button id="shareProductButton">Compartilhar</button>
-                    <a href="#" target="_blank" id="modalBuyButton">Pegar Promoção</a>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="descriptionModal" class="modal" style="z-index: 1200;">
-        <div class="modal-content" style="padding: 20px; flex-direction: column; max-width: 500px; height: auto; max-height: 80vh; width: 90%;">
-            <button class="close-button" onclick="closeDescriptionModal()">&times;</button>
-            <h3 style="font-family: 'Montserrat', sans-serif;">Descrição Completa</h3>
-            <div id="fullDescriptionText" style="overflow-y: auto; line-height: 1.6; color: #444; text-align: left; white-space: pre-wrap;"></div>
-            <button class="btn-details" onclick="closeDescriptionModal()" style="margin-top: 20px; background:#666; color:white; border:none; cursor:pointer; padding:10px;">Voltar</button>
-        </div>
-    </div>
 
     <script>
         // SCRIPT PARA CARREGAR A PRÉVIA (8 ITENS) E CONTROLAR O MODAL
