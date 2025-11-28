@@ -1,54 +1,90 @@
 import { fetchProductById } from "../_utils/sheets.js";
 
+// URL do seu Script "Gestor de Ofertas" (Para buscar produtos manuais se não achar no KV)
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
+
 export async function onRequest(context) {
-	const { params, env } = context;
-	const id = params.id;
+    // CRÍTICO: Precisamos do 'request' para pegar a URL atual para o compartilhamento
+    const { params, env, request } = context;
+    const id = params.id;
 
-	try {
-		const produto = await fetchProductById(env, id);
-		if (!produto) {
-			return new Response("Produto não encontrado", { status: 404 });
-		}
+    try {
+        let produto = null;
 
-        // Função auxiliar de formatação de preço
+        // 1. Busca no Catálogo Principal (KV)
+        produto = await fetchProductById(env, id);
+
+        // 2. Se não achou, busca nas Ofertas Manuais (Apps Script)
+        if (!produto) {
+            try {
+                const res = await fetch(`${APPS_SCRIPT_URL}?type=ofertas`);
+                if (res.ok) {
+                    const ofertas = await res.json();
+                    const ofertaEncontrada = ofertas.find(o => String(o.id).trim() === String(id).trim());
+                    
+                    if (ofertaEncontrada) {
+                        produto = {
+                            nome: ofertaEncontrada.titulo,
+                            preco: ofertaEncontrada.por || ofertaEncontrada.de,
+                            imagem: ofertaEncontrada.imagem,
+                            lojaParceira: ofertaEncontrada.loja,
+                            marca: ofertaEncontrada.marca || "Oferta",
+                            categoria: "Oferta Relâmpago",
+                            descricao: ofertaEncontrada.descricao,
+                            linkAfiliado: ofertaEncontrada.link,
+                            facebookLink: ofertaEncontrada.link 
+                        };
+                    }
+                }
+            } catch (e) {
+                console.error("Erro ao buscar ofertas manuais:", e);
+            }
+        }
+
+        if (!produto) {
+            return new Response("Produto não encontrado", { status: 404 });
+        }
+
+        // --- FORMATAÇÃO DE DADOS ---
+
         const formatMoney = (val) => {
+            if (!val) return "Consulte";
             let num = typeof val === 'string' ? parseFloat(val.replace('R$', '').replace(',', '.')) : val;
             if(isNaN(num)) return val;
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
         };
         const precoFormatado = formatMoney(produto.preco);
 
-        // LINK DE COMPRA: Sempre link afiliado direto
+        // Link para a loja (Afiliado)
         const buyLink = produto.linkAfiliado || '#';
         
-        // LINK DE COMPARTILHAMENTO: Preferência por facebookLink, senão afiliado
-        const shareLink = produto.facebookLink || produto.linkAfiliado;
+        // Link para compartilhar: USA A URL ATUAL DA PÁGINA DO PRODUTO
+        const currentPageUrl = request.url;
 
-        // MENSAGEM WHATSAPP
-        const msgWhatsApp = `Olha que oferta!
+        const msgWhatsApp = `Olha que oferta!\n\n*${produto.nome}*\nPreço: _*${precoFormatado}*_\nLoja: _${produto.lojaParceira || "Parceiro"}_\n\nLink: ${currentPageUrl}`;
 
-*${produto.nome}*
-Preço: _*${precoFormatado}*_
-Loja: _${produto.lojaParceira || "Parceiro"}_
-
-Link: ${shareLink}`;
-
-        // Lógica da Descrição: Cortar se for longa
+        // Lógica de Corte da Descrição
         const descCompleta = produto.descricao || '';
         const isLongDesc = descCompleta.length > 200;
+        // Se for longa, corta e põe reticências. Se não, mostra tudo.
         const descCurta = isLongDesc ? descCompleta.substring(0, 200) + '...' : descCompleta;
 
-		const html = `
+
+        // --- HTML DA PÁGINA ---
+        const html = `
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-	<meta charset="utf-8" />
-	<title>${produto.nome} — Melhor Oferta</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <title>${produto.nome} — Melhor Oferta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
     <meta property="og:title" content="${produto.nome}">
     <meta property="og:description" content="Confira essa oferta incrível por ${precoFormatado}">
     <meta property="og:image" content="${produto.imagem}">
-	<style>
+    <meta property="og:url" content="${currentPageUrl}">
+
+    <style>
         * { box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -114,10 +150,11 @@ Link: ${shareLink}`;
             margin-bottom: 15px;
             align-self: flex-start;
             border: 1px solid #e1e8ed;
+            text-transform: uppercase;
         }
 
         h1 {
-            font-size: 1.8em;
+            font-size: 1.6em;
             margin: 0 0 10px 0;
             color: #1a1a1a;
             line-height: 1.3;
@@ -138,23 +175,25 @@ Link: ${shareLink}`;
         }
         .info-row strong { color: #333; }
 
+        /* Caixa de Descrição (Sem Scrollbar agora) */
         .description-box {
-            margin-top: 20px;
-            color: #666;
-            line-height: 1.6;
-            font-size: 0.95em;
-            background-color: #f9f9f9;
-            padding: 15px;
-            border-radius: 8px;
+             color: #666; 
+             line-height: 1.6; 
+             margin-top: 15px; 
+             font-size: 0.95em;
+             background-color: #f9f9f9;
+             padding: 15px;
+             border-radius: 8px;
+             text-align: left;
         }
 
         .read-more-link {
             color: #007bff;
             text-decoration: underline;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             display: inline-block;
-            margin-top: 5px;
+            margin-top: 8px;
         }
 
         .buttons {
@@ -174,13 +213,21 @@ Link: ${shareLink}`;
             text-decoration: none;
             cursor: pointer;
             transition: opacity 0.2s;
+            display: flex; align-items: center; justify-content: center;
         }
         .btn:hover { opacity: 0.9; }
 
-        .btn-buy { background-color: #28a745; color: white; }
+        .btn-buy { background-color: #28a745; color: white; text-transform: uppercase; }
         .btn-share { background-color: #6c757d; color: white; }
 
-        /* MODAL */
+        .back-home {
+            margin-top: 20px; text-align: center;
+        }
+        .back-home a {
+            color: #007bff; text-decoration: none; font-size: 0.9em;
+        }
+
+        /* --- MODAL (IDÊNTICO AO INDEX) --- */
         .modal {
             display: none;
             position: fixed;
@@ -203,6 +250,8 @@ Link: ${shareLink}`;
             overflow-y: auto;
             position: relative;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
         }
 
         .close-modal {
@@ -224,22 +273,34 @@ Link: ${shareLink}`;
             font-size: 1.4em;
             margin-bottom: 15px;
             padding-right: 30px;
+            color: #222;
         }
 
         .full-description {
-            white-space: pre-wrap;
+            white-space: pre-wrap; /* Respeita os Enters da planilha */
             line-height: 1.6;
             color: #444;
+            font-size: 1em;
         }
 
         /* Responsividade */
         @media (max-width: 768px) {
-            .container { flex-direction: column; margin: 10px; width: 95%; }
-            .image-col { width: 100%; border-right: none; border-bottom: 1px solid #eee; padding: 20px; }
-            .details-col { width: 100%; padding: 25px; box-sizing: border-box; }
-            h1 { font-size: 1.4em; }
-            .price { font-size: 2em; }
-            .buttons { flex-direction: column; }
+            .container { flex-direction: column; width: 95%; margin: 10px; }
+            .image-col { width: 100%; border-right: none; border-bottom: 1px solid #eee; padding: 20px; height: 300px; }
+            
+            .details-col { 
+                width: 100%; padding: 25px; 
+                text-align: center; 
+                align-items: center; 
+            }
+            
+            .store-badge { align-self: center; } 
+            h1 { font-size: 1.5em; text-align: center; }
+            .price { font-size: 2.2em; margin: 10px 0; }
+            .description-box { text-align: left; } /* Descrição alinhada a esquerda para leitura */
+            
+            .buttons { flex-direction: column; width: 100%; }
+            .btn { width: 100%; padding: 14px; }
         }
 	</style>
 </head>
@@ -247,7 +308,7 @@ Link: ${shareLink}`;
 
     <div class="container">
         <div class="image-col">
-            <img src="${produto.imagem}" alt="${produto.nome}">
+            <img src="${produto.imagem || 'https://via.placeholder.com/500?text=Oferta'}" alt="${produto.nome}">
         </div>
 
         <div class="details-col">
@@ -269,17 +330,16 @@ Link: ${shareLink}`;
                     Compartilhar
                 </a>
                 <a href="${buyLink}" target="_blank" class="btn btn-buy">
-                    Comprar na Loja
+                    Ir para a Loja
                 </a>
             </div>
             
-            <div style="margin-top:20px; text-align:center;">
-                <a href="/" style="color:#007bff; text-decoration:none; font-size:0.9em;">Voltar para o catálogo</a>
+            <div class="back-home">
+                <a href="/">Voltar para o catálogo</a>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE DESCRIÇÃO -->
     <div id="descriptionModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" id="closeModalBtn">&times;</button>
@@ -323,10 +383,10 @@ Link: ${shareLink}`;
 </html>
     `;
 
-		return new Response(html, {
-			headers: { "Content-Type": "text/html" },
-		});
-	} catch (error) {
-		return new Response(`Erro interno: ${error.message}`, { status: 500 });
-	}
+    return new Response(html, {
+        headers: { "Content-Type": "text/html" },
+    });
+    } catch (error) {
+        return new Response(`Erro interno: ${error.message}`, { status: 500 });
+    }
 }
