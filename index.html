@@ -15,12 +15,17 @@
     <meta property="og:title" content="🔥 DEAB - As Melhores Ofertas e Cupons do Dia">
     <meta property="og:description" content="Não compre antes de ver isso! Selecionei as melhores promoções e cupons para você economizar de verdade.">
     <meta property="og:image" content="https://ofertasincriveis.deab.com.br/capa-zap.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     
     <link rel="icon" href="/logo.png" type="image/png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* MANTENDO TODO O SEU CSS ORIGINAL AQUI */
+        /* --- ESTILOS GERAIS --- */
         * { box-sizing: border-box; }
         body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; padding-top: 70px; background-color: #fff; color: #333; line-height: 1.6; }
         a { text-decoration: none; }
@@ -28,12 +33,14 @@
         /* NAVBAR */
         .navbar { position: fixed; top: 0; left: 0; width: 100%; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; padding: 10px 20px; }
         .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
-        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        
+        .logo-container { display: flex; align-items: center; gap: 10px; text-decoration: none !important; }
         .logo-img { height: 50px; width: auto; object-fit: contain; }
         .logo-text { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.4rem; color: #d32f2f; line-height: 1; }
         .logo-text span { font-size: 0.7rem; color: #555; display: block; letter-spacing: 1px; font-weight: 400; }
+
         .nav-links { display: flex; gap: 20px; align-items: center; }
-        .nav-item { text-decoration: none; color: #555; font-weight: 600; font-size: 0.9rem; padding: 8px 12px; border-radius: 6px; transition: 0.2s; }
+        .nav-item { text-decoration: none !important; color: #555; font-weight: 600; font-size: 0.9rem; padding: 8px 12px; border-radius: 6px; transition: 0.2s; }
         .nav-item:hover, .nav-item.active { background-color: #f0f0f0; color: #d32f2f; }
         .hamburger { display: none; cursor: pointer; background: none; border: none; font-size: 24px; color: #333; }
 
@@ -43,29 +50,29 @@
         .hero h1 span { color: #d32f2f; }
         .hero-text { font-size: 1.2rem; color: #666; max-width: 800px; margin: 0 auto 30px; }
 
-        /* CTA */
-        .cta-container { text-align: center; margin: 40px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .btn-big { padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.1rem; color: white; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; }
-        .btn-big:hover { transform: translateY(-3px); filter: brightness(1.1); }
-        .btn-ofertas { background-color: #d32f2f; }
-        .btn-cupons { background-color: #007bff; }
-        .btn-catalogo { background-color: #2c3e50; }
-
-        /* COPY */
+        /* TEXTO DE VENDAS */
         .copy-section { padding: 40px 20px; background: #fff; }
         .copy-box { max-width: 900px; margin: 0 auto; background: #fdfdfd; padding: 30px; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .copy-box h3 { color: #d32f2f; margin-top: 0; font-size: 1.5rem; }
         .copy-box p { margin-bottom: 15px; font-size: 1.05rem; }
         .copy-highlight { background: #fff3e0; padding: 2px 5px; border-radius: 4px; font-weight: bold; color: #e65100; }
 
+        /* BOTÕES */
+        .cta-container { text-align: center; margin: 40px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn-big { padding: 15px 30px; border-radius: 50px; font-weight: bold; font-size: 1.1rem; color: white; transition: transform 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 10px; text-decoration: none !important; }
+        .btn-big:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-ofertas { background-color: #d32f2f; }
+        .btn-cupons { background-color: #007bff; }
+        .btn-catalogo { background-color: #2c3e50; }
+
         /* PARCEIROS */
         .partners { text-align: center; padding: 40px 20px; background: #f8f9fa; }
         .partner-list { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; margin-top: 20px; color: #777; font-weight: bold; font-size: 1.1rem; }
 
-        /* PREVIEW */
+        /* PRÉVIA */
         .preview-section { padding: 40px 20px; background: #fff; }
         .preview-header { text-align: center; margin-bottom: 30px; }
-        .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; text-align: left; }
         
         /* CARD */
         .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 1px solid #eee; transition: transform 0.2s; display: flex; flex-direction: column; }
@@ -73,17 +80,20 @@
         .card-img-box { width: 100%; padding-top: 100%; position: relative; background: #fff; border-bottom: 1px solid #f0f0f0; }
         .card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 15px; }
         .card-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        h4 { margin: 0 0 5px 0; font-size: 0.95rem; line-height: 1.4; color: #333; height: 3.9em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+        .store-tag { font-size: 0.75rem; text-transform: uppercase; font-weight: 800; color: #6f42c1; margin-bottom: 8px; background: #f3e5f5; display: inline-block; padding: 2px 8px; border-radius: 4px; align-self: flex-start; }
+        h4 { margin: 0 0 10px 0; font-size: 0.95rem; line-height: 1.4; color: #333; height: 3.9em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; font-weight: 600; }
         .price-preview { color: #28a745; font-weight: 800; font-size: 1.3rem; margin-top: auto; }
-        .btn-link { display: block; text-align: center; background: #6c757d; color: white; padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; font-size: 0.9rem; cursor: pointer; }
-        .btn-buy-small { display: block; text-align: center; background: #28a745; color: white; padding: 10px; border-radius: 6px; margin-top: 8px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; }
+        
+        /* Botões do Card */
+        .btn-link { display: block; text-align: center; background: #6c757d; color: white; padding: 10px; border-radius: 6px; margin-top: 10px; font-weight: bold; font-size: 0.9rem; cursor: pointer; text-decoration: none !important; }
+        .btn-buy-small { display: block; text-align: center; background: #28a745; color: white; padding: 10px; border-radius: 6px; margin-top: 8px; font-weight: bold; font-size: 0.9rem; text-transform: uppercase; text-decoration: none !important; }
 
         /* WHATSAPP */
         .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 2000; transition: transform 0.2s;}
         .whatsapp-float:hover { transform: scale(1.1); }
         
         footer { background: #333; color: white; text-align: center; padding: 30px 20px; margin-top: 40px; }
-        
+
         /* MODAL */
         .modal { display: none; position: fixed; z-index: 3000; inset: 0; background-color: rgba(0,0,0,0.7); align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(3px); }
         .modal-content { background-color: #fff; border-radius: 12px; width: 100%; max-width: 800px; max-height: 90vh; display: flex; flex-direction: row; overflow: hidden; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
@@ -91,17 +101,25 @@
         .modal-image-col img { max-width: 100%; max-height: 50vh; object-fit: contain; }
         .modal-details-col { width: 55%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
         .close-button { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; background: rgba(255,255,255,0.9); border-radius: 50%; width: 40px; height: 40px; border: none; z-index: 100; display: flex; align-items: center; justify-content: center; color: #555; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        #modalTitle { font-size: 1.6em; margin-top: 10px; line-height: 1.3; margin-right: 30px; font-family: 'Montserrat', sans-serif;}
+        
+        #modalTitle { font-size: 1.6em; margin-top: 10px; line-height: 1.3; margin-right: 30px; font-family: 'Montserrat', sans-serif; }
         #modalPrice { font-size: 2em; font-weight: 800; color: #28a745; margin: 15px 0; }
+        
         .modal-description-box { background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; color: #555; font-size: 0.95em; text-align: left; }
         #modalDescription { white-space: pre-wrap; }
-        /* CORREÇÃO: O LINK AGORA É UM BOTÃO SEMÂNTICO */
-        .read-more-btn { background:none; border:none; padding:0; color: #007bff; text-decoration: underline; cursor: pointer; font-weight: 600; font-size: inherit; font-family: inherit; display: inline-block; margin-top: 5px; }
+        .read-more-link { color: #007bff; text-decoration: underline; cursor: pointer; font-weight: 600; display: inline-block; margin-top: 5px; }
+        
+        .mini-coupon { background: #fff3e0; color: #e65100; padding: 8px; border: 1px dashed #ffb74d; border-radius: 6px; font-size: 0.9rem; text-align: center; margin-bottom: 15px; cursor: pointer; font-weight: bold; }
+        .validity-info { font-size: 0.8rem; color: #777; margin-bottom: 10px; }
 
         .modal-buttons-container { display: flex; gap: 10px; margin-top: 20px; }
         #modalBuyButton, #shareProductButton { flex: 1; padding: 14px; border-radius: 6px; text-align: center; font-weight: bold; cursor: pointer; border:none; text-decoration:none; display:flex; align-items:center; justify-content:center; color: white; font-size: 0.95rem; }
         #shareProductButton { background-color: #6c757d; }
         #modalBuyButton { background-color: #28a745; text-transform: uppercase; }
+        
+        #descriptionModal .modal-content { flex-direction: column; max-width: 500px; height: auto; max-height: 80vh; }
+
+        .no-scroll { overflow: hidden; }
 
         /* RESPONSIVIDADE */
         @media (max-width: 768px) {
@@ -111,10 +129,14 @@
             .hero h1 { font-size: 1.8rem; }
             .cta-container { flex-direction: column; width: 100%; }
             .btn-big { width: 100%; justify-content: center; }
+            
             .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .card-img { height: 140px; }
-            .card-title { font-size: 0.85rem; }
-            .card-price { font-size: 1.1rem; }
+            .card-body { padding: 10px; }
+            h4 { font-size: 0.85rem; min-height: 3.6em; }
+            .price-preview { font-size: 1.1rem; }
+            
+            /* Modal Mobile */
             .modal-content { flex-direction: column; width: 95%; margin: 0 auto; max-height: 95vh; }
             .modal-image-col { width: 100%; height: 250px; border-right: none; border-bottom: 1px solid #eee; padding: 10px; flex-shrink: 0;}
             .modal-image-col img { max-height: 100%; }
@@ -229,7 +251,7 @@
                 <div class="modal-description-box">
                     <strong>Detalhes:</strong><br>
                     <span id="modalDescription"></span>
-                    <button id="readMoreBtn" class="read-more-btn" style="display: none;">Ler completa</button>
+                    <a href="javascript:void(0)" id="readMoreLink" style="display: none; color: #007bff; text-decoration: underline; margin-top:5px; display:block;">Ler completa</a>
                 </div>
                 
                 <div id="modalCouponArea" style="margin-bottom: 15px;"></div>
@@ -242,8 +264,8 @@
         </div>
     </div>
 
-    <div id="descriptionModal" class="modal" style="z-index: 1200;">
-        <div class="modal-content" style="padding: 20px; flex-direction: column; max-width: 500px; height: auto; width: 90%;">
+    <div id="descriptionModal" class="modal" style="z-index: 1100;">
+        <div class="modal-content" style="padding: 20px; flex-direction: column; max-width: 500px; height: auto; max-height: 80vh; width: 90%;">
             <button class="close-button" onclick="closeDescriptionModal()">&times;</button>
             <h3 style="font-family: 'Montserrat', sans-serif;">Descrição Completa</h3>
             <div id="fullDescriptionText" style="overflow-y: auto; line-height: 1.6; color: #444; text-align: left; white-space: pre-wrap;"></div>
@@ -252,8 +274,10 @@
     </div>
 
     <script>
-        // URL DO SCRIPT GOOGLE
+        // SCRIPT PARA CARREGAR A PRÉVIA (8 ITENS) E CONTROLAR O MODAL
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
+        const modal = document.getElementById('productModal');
+        const descModal = document.getElementById('descriptionModal');
 
         async function loadPreview() {
             try {
@@ -267,36 +291,41 @@
                 grid.innerHTML = ''; 
 
                 activeOffers.forEach(item => {
-                    // CORREÇÃO SEO: ADICIONADO ALT TEXT NA IMAGEM
                     const imgUrl = item.imagem || "https://via.placeholder.com/300?text=Oferta";
                     let htmlPreco = '';
                     if(item.por) {
                         htmlPreco = `<div class="price-preview">${item.por}</div>`;
                     }
 
-                    const detailLink = `/p/${item.id}`;
+                    let htmlCupom = '';
+                    if(item.cupom) {
+                        htmlCupom = `<div class="mini-coupon" onclick="event.stopPropagation(); navigator.clipboard.writeText('${item.cupom}');alert('Copiado!')">🎟️ ${item.cupom}</div>`;
+                    }
 
-                    // CORREÇÃO SEO: MUDADO PARA BUTTON SE NÃO FOR LINK REAL
+                    const productString = JSON.stringify(item).replace(/'/g, "&apos;");
+
                     grid.innerHTML += `
                         <div class="card">
-                            <div class="card-img-box"><img src="${imgUrl}" alt="${item.titulo}" class="card-img" loading="lazy"></div>
+                            <div class="card-img-box"><img src="${imgUrl}" class="card-img" loading="lazy"></div>
                             <div class="card-body">
-                                <div class="store-tag" style="font-size:0.7rem;font-weight:bold;color:#6f42c1;text-transform:uppercase;">${item.loja}</div>
+                                <div class="store-tag">${item.loja}</div>
                                 <h4>${item.titulo}</h4>
                                 ${htmlPreco}
-                                <button class="btn-link" style="width:100%; border:none;" onclick='openProductModal(${JSON.stringify(item).replace(/'/g, "&apos;")})'>VER DETALHES</button>
-                                <a href="${item.link}" target="_blank" class="btn-buy-small" style="margin-top:5px; text-decoration:none; background:#28a745; color:white; padding:8px; display:block; border-radius:6px; text-align:center;">PEGAR PROMOÇÃO</a>
+                                ${htmlCupom}
+                                
+                                <div class="card-actions">
+                                    <button class="btn-link" style="width:100%; border:none;" onclick='openProductModal(${productString})'>VER DETALHES</button>
+                                    <a href="${item.link}" target="_blank" class="btn-buy-small" style="margin-top:5px; text-decoration:none; background:#28a745; color:white; padding:8px; display:block; border-radius:6px; text-align:center;">PEGAR PROMOÇÃO</a>
+                                </div>
                             </div>
                         </div>
                     `;
                 });
+
             } catch(e) { console.log("Erro preview:", e); }
         }
 
-        // --- MODAL LOGIC ---
-        const modal = document.getElementById('productModal');
-        const descModal = document.getElementById('descriptionModal');
-
+        // --- LÓGICA DO MODAL ---
         function openProductModal(item) {
             if (typeof item === 'string') item = JSON.parse(item);
             
@@ -306,22 +335,26 @@
             document.getElementById('modalPrice').textContent = item.por || "";
             
             const desc = item.descricao || "Sem descrição.";
-            const MAX_LEN = 200;
-            
-            // CORREÇÃO: Uso do botão readMoreBtn
-            const readMoreBtn = document.getElementById('readMoreBtn');
-            
+            const MAX_LEN = 250;
             if (desc.length > MAX_LEN) {
                 document.getElementById('modalDescription').textContent = desc.substring(0, MAX_LEN) + "...";
-                readMoreBtn.style.display = 'inline-block';
-                readMoreBtn.onclick = () => openDescriptionModal(desc);
+                const readMore = document.getElementById('readMoreLink');
+                readMore.style.display = 'inline-block';
+                readMore.onclick = () => openDescriptionModal(desc);
             } else {
                 document.getElementById('modalDescription').textContent = desc;
-                readMoreBtn.style.display = 'none';
+                document.getElementById('readMoreLink').style.display = 'none';
             }
 
             document.getElementById('modalValidity').textContent = "Validade: " + (item.validade || "Indeterminado");
             document.getElementById('modalBuyButton').href = item.link;
+            
+            // Compartilhar
+            document.getElementById('shareProductButton').onclick = () => {
+                const productPageLink = `${window.location.origin}/p/${item.id}`;
+                const msg = `Olha essa oferta!\n*${item.titulo}*\nPor: ${item.por}\nLoja: ${item.loja}\n\nLink: ${productPageLink}`;
+                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+            };
             
             const couponArea = document.getElementById('modalCouponArea');
             if (item.cupom) {
@@ -330,22 +363,12 @@
                 couponArea.innerHTML = '';
             }
 
-            document.getElementById('shareProductButton').onclick = () => {
-                const productPageLink = `${window.location.origin}/p/${item.id}`;
-                const msg = `Olha essa oferta!\n*${item.titulo}*\nPor: ${item.por}\nLoja: ${item.loja}\nLink: ${productPageLink}`;
-                window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
-            };
-
             modal.style.display = 'flex';
             document.body.classList.add('no-scroll');
         }
 
-        function closeProductModal() { modal.style.display = 'none'; document.body.classList.remove('no-scroll'); }
-        
-        function openDescriptionModal(text) {
-            document.getElementById('fullDescriptionText').textContent = text;
-            descModal.style.display = 'flex';
-        }
+        function closeProductModal() { modal.style.display = 'none'; document.body.style.overflow = 'auto'; }
+        function openDescriptionModal(text) { document.getElementById('fullDescriptionText').textContent = text; descModal.style.display = 'flex'; }
         function closeDescriptionModal() { descModal.style.display = 'none'; }
 
         window.onclick = (e) => {
