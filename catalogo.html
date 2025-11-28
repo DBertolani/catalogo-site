@@ -327,7 +327,7 @@
             if (!currentProduct) return;
             // 1. LINK CORRIGIDO PARA A PÁGINA DO PRODUTO
             const productPageLink = `${window.location.origin}/p/${currentProduct.id}`;
-            const msg = `Olha que oferta!\n\n*${currentProduct.nome}*\nPreço: ${formatMoney(currentProduct.preco)}\nLoja: ${currentProduct.lojaParceira}\n\nLink: ${productPageLink}`;
+            const msg = `Olha que oferta!\n\n*${currentProduct.nome}*\nPreço: *_${formatMoney(currentProduct.preco)}_*\nLoja: _${currentProduct.lojaParceira}_\n\nLink: ${productPageLink}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         });
 
