@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Completo - DEAB</title>
@@ -9,10 +10,19 @@
 <style>
     /* --- ESTILOS GERAIS (PADRÃO DEAB) --- */
     * { box-sizing: border-box; }
-    body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; padding-top: 70px; background-color: #f8f9fa; color: #333; overflow-x: hidden; }
+    body { 
+        font-family: 'Open Sans', sans-serif; 
+        margin: 0; 
+        padding: 0; 
+        padding-top: 80px; /* Espaço para o menu fixo */
+        background-color: #f8f9fa; 
+        color: #333; 
+        overflow-x: hidden; 
+    }
+    .no-scroll { overflow: hidden !important; position: fixed; width: 100%; height: 100%; top: 0; left: 0; }
     .container { max-width: 1200px; margin: 0 auto; padding: 20px 15px; }
 
-    /* NAVBAR */
+    /* NAVBAR FIXA */
     .navbar { position: fixed; top: 0; left: 0; width: 100%; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; padding: 10px 20px; }
     .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
     .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.4rem; text-decoration: none; background: linear-gradient(45deg, #d32f2f, #ff5252); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1;}
@@ -22,61 +32,117 @@
     .nav-item:hover, .nav-item.active { background-color: #f0f0f0; color: #d32f2f; }
     .hamburger { display: none; cursor: pointer; background: none; border: none; font-size: 24px; color: #333; }
 
-    /* HEADER INTERNO */
+    /* HEADER DA PÁGINA */
     .header { text-align: center; margin-bottom: 35px; }
-    .header h1 { color: #2c3e50; margin-bottom: 10px; font-family: 'Montserrat', sans-serif;}
+    .header h1 { color: #2c3e50; margin-bottom: 10px; font-family: 'Montserrat', sans-serif; font-size: 2rem; }
 
-    /* BARRA DE BUSCA */
+    /* BARRA DE BUSCA E FILTROS (Visual Atualizado) */
     .search-and-filter-container { display: flex; gap: 10px; margin-bottom: 30px; flex-wrap: wrap; }
     .search-container { flex-grow: 1; display: flex; gap: 10px; }
     .search-container input[type="text"] { flex-grow: 1; padding: 12px; border: 1px solid #ced4da; border-radius: 6px; font-size: 16px; }
-    .search-container button, #filterButton { padding: 12px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-    .search-container button:hover { background-color: #0056b3; }
+    .search-container button, #filterButton { padding: 12px 20px; background-color: #007bff; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .search-container button:hover, #filterButton:hover { background-color: #0056b3; }
 
-    /* GRID */
-    .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; justify-content: center; }
+    /* GRID DE PRODUTOS (Responsivo) */
+    .product-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+        gap: 25px; 
+        justify-content: center; 
+    }
     
-    /* CARD NOVO ESTILO */
-    .product-card { background-color: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; text-align: center; display: flex; flex-direction: column; transition: transform 0.2s; border: 1px solid #eee; height: 100%; max-width: 400px; margin: 0 auto; width: 100%; }
-    .product-card:hover { transform: translateY(-5px); }
+    /* CARD NOVO ESTILO (Compatível com seu JS) */
+    .product-card { 
+        background-color: white; border-radius: 12px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+        overflow: hidden; text-align: center; display: flex; flex-direction: column; 
+        transition: transform 0.2s; border: 1px solid #eee; height: 100%; width: 100%; 
+    }
+    .product-card:hover { transform: translateY(-5px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
 
-    .product-card-image-container { position: relative; width: 100%; padding-top: 100%; background-color: #fff; border-bottom: 1px solid #f0f0f0;}
-    .product-card-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 15px; }
+    .product-card-image-container { 
+        position: relative; width: 100%; padding-top: 100%; 
+        background-color: #fff; border-bottom: 1px solid #f0f0f0;
+    }
+    .product-card-image { 
+        position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+        object-fit: contain; padding: 15px; 
+    }
 
     .product-card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
-    .product-card-title { color: #333; font-size: 1rem; margin: 0 0 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 4.2em; }
-    .product-card-store span { color: #6f42c1; font-weight: bold; text-transform: uppercase; font-size: 0.8em;}
+    
+    .product-card-title { 
+        color: #333; font-size: 1rem; margin: 0 0 10px; line-height: 1.4; 
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; 
+        overflow: hidden; min-height: 4.2em; 
+    }
+    
+    .product-card-store { font-size: 0.85em; color: #666; margin-bottom: 5px; text-transform: uppercase; }
+    .product-card-store span { color: #6f42c1; font-weight: bold; }
     .product-card-price { color: #28a745; font-size: 1.4em; font-weight: 800; margin: 10px 0; }
 
-    .btn-details { background-color: #6c757d; color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9em; display:block; margin-bottom:5px; cursor: pointer; border: none; width: 100%;}
-    .btn-buy { background-color: #28a745; color: white; padding: 12px; border-radius: 6px; text-decoration: none; font-weight: bold; text-transform: uppercase; font-size: 0.9em; display: block; }
+    .product-card-buttons { display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+    
+    /* Botões do Card (Estilo Novo) */
+    .btn-details { 
+        background-color: #6c757d; color: white; padding: 10px; border-radius: 6px; 
+        text-decoration: none; font-weight: 600; font-size: 0.9em; 
+        cursor: pointer; border: none; width: 100%; display: block;
+    }
+    .btn-buy { 
+        background-color: #28a745; color: white; padding: 12px; border-radius: 6px; 
+        text-decoration: none; font-weight: bold; text-transform: uppercase; 
+        font-size: 0.9em; display: block; cursor: pointer; border: none; width: 100%;
+    }
+    .btn-buy:hover { background-color: #218838; }
 
-    /* MODAL */
+    /* MODAIS (Visual Atualizado) */
     .modal { display: none; position: fixed; z-index: 1100; inset: 0; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center; padding: 15px; backdrop-filter: blur(3px); }
-    .modal-content { background-color: #fff; border-radius: 12px; width: 100%; max-width: 900px; max-height: 90vh; display: flex; flex-direction: row; overflow: hidden; position: relative; }
+    
+    .modal-content { 
+        background-color: #fff; border-radius: 12px; width: 100%; max-width: 900px; max-height: 90vh; 
+        display: flex; flex-direction: row; overflow: hidden; position: relative; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    
     .modal-image-col { width: 45%; display: flex; align-items: center; justify-content: center; padding: 20px; background: #fff; border-right: 1px solid #eee; }
     .modal-image-col img { max-width: 100%; max-height: 50vh; object-fit: contain; }
     .modal-details-col { width: 55%; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; }
-    .close-button { position: absolute; top: 10px; right: 15px; font-size: 32px; cursor: pointer; border:none; background:none; z-index: 1200;}
-    #modalTitle { font-size: 1.6em; margin-top: 0; line-height: 1.3; }
+    
+    .close-button { 
+        position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; 
+        border:none; background: rgba(255,255,255,0.8); border-radius: 50%; width: 35px; height: 35px;
+        display: flex; align-items: center; justify-content: center; color: #555; z-index: 10;
+    }
+    
+    #modalTitle { font-size: 1.6em; margin-top: 10px; line-height: 1.3; margin-right: 30px;}
     #modalPrice { font-size: 2.2em; font-weight: 800; color: #28a745; margin: 15px 0; }
-    .modal-description-box { background-color: #f9f9f9; padding: 15px; border-radius: 8px; margin: 15px 0; color: #555; font-size: 0.95em; text-align: left; }
-    .modal-buttons-container { display: flex; gap: 15px; margin-top: auto; }
-    #modalBuyButton, #shareProductButton { flex: 1; padding: 15px; border-radius: 6px; font-weight: bold; text-align: center; cursor: pointer; color: white; border:none;}
+    
+    .modal-buttons-container { display: flex; gap: 10px; margin-top: 20px; }
+    #modalBuyButton, #shareProductButton { 
+        flex: 1; padding: 12px; border-radius: 6px; font-weight: bold; text-align: center; 
+        cursor: pointer; color: white; border:none; text-decoration:none; 
+        display: flex; align-items: center; justify-content: center;
+    }
     #shareProductButton { background-color: #6c757d; }
-    #modalBuyButton { background-color: #28a745; text-decoration: none; display: flex; align-items: center; justify-content: center;}
+    #modalBuyButton { background-color: #28a745; text-transform: uppercase; }
 
-    /* WHATSAPP */
-    .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 2000; transition: transform 0.2s;}
+    /* WHATSAPP FLUTUANTE */
+    .whatsapp-float { 
+        position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; 
+        width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; 
+        justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); 
+        z-index: 2000; transition: transform 0.2s;
+    }
     .whatsapp-float:hover { transform: scale(1.1); }
 
-    /* Loader e Filtros */
+    /* Filtros Ativos e Loader */
     #activeFilters { margin-bottom: 20px; padding: 10px 15px; background-color: #e9ecef; border-radius: 6px; display: none; font-size: 0.9em; }
     #loader-container { text-align: center; margin-top: 50px; display: none; }
     .loader { border: 5px solid #f3f3f3; border-top: 5px solid #007bff; border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin: 0 auto 20px auto; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-    /* RESPONSIVIDADE */
+    /* RESPONSIVIDADE (2 Colunas Mobile) */
     @media (max-width: 768px) {
         .nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 60px; left: 0; background: white; padding: 10px 0; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
         .nav-links.active { display: flex; }
@@ -85,16 +151,14 @@
         .product-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
         .product-card-title { font-size: 0.9em; min-height: 3.6em; }
         .product-card-price { font-size: 1.1em; }
-        .btn-buy, .btn-details { padding: 8px; font-size: 0.8rem; }
         
+        /* Modal Mobile */
         .modal-content { flex-direction: column; width: 95%; margin: 0 auto; }
         .modal-image-col { width: 100%; height: 250px; border-right: none; border-bottom: 1px solid #eee; padding: 10px; }
+        .modal-image-col img { max-height: 100%; }
         .modal-details-col { width: 100%; padding: 20px; }
         .modal-buttons-container { flex-direction: column; }
     }
-    
-    /* Ocultar scroll quando modal aberto */
-    .no-scroll { overflow: hidden; }
 </style>
 </head>
 <body>
@@ -112,7 +176,7 @@
         </div>
     </nav>
 
-    <a href="https://wa.me/5527996962395?text=Olá! Preciso de ajuda com um produto do catálogo." class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/5527996962395?text=Olá! Vim pelo Catálogo e preciso de ajuda." class="whatsapp-float" target="_blank" title="Fale no WhatsApp">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35" height="35" alt="Zap">
     </a>
 
@@ -123,38 +187,51 @@
 
         <div class="search-and-filter-container">
             <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Busque por produto, marca ou loja...">
+                <input type="text" id="searchInput" placeholder="O que você procura hoje?">
                 <button id="searchButton">Buscar</button>
             </div>
             <button id="filterButton">Filtros</button>
         </div>
 
-        <div id="activeFilters"><p>Filtros aplicados: <span id="filtersAppliedText"></span> <button id="clearFiltersButton">Limpar</button></p></div>
-        
-        <div id="loader-container"><div class="loader"></div><div class="loader-text">Carregando produtos...</div></div>
-        
+        <div id="activeFilters">
+            <p>Filtros aplicados: <span id="filtersAppliedText"></span> <button id="clearFiltersButton">Limpar</button></p>
+        </div>
+
+        <div id="loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">Carregando produtos...</div>
+        </div>
+
         <div id="productGrid" class="product-grid"></div>
-        
+
         <div style="text-align: center; margin: 30px 0;">
-            <button id="loadMoreBtn" class="btn-details" style="display:none; width: 200px; margin: 0 auto; background:#007bff; color:white;">Carregar Mais</button>
-            <p id="noMoreProducts" style="display:none; color: #888;">Fim dos resultados.</p>
+            <button id="loadMoreBtn" class="btn-details" style="display:none; width: 200px; margin: 0 auto; background:#007bff; color:white;">Carregar Mais Produtos</button>
+            <p id="noMoreProducts" style="display:none; color: #888;">Não há mais produtos para carregar.</p>
         </div>
     </div>
 
     <div id="productModal" class="modal">
         <div class="modal-content">
             <button class="close-button" onclick="closeProductModal()">&times;</button>
-            <div class="modal-image-col"><img id="modalImage" src=""></div>
+            
+            <div class="modal-image-col">
+                <img id="modalImage" src="" alt="">
+            </div>
+            
             <div class="modal-details-col">
+                <span class="modal-store-badge" id="modalStoreBadge" style="display:inline-block; background:#eee; padding:4px 8px; border-radius:10px; font-weight:bold; color:#6f42c1; margin-bottom:10px;"></span>
                 <h2 id="modalTitle"></h2>
                 <div id="modalPrice"></div>
-                <p><strong>Loja:</strong> <span id="modalStore"></span></p>
-                <p><strong>Marca:</strong> <span id="modalBrand"></span></p>
-                <p><strong>Categoria:</strong> <span id="modalCategory"></span></p>
-                <div class="modal-description-box">
-                     <strong>Detalhes:</strong><br>
-                     <span id="modalDescription" style="white-space: pre-wrap;"></span>
+                <p style="margin-bottom:5px;"><strong>Loja:</strong> <span id="modalStore"></span></p>
+                <p style="margin-bottom:5px;"><strong>Marca:</strong> <span id="modalBrand"></span></p>
+                <p style="margin-bottom:15px;"><strong>Categoria:</strong> <span id="modalCategory"></span></p>
+                
+                <div class="modal-description-box" style="background:#f9f9f9; padding:15px; border-radius:8px; text-align:left;">
+                    <strong>Detalhes:</strong><br>
+                    <span id="modalDescription" style="white-space: pre-wrap;"></span>
+                    <a href="javascript:void(0)" id="readMoreLink" style="display: none; color: #007bff; text-decoration: underline; display:block; margin-top:5px;">Ler completa</a>
                 </div>
+
                 <div class="modal-buttons-container">
                     <button id="shareProductButton">Compartilhar</button>
                     <a href="#" target="_blank" id="modalBuyButton">Ir para a Loja</a>
@@ -163,34 +240,42 @@
         </div>
     </div>
 
+    <div id="descriptionModal" class="modal" style="z-index: 1200;">
+        <div class="modal-content" style="padding: 20px; flex-direction: column; max-width: 600px; height: auto;">
+            <button class="close-button" onclick="closeDescriptionModal()">&times;</button>
+            <h3>Descrição Completa</h3>
+            <div id="fullDescriptionText" style="overflow-y: auto; max-height: 60vh; white-space: pre-wrap; text-align: left;"></div>
+            <button class="btn-details" onclick="closeDescriptionModal()" style="margin-top: 20px; background:#666; color:white;">Voltar</button>
+        </div>
+    </div>
+
     <div id="filterModal" class="modal">
-        <div class="modal-content" style="max-width:500px; flex-direction:column; height:auto; width:95%;">
-             <div style="padding:20px; width:100%;">
-                <button class="close-button" onclick="closeFilterModal()" style="position:absolute; top:10px; right:10px;">&times;</button>
-                <h3 style="margin-top:0;">Filtrar</h3>
-                <div id="filterOptions"></div>
-                <button id="applyFiltersButton" style="background:#007bff; color:white; border:none; padding:12px; width:100%; margin-top:15px; cursor:pointer; border-radius:6px; font-weight:bold;">Aplicar</button>
-             </div>
+        <div class="modal-content" style="max-width: 500px; flex-direction: column; height: auto; width: 95%;">
+            <button class="close-button" onclick="closeFilterModal()">&times;</button>
+            <div style="padding: 20px; width: 100%;">
+                <h3 style="margin-top: 0;">Refinar Busca</h3>
+                <div id="filterOptions" style="display: flex; flex-direction: column; gap: 15px;"></div>
+                <button id="applyFiltersButton" style="margin-top: 20px; width: 100%; padding:12px; background:#007bff; color:white; border:none; border-radius:6px; font-weight:bold; cursor:pointer;">Aplicar Filtros</button>
+            </div>
         </div>
     </div>
 
     <script>
         function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
-        
-        // --- LÓGICA ORIGINAL (MANTIDA E ADAPTADA AO NOVO DESIGN) ---
-        
+    
         let currentOffset = 0;
         const productsPerPage = 50;
         let currentQuery = new URLSearchParams(window.location.search).get('query') || '';
         let totalProductsFound = 0;
-        const MAX_DESC_LENGTH = 180; 
+        const MAX_DESC_LENGTH = 180;
 
         let currentProduct = null;
+        let currentProductDescription = '';
         let currentStoreFilter = '';
         let currentCategoryFilter = '';
         let currentBrandFilter = '';
 
-        // Elementos
+        // Elementos DOM (Mantidos do seu original)
         const productGrid = document.getElementById('productGrid');
         const loaderContainer = document.getElementById('loader-container');
         const searchInput = document.getElementById('searchInput');
@@ -200,19 +285,38 @@
         const activeFiltersContainer = document.getElementById('activeFilters');
         const filtersAppliedText = document.getElementById('filtersAppliedText');
         const clearFiltersButton = document.getElementById('clearFiltersButton');
-        
+
         // Modais
         const productModal = document.getElementById('productModal');
+        const descriptionModal = document.getElementById('descriptionModal');
         const filterModal = document.getElementById('filterModal');
+        const modalImage = document.getElementById('modalImage');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalPrice = document.getElementById('modalPrice');
+        const modalStoreBadge = document.getElementById('modalStoreBadge');
+        const modalBrand = document.getElementById('modalBrand');
+        const modalCategory = document.getElementById('modalCategory');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalStore = document.getElementById('modalStore');
+        const modalBuyButton = document.getElementById('modalBuyButton');
+        const readMoreLink = document.getElementById('readMoreLink');
+        const fullDescriptionText = document.getElementById('fullDescriptionText');
+        const shareProductButton = document.getElementById('shareProductButton');
         const filterButton = document.getElementById('filterButton');
         const applyFiltersButton = document.getElementById('applyFiltersButton');
 
-        // Funções de Apoio
         function formatMoney(value) {
             if (!value) return "R$ 0,00";
             let num = typeof value === 'string' ? parseFloat(value.replace('R$', '').replace(',', '.')) : value;
             if (isNaN(num)) return value;
             return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+        }
+
+        function adjustIframeHeight() {
+            const height = document.body.scrollHeight;
+            if (typeof google !== 'undefined' && google.script && google.script.host) {
+                google.script.host.setHeight(height);
+            }
         }
 
         function showLoader() {
@@ -227,15 +331,18 @@
             productGrid.style.display = 'grid';
         }
 
-        // --- CRIAÇÃO DO CARD COM NOVO DESIGN ---
+        // --- FUNÇÃO DE CARD ATUALIZADA (Novo HTML + Dados Antigos) ---
         function createProductCard(product) {
             const card = document.createElement('div');
-            card.className = 'product-card';
+            card.className = 'product-card'; // Usa o CSS novo
+
+            // Formata preço (mantendo a lógica original de dados)
             const priceFormatted = formatMoney(product.preco);
 
-            // Nota: O JS converte o objeto product para string segura para o onclick
+            // String segura para passar no onclick
             const productString = JSON.stringify(product).replace(/'/g, "&apos;");
 
+            // HTML com a estrutura nova, mas preenchido pelos seus dados
             card.innerHTML = `
                 <div class="product-card-image-container">
                     <img src="${product.imagem}" alt="${product.nome}" class="product-card-image" loading="lazy" onerror="this.src='https://via.placeholder.com/300x300?text=Sem+Imagem'">
@@ -243,6 +350,7 @@
                 <div class="product-card-content">
                     <div class="product-card-store">Vendido por <span>${product.lojaParceira || 'Parceiro'}</span></div>
                     <h3 class="product-card-title" title="${product.nome}">${product.nome}</h3>
+                    
                     <div class="product-card-price">${priceFormatted}</div>
                     
                     <div class="product-card-buttons">
@@ -256,7 +364,60 @@
             return card;
         }
 
-        // --- FETCH DOS PRODUTOS (MANTIDO) ---
+        function updateActiveFiltersDisplay() {
+            let filters = [];
+            if (currentQuery) filters.push(`Pesquisa: "${currentQuery}"`);
+            if (currentStoreFilter) filters.push(`Loja: "${currentStoreFilter}"`);
+            if (currentCategoryFilter) filters.push(`Categoria: "${currentCategoryFilter}"`);
+            if (currentBrandFilter) filters.push(`Marca: "${currentBrandFilter}"`);
+
+            if (filters.length > 0) {
+                filtersAppliedText.innerHTML = filters.map(f => `<strong>${f}</strong>`).join(' | ');
+                activeFiltersContainer.style.display = 'block';
+            } else {
+                activeFiltersContainer.style.display = 'none';
+                filtersAppliedText.textContent = '';
+            }
+        }
+
+        // --- CARREGAMENTO DOS FILTROS (Lógica Original) ---
+        async function loadGlobalFilters() {
+            const filterApiUrl = "https://teste-api.deab.com.br/api/filtros"; // Sua API original
+            const container = document.getElementById('filterOptions');
+            if (!container) return;
+
+            try {
+                const response = await fetch(filterApiUrl);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+                
+                if (!data.stores || !data.categories || !data.brands) return;
+
+                // Renderiza com o mesmo HTML que você já usava, mas injetado no novo modal
+                container.innerHTML = `
+                <div style="margin-bottom:15px">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Loja Parceira:</label>
+                    <input list="storeDatalist" id="storeFilterInput" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;" placeholder="Todas as Lojas" value="${currentStoreFilter}">
+                    <datalist id="storeDatalist"><option value="">Todas Lojas</option>${data.stores.map(store => `<option value="${store}">`).join('')}</datalist>
+                </div>
+                <div style="margin-bottom:15px">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Categoria:</label>
+                    <input list="categoryDatalist" id="categoryFilterInput" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;" placeholder="Todas as Categorias" value="${currentCategoryFilter}">
+                    <datalist id="categoryDatalist"><option value="">Todas Categorias</option>${data.categories.map(cat => `<option value="${cat}">`).join('')}</datalist>
+                </div>
+                <div style="margin-bottom:15px">
+                    <label style="font-weight:bold; display:block; margin-bottom:5px;">Marca:</label>
+                    <input list="brandDatalist" id="brandFilterInput" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:4px;" placeholder="Todas as Marcas" value="${currentBrandFilter}">
+                    <datalist id="brandDatalist"><option value="">Todas Marcas</option>${data.brands.map(brand => `<option value="${brand}">`).join('')}</datalist>
+                </div>
+                `;
+                adjustIframeHeight();
+            } catch (error) {
+                console.error("Erro filtros:", error);
+            }
+        }
+
+        // --- CARREGAMENTO DE PRODUTOS (Lógica Original) ---
         function loadProducts(append) {
             append = typeof append === 'undefined' ? true : append;
             showLoader();
@@ -291,29 +452,41 @@
                     }
                 }
                 updateActiveFiltersDisplay();
+                adjustIframeHeight();
             })
             .catch(error => {
                 hideLoader();
                 console.error("Erro:", error);
-                productGrid.innerHTML = '<p class="no-products">Erro de conexão.</p>';
+                productGrid.innerHTML = '<p class="no-products">Erro ao carregar produtos. Tente recarregar a página.</p>';
             });
         }
 
-        // --- MODAL LOGIC ---
+        // --- LÓGICA DOS MODAIS (Adaptada para o novo visual) ---
         function openProductModal(product) {
-            if (typeof product === 'string') {
-                try { product = JSON.parse(product); } catch(e){ return; }
-            }
-            currentProduct = product;
+            if (typeof product === 'string') { try { product = JSON.parse(product); } catch(e){ return; } }
 
-            document.getElementById('modalImage').src = product.imagem || '';
-            document.getElementById('modalTitle').textContent = product.nome || '';
-            document.getElementById('modalPrice').textContent = formatMoney(product.preco);
-            document.getElementById('modalStore').textContent = product.lojaParceira || 'Parceiro';
-            document.getElementById('modalBrand').textContent = product.marca || '-';
-            document.getElementById('modalCategory').textContent = product.categoria || '-';
-            document.getElementById('modalDescription').textContent = product.descricao || 'Sem descrição.';
-            document.getElementById('modalBuyButton').href = product.linkAfiliado || '#';
+            currentProduct = product;
+            currentProductDescription = product.descricao || '';
+
+            modalImage.src = product.imagem || '';
+            modalTitle.textContent = product.nome || '';
+            modalPrice.textContent = formatMoney(product.preco);
+            modalStoreBadge.textContent = product.lojaParceira || 'Parceiro'; // Usa o span do novo visual
+            document.getElementById('modalStore').textContent = product.lojaParceira || "-";
+            document.getElementById('modalBrand').textContent = product.marca || "-";
+            document.getElementById('modalCategory').textContent = product.categoria || "-";
+            
+            modalBuyButton.href = product.linkAfiliado || '#';
+            modalBuyButton.textContent = `Comprar na Loja`;
+
+            // Lógica de descrição longa
+            if ((product.descricao || '').length > MAX_DESC_LENGTH) {
+                modalDescription.textContent = product.descricao.substring(0, MAX_DESC_LENGTH) + '...';
+                readMoreLink.style.display = 'inline-block';
+            } else {
+                modalDescription.textContent = product.descricao || 'Sem descrição disponível.';
+                readMoreLink.style.display = 'none';
+            }
 
             productModal.style.display = 'flex';
             document.body.classList.add('no-scroll');
@@ -324,56 +497,27 @@
             document.body.classList.remove('no-scroll');
         }
 
-        // --- COMPARTILHAMENTO WHATSAPP (LINK P/ PÁGINA INTERNA) ---
-        document.getElementById('shareProductButton').addEventListener('click', function() {
-            if (!currentProduct) return;
-            
-            // Cria link para a página de detalhes (/p/ID)
-            const productPageLink = `${window.location.origin}/p/${currentProduct.id}`;
+        function closeDescriptionModal() {
+            descriptionModal.style.display = 'none';
+        }
 
-            const msg = `Olha que oferta!\n\n*${currentProduct.nome}*\nPreço: ${formatMoney(currentProduct.preco)}\nLoja: ${currentProduct.lojaParceira}\n\nLink: ${productPageLink}`;
+        // EVENT LISTENERS
+        readMoreLink.addEventListener('click', function() {
+            fullDescriptionText.textContent = currentProductDescription;
+            descriptionModal.style.display = 'flex';
+        });
+
+        // Compartilhamento com Link da Página (/p/ID)
+        shareProductButton.addEventListener('click', function() {
+            if (!currentProduct) return;
+            const productPageLink = `${window.location.origin}/p/${currentProduct.id}`;
+            const msg = `Confira este produto!\n\n*${currentProduct.nome}*\nPreço: ${formatMoney(currentProduct.preco)}\nLoja: ${currentProduct.lojaParceira}\n\nLink: ${productPageLink}`;
             window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
         });
 
-        // --- FILTROS ---
-        function updateActiveFiltersDisplay() {
-            let filters = [];
-            if (currentQuery) filters.push(`Pesquisa: "${currentQuery}"`);
-            if (currentStoreFilter) filters.push(`Loja: "${currentStoreFilter}"`);
-            if (currentCategoryFilter) filters.push(`Categoria: "${currentCategoryFilter}"`);
-            if (currentBrandFilter) filters.push(`Marca: "${currentBrandFilter}"`);
-
-            if (filters.length > 0) {
-                filtersAppliedText.innerHTML = filters.map(f => `<strong>${f}</strong>`).join(' | ');
-                activeFiltersContainer.style.display = 'block';
-            } else {
-                activeFiltersContainer.style.display = 'none';
-                filtersAppliedText.textContent = '';
-            }
-        }
-
-        async function loadGlobalFilters() {
-            const filterApiUrl = "https://teste-api.deab.com.br/api/filtros";
-            const container = document.getElementById('filterOptions');
-            if (!container) return;
-
-            try {
-                const response = await fetch(filterApiUrl);
-                const data = await response.json();
-                if (!data.stores) return;
-
-                // HTML do filtro (igual ao que você já tinha)
-                container.innerHTML = `
-                <div style="margin-bottom:15px"><label style="font-weight:bold;display:block;margin-bottom:5px;">Loja:</label><input list="storeDatalist" id="storeFilterInput" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;" placeholder="Todas" value="${currentStoreFilter}"><datalist id="storeDatalist"><option value="">Todas</option>${data.stores.map(s => `<option value="${s}">`).join('')}</datalist></div>
-                <div style="margin-bottom:15px"><label style="font-weight:bold;display:block;margin-bottom:5px;">Categoria:</label><input list="categoryDatalist" id="categoryFilterInput" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;" placeholder="Todas" value="${currentCategoryFilter}"><datalist id="categoryDatalist"><option value="">Todas</option>${data.categories.map(c => `<option value="${c}">`).join('')}</datalist></div>
-                <div style="margin-bottom:15px"><label style="font-weight:bold;display:block;margin-bottom:5px;">Marca:</label><input list="brandDatalist" id="brandFilterInput" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:4px;" placeholder="Todas" value="${currentBrandFilter}"><datalist id="brandDatalist"><option value="">Todas</option>${data.brands.map(b => `<option value="${b}">`).join('')}</datalist></div>
-                `;
-            } catch (error) { console.error("Erro filtros:", error); }
-        }
-
-        // Listeners
         filterButton.addEventListener('click', () => { filterModal.style.display = "flex"; });
         function closeFilterModal() { filterModal.style.display = "none"; }
+        
         applyFiltersButton.addEventListener('click', () => {
             currentStoreFilter = document.getElementById('storeFilterInput').value;
             currentCategoryFilter = document.getElementById('categoryFilterInput').value;
@@ -381,17 +525,29 @@
             closeFilterModal();
             loadProducts(false);
         });
+
         clearFiltersButton.addEventListener('click', () => {
             currentQuery = ''; currentStoreFilter = ''; currentCategoryFilter = ''; currentBrandFilter = '';
             searchInput.value = '';
             loadProducts(false);
         });
-        searchButton.addEventListener('click', () => { currentQuery = searchInput.value.trim(); loadProducts(false); });
-        searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') { currentQuery = searchInput.value.trim(); loadProducts(false); } });
-        loadMoreBtn.addEventListener('click', () => loadProducts(true));
+
+        searchButton.addEventListener('click', () => {
+            currentQuery = searchInput.value.trim();
+            loadProducts(false);
+        });
+        searchInput.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') {
+                currentQuery = searchInput.value.trim();
+                loadProducts(false);
+            }
+        });
         
+        loadMoreBtn.addEventListener('click', () => loadProducts(true));
+
         window.addEventListener('click', (e) => {
             if (e.target === productModal) closeProductModal();
+            if (e.target === descriptionModal) closeDescriptionModal();
             if (e.target === filterModal) closeFilterModal();
         });
 
@@ -401,5 +557,6 @@
             loadProducts(true);
         };
     </script>
+
 </body>
 </html>
