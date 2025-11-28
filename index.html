@@ -326,7 +326,20 @@
     function closeProductModal() { productModal.style.display = 'none'; document.body.classList.remove('no-scroll'); }
     function closeDescriptionModal() { descriptionModal.style.display = 'none'; }
     readMoreLink.addEventListener('click', function() { fullDescriptionText.textContent = currentProductDescription; descriptionModal.style.display = 'flex'; });
-    shareProductButton.addEventListener('click', function() { if (!currentProduct) return; const msg = `Olha que oferta!\n\n*${currentProduct.nome}*\nPreço: ${formatMoney(currentProduct.preco)}\nLoja: ${currentProduct.lojaParceira}\n\nLink: ${currentProduct.linkAfiliado}`; window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank'); });
+
+    ///BOTÃO COMPARTILHAR
+    shareProductButton.addEventListener('click', function() {
+      if (!currentProduct) return;
+      
+      // 1. Pega o endereço do seu site (ex: https://teste-api...) e adiciona /p/ID
+      const productPageLink = `${window.location.origin}/p/${currentProduct.id}`;
+
+      // 2. Monta a mensagem usando esse novo link
+      const msg = `Olha que oferta!\n\n*${currentProduct.nome}*\nPreço: ${formatMoney(currentProduct.preco)}\nLoja: ${currentProduct.lojaParceira}\n\nLink: ${productPageLink}`;
+      
+      window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+    });
+    
     filterButton.addEventListener('click', () => { filterModal.style.display = "flex"; });
     function closeFilterModal() { filterModal.style.display = "none"; }
     applyFiltersButton.addEventListener('click', () => { currentStoreFilter = document.getElementById('storeFilterInput').value; currentCategoryFilter = document.getElementById('categoryFilterInput').value; currentBrandFilter = document.getElementById('brandFilterInput').value; closeFilterModal(); loadProducts(false); });
