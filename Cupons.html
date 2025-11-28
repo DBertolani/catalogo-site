@@ -3,34 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cupons de Desconto</title>
+    <title>Central de Cupons</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 15px; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        
-        header { text-align: center; margin-bottom: 30px; }
-        header h1 { color: #007bff; margin: 0; font-size: 2rem; }
-        
-        .nav-bar { margin-top: 15px; display: flex; justify-content: center; gap: 10px; }
-        .nav-btn { text-decoration: none; padding: 8px 16px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-        .nav-btn.active { background: #007bff; color: white; }
-        .nav-btn.inactive { background: white; color: #555; border: 1px solid #ddd; }
+        /* --- ESTILOS GERAIS --- */
+        * { box-sizing: border-box; }
+        body { font-family: 'Open Sans', sans-serif; margin: 0; padding: 0; padding-top: 70px; background-color: #f0f2f5; color: #333; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px 15px; }
 
+        /* NAVBAR (PADRÃO DEAB) */
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; background: white; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; padding: 10px 20px; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.4rem; text-decoration: none; background: linear-gradient(45deg, #d32f2f, #ff5252); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1;}
+        .logo span { font-size: 0.7rem; color: #555; -webkit-text-fill-color: #555; display: block; letter-spacing: 1px; font-weight: 400;}
+        .nav-links { display: flex; gap: 20px; align-items: center; }
+        .nav-item { text-decoration: none; color: #555; font-weight: 600; font-size: 0.9rem; padding: 8px 12px; border-radius: 6px; transition: 0.2s; }
+        .nav-item:hover, .nav-item.active { background-color: #f0f0f0; color: #007bff; } /* Azul para Cupons */
+        .hamburger { display: none; cursor: pointer; background: none; border: none; font-size: 24px; color: #333; }
+
+        /* TÍTULO DA PÁGINA */
+        header { text-align: center; margin-bottom: 30px; }
+        header h1 { color: #007bff; margin: 0; font-size: 2rem; font-family: 'Montserrat', sans-serif; }
+
+        /* WHATSAPP */
+        .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 2000; transition: transform 0.2s;}
+        .whatsapp-float:hover { transform: scale(1.1); }
+
+        /* FILTRO */
         .filter-bar { margin: 20px 0; display: flex; justify-content: flex-end; }
         #storeFilter { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; min-width: 200px; }
 
+        /* GRID */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; }
         
+        /* CARTÃO DE CUPOM */
         .card { 
-            background: white; padding: 20px; border-radius: 10px; 
+            background: white; padding: 20px; border-radius: 12px; 
             border-left: 5px solid #007bff; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column;
+            display: flex; flex-direction: column; transition: transform 0.2s;
         }
-        /* Estilo Expirado (Desbotado) */
+        .card:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .card.expired { opacity: 0.5; filter: grayscale(1); background: #f9f9f9; border-left-color: #999; }
         
         .store { font-size: 0.8rem; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
-        h2 { font-size: 1.1rem; margin: 0 0 15px 0; color: #333; flex-grow: 1; }
+        h2 { font-size: 1.1rem; margin: 0 0 15px 0; color: #333; flex-grow: 1; line-height: 1.4; }
 
         .coupon-box { 
             background: #e3f2fd; border: 2px dashed #2196f3; padding: 10px; 
@@ -40,113 +56,133 @@
         
         .btn-copy { 
             background: #007bff; color: white; border: none; padding: 8px; width: 100%; 
-            border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px;
+            border-radius: 4px; font-weight: bold; cursor: pointer; margin-top: 5px; transition: 0.2s;
         }
+        .btn-copy:hover { background: #0056b3; }
         .card.expired .btn-copy { background: #999; cursor: not-allowed; }
         
         .validity { font-size: 0.8rem; color: #888; text-align: center; margin-top: 10px; }
+        
+        .loader { text-align: center; margin-top: 60px; font-size: 1.2rem; color: #666; }
 
-        /* Mobile: 2 Colunas para Cupons também (Opcional, mas solicitado) */
-        @media (max-width: 600px) {
+        /* RESPONSIVIDADE */
+        @media (max-width: 768px) {
+            .nav-links { display: none; flex-direction: column; width: 100%; position: absolute; top: 60px; left: 0; background: white; border-top: 1px solid #eee; padding: 10px 0; box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+            .nav-links.active { display: flex; }
+            .hamburger { display: block; }
+            
+            /* 2 Colunas no Mobile para Cupons também */
             .grid { grid-template-columns: repeat(2, 1fr); } 
-            .card { padding: 10px; }
+            .card { padding: 15px; }
             h2 { font-size: 0.9rem; }
             .code { font-size: 1rem; }
+            .btn-copy { font-size: 0.8rem; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <header>
-        <h1>🎟️ Central de Cupons</h1>
-        <div class="nav-bar">
-            <a href="/" class="nav-btn inactive">Loja</a>
-            <a href="/Ofertas" class="nav-btn inactive">Ofertas</a>
-            <a href="#" class="nav-btn active">Cupons</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">DEAB<br><span>OFERTAS INCRÍVEIS</span></a>
+            <button class="hamburger" onclick="toggleMenu()">☰</button>
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-item">Início</a>
+                <a href="/catalogo" class="nav-item">Catálogo</a>
+                <a href="/Ofertas" class="nav-item">Ofertas Relâmpago</a>
+                <a href="#" class="nav-item active">Cupons</a>
+            </div>
         </div>
-    </header>
-    
-    <div class="filter-bar">
-        <select id="storeFilter">
-            <option value="">Todas as Lojas</option>
-        </select>
+    </nav>
+
+    <a href="https://wa.me/5527996962395?text=Olá! Vim pela página de Cupons e preciso de ajuda." class="whatsapp-float" target="_blank" title="Fale no WhatsApp">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35" height="35" alt="Zap">
+    </a>
+
+    <div class="container">
+        <header>
+            <h1>🎟️ Central de Cupons</h1>
+        </header>
+        
+        <div class="filter-bar">
+            <select id="storeFilter">
+                <option value="">Todas as Lojas</option>
+            </select>
+        </div>
+
+        <div id="loader" class="loader">Buscando cupons ativos...</div>
+        <div id="grid" class="grid"></div>
     </div>
 
-    <div id="grid" class="grid"></div>
-</div>
+    <script>
+        function toggleMenu() { document.getElementById('navLinks').classList.toggle('active'); }
 
-<script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
-    let allCoupons = [];
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
+        let allCoupons = [];
 
-    async function load() {
-        const grid = document.getElementById('grid');
-        const storeSelect = document.getElementById('storeFilter');
-        
-        try {
-            const req = await fetch(`${SCRIPT_URL}?type=cupons`);
-            const data = await req.json();
+        async function load() {
+            const grid = document.getElementById('grid');
+            const storeSelect = document.getElementById('storeFilter');
             
-            if(!data.length) { grid.innerHTML = '<p style="text-align:center;width:100%">Sem cupons.</p>'; return; }
-            
-            allCoupons = data;
-            
-            // Ordena: Ativos primeiro
-            data.sort((a,b) => a.expirado - b.expirado);
+            try {
+                const req = await fetch(`${SCRIPT_URL}?type=cupons`);
+                const data = await req.json();
+                
+                document.getElementById('loader').style.display = 'none';
+                if(!data.length) { grid.innerHTML = '<p style="text-align:center;width:100%">Sem cupons.</p>'; return; }
+                
+                allCoupons = data;
+                data.sort((a,b) => (a.expirado === b.expirado)? 0 : a.expirado? 1 : -1);
 
-            // Popula filtro
-            const stores = [...new Set(data.map(item => item.loja))].sort();
-            stores.forEach(store => {
-                const opt = document.createElement('option');
-                opt.value = store;
-                opt.textContent = store;
-                storeSelect.appendChild(opt);
+                // Popula filtro
+                const stores = [...new Set(data.map(item => item.loja))].sort();
+                stores.forEach(store => {
+                    const opt = document.createElement('option');
+                    opt.value = store;
+                    opt.textContent = store;
+                    storeSelect.appendChild(opt);
+                });
+                storeSelect.addEventListener('change', () => renderGrid(storeSelect.value));
+
+                renderGrid();
+            } catch(e) { console.log(e); }
+        }
+
+        function renderGrid(filterStore = "") {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = "";
+            const filtered = filterStore ? allCoupons.filter(i => i.loja === filterStore) : allCoupons;
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = `card ${item.expirado ? 'expired' : ''}`;
+                const btnText = item.expirado ? 'EXPIRADO' : 'COPIAR CÓDIGO';
+                const btnState = item.expirado ? 'disabled' : '';
+
+                card.innerHTML = `
+                    <div class="store">${item.loja}</div>
+                    <h2>${item.titulo}</h2>
+                    <div class="coupon-box">
+                        <div class="code">${item.cupom}</div>
+                        <button class="btn-copy" ${btnState} onclick="copy('${item.cupom}', this)">${btnText}</button>
+                    </div>
+                    <a href="${item.link}" target="_blank" style="text-align:center;display:block;text-decoration:none;color:#007bff;font-weight:bold;font-size:0.9rem">Ir para a loja ➤</a>
+                    <div class="validity">Validade: ${item.validade || 'Indeterminado'}</div>
+                `;
+                grid.appendChild(card);
             });
+        }
 
-            storeSelect.addEventListener('change', () => renderGrid(storeSelect.value));
-            renderGrid();
-
-        } catch(e) { console.log(e); }
-    }
-
-    function renderGrid(filterStore = "") {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = "";
-        
-        const filtered = filterStore ? allCoupons.filter(i => i.loja === filterStore) : allCoupons;
-
-        filtered.forEach(item => {
-            const card = document.createElement('div');
-            card.className = `card ${item.expirado ? 'expired' : ''}`;
-            const btnText = item.expirado ? 'EXPIRADO' : 'COPIAR CÓDIGO';
-            const btnState = item.expirado ? 'disabled' : '';
-
-            card.innerHTML = `
-                <div class="store">${item.loja}</div>
-                <h2>${item.titulo}</h2>
-                <div class="coupon-box">
-                    <div class="code">${item.cupom}</div>
-                    <button class="btn-copy" ${btnState} onclick="copy('${item.cupom}', this)">${btnText}</button>
-                </div>
-                <a href="${item.link}" target="_blank" style="text-align:center;display:block;text-decoration:none;color:#007bff;font-weight:bold;font-size:0.9rem">Ir para a loja ➤</a>
-                <div class="validity">Validade: ${item.validade || 'Indeterminado'}</div>
-            `;
-            grid.appendChild(card);
-        });
-    }
-
-    function copy(code, btn) {
-        navigator.clipboard.writeText(code);
-        btn.innerText = "COPIADO!";
-        btn.style.background = "#28a745";
-        setTimeout(() => {
-            btn.innerText = "COPIAR CÓDIGO";
-            btn.style.background = "#007bff";
-        }, 2000);
-    }
-    load();
-</script>
-
+        function copy(code, btn) {
+            navigator.clipboard.writeText(code);
+            btn.innerText = "COPIADO!";
+            btn.style.background = "#28a745";
+            setTimeout(() => {
+                btn.innerText = "COPIAR CÓDIGO";
+                btn.style.background = "#007bff";
+            }, 2000);
+        }
+        load();
+    </script>
 </body>
 </html>
