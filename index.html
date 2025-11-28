@@ -1,115 +1,268 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DEAB - Ofertas Incríveis</title>
-    <style>
-        /* --- ESTILOS GERAIS --- */
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; background-color: #f8f9fa; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px 15px; }
-        a { text-decoration: none; }
-        
-        /* --- CABEÇALHO --- */
-        header { text-align: center; padding: 40px 20px; background: #fff; border-bottom: 1px solid #eee; }
-        
-        .logo-area h1 { margin: 0; color: #d32f2f; font-size: 2.5rem; letter-spacing: -1px; }
-        .logo-area span { color: #555; font-weight: bold; font-size: 0.9rem; letter-spacing: 2px; }
-        
-        .hero-text { font-size: 1.1em; color: #666; max-width: 700px; margin: 20px auto; }
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
-        /* --- MENU DE NAVEGAÇÃO --- */
-        .main-nav { margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
-        .nav-link { padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; color: #555; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
-        .nav-link:hover, .nav-link.active { background: #333; color: white; border-color: #333; }
-        .nav-link.destaque { border-color: #d32f2f; color: #d32f2f; }
-        .nav-link.destaque:hover { background: #d32f2f; color: white; }
+<style>
+    /* --- ESTILOS GERAIS --- */
+    * { box-sizing: border-box; }
 
-        /* --- BOTÕES GRANDES (HERO) --- */
-        .cta-buttons { margin: 30px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .btn-hero { padding: 15px 30px; border-radius: 50px; font-weight: bold; color: white; font-size: 1.1rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn-primary { background-color: #d32f2f; } 
-        .btn-secondary { background-color: #007bff; }
-        .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); filter: brightness(1.1); }
+    body {
+        font-family: 'Open Sans', sans-serif;
+        margin: 0;
+        padding: 0;
+        padding-top: 70px; /* Espaço para o menu fixo */
+        background-color: #f8f9fa;
+        color: #333;
+        overflow-x: hidden;
+    }
 
-        /* --- SEÇÃO DE BENEFÍCIOS --- */
-        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 40px 0; }
-        .benefit-card { background: #fff; padding: 25px; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .benefit-card h3 { margin-top: 0; color: #d32f2f; }
+    /* --- MENU DE NAVEGAÇÃO (NAVBAR) --- */
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        padding: 10px 20px;
+    }
 
-        /* --- PRÉVIA DE OFERTAS (ESTILO IGUAL AO OFERTAS.HTML) --- */
-        .preview-section { padding: 40px 20px; background: #f0f2f5; text-align: center; }
-        .preview-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-            gap: 20px; 
-            margin-top: 30px;
-            text-align: left; /* Texto dentro do card alinhado a esquerda */
+    .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* Logo Estilizada */
+    .logo {
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 900;
+        font-size: 1.5rem;
+        text-decoration: none;
+        text-transform: uppercase;
+        background: linear-gradient(45deg, #d32f2f, #ff5252);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        letter-spacing: -0.5px;
+    }
+    .logo span {
+        font-weight: 400;
+        font-size: 0.8rem;
+        color: #555;
+        -webkit-text-fill-color: #555;
+        display: block;
+        line-height: 0.8;
+        letter-spacing: 1px;
+    }
+
+    /* Links do Menu Desktop */
+    .nav-links {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+
+    .nav-item {
+        text-decoration: none;
+        color: #555;
+        font-weight: 600;
+        font-size: 0.95rem;
+        padding: 8px 12px;
+        border-radius: 6px;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover, .nav-item.active {
+        background-color: #f0f0f0;
+        color: #d32f2f;
+    }
+
+    /* Botão Sanduiche (Mobile) */
+    .hamburger {
+        display: none;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 24px;
+        color: #333;
+    }
+
+    /* --- HERO SECTION --- */
+    .hero-section {
+        background: white;
+        padding: 60px 20px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+    }
+
+    .hero-title {
+        font-family: 'Montserrat', sans-serif;
+        color: #2c3e50;
+        font-size: 2.2rem;
+        margin: 0 0 15px 0;
+        font-weight: 800;
+    }
+    .hero-title span { color: #d32f2f; }
+
+    .hero-subtitle {
+        font-size: 1.1rem;
+        color: #666;
+        max-width: 700px;
+        margin: 0 auto 30px auto;
+        line-height: 1.6;
+    }
+
+    /* BOTÕES DE AÇÃO */
+    .cta-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .cta-row {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .btn-hero {
+        text-decoration: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-weight: bold;
+        font-size: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        min-width: 200px;
+        text-align: center;
+    }
+    
+    .btn-primary { background-color: #d32f2f; color: white; }
+    .btn-secondary { background-color: #007bff; color: white; }
+    .btn-dark { background-color: #2c3e50; color: white; border: 2px solid #2c3e50; }
+    
+    .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.2); filter: brightness(1.1); }
+
+
+    /* --- BENEFÍCIOS --- */
+    .container { max-width: 1100px; margin: 0 auto; padding: 20px 15px; }
+    .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 40px 0; }
+    .benefit-card { background: #fff; padding: 25px; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .benefit-card h3 { margin-top: 0; color: #d32f2f; font-family: 'Montserrat', sans-serif;}
+
+    /* --- PRÉVIA DE OFERTAS --- */
+    .preview-section { padding: 40px 20px; background: #e9ecef; text-align: center; }
+    .preview-grid { 
+        display: grid; 
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
+        gap: 20px; 
+        margin-top: 30px;
+        text-align: left;
+    }
+
+    /* Card Estilo Simplificado */
+    .card { background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: transform 0.2s; }
+    .card:hover { transform: translateY(-3px); }
+    .card-img-box { height: 200px; display: flex; align-items: center; justify-content: center; padding: 10px; background: #fff; border-bottom: 1px solid #eee; }
+    .card-img { max-height: 100%; max-width: 100%; object-fit: contain; }
+    .card-body { padding: 15px; }
+    h4 { margin: 0 0 5px 0; font-size: 0.9rem; height: 2.4em; overflow: hidden; color: #333; }
+    .price-preview { color: #28a745; font-weight: bold; font-size: 1.2rem; }
+    .btn-link { display: block; margin-top: 10px; text-align: center; background: #6c757d; color: white; padding: 8px; border-radius: 5px; text-decoration: none; font-size: 0.8rem; font-weight: bold; }
+
+
+    /* --- WHATSAPP FLUTUANTE --- */
+    .whatsapp-float {
+        position: fixed; bottom: 20px; right: 20px;
+        background-color: #25d366; color: white;
+        width: 60px; height: 60px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+        z-index: 2000; transition: transform 0.2s;
+    }
+    .whatsapp-float:hover { transform: scale(1.1); }
+    
+    footer { background: #333; color: white; text-align: center; padding: 30px 20px; margin-top: 0; }
+
+    /* --- RESPONSIVIDADE DO MENU --- */
+    @media (max-width: 768px) {
+        .nav-links {
+            display: none; /* Esconde menu */
+            flex-direction: column;
+            width: 100%;
+            position: absolute;
+            top: 60px; /* Altura do navbar */
+            left: 0;
+            background: white;
+            border-top: 1px solid #eee;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+            padding: 10px 0;
         }
-
-        /* Card Estilo Ofertas */
-        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%; transition: transform 0.2s; position: relative; }
-        .card:hover { transform: translateY(-5px); }
-        .card-img-box { width: 100%; padding-top: 100%; position: relative; background: #fff; border-bottom: 1px solid #f0f0f0; }
-        .card-img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; max-width: 90%; max-height: 90%; margin: auto; object-fit: contain; }
-        .card-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
-        .store-tag { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: #6f42c1; margin-bottom: 5px; }
-        h4 { font-size: 0.95rem; margin: 0 0 10px; line-height: 1.3; color: #222; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 3.9em; }
-        .prices { margin-top: auto; margin-bottom: 10px; }
-        .price-from { font-size: 0.8rem; color: #999; text-decoration: line-through; }
-        .price-to { font-size: 1.3rem; color: #28a745; font-weight: 800; display: block; }
-        .btn-small { background: #6c757d; color: white; text-align: center; padding: 8px; border-radius: 6px; font-size: 0.85rem; display: block; font-weight: 600; margin-bottom: 5px;}
-        .btn-buy-small { background: #28a745; color: white; text-align: center; padding: 8px; border-radius: 6px; font-size: 0.85rem; display: block; font-weight: bold; text-transform: uppercase;}
         
-        /* --- RODAPÉ --- */
-        footer { background: #333; color: white; text-align: center; padding: 30px 20px; margin-top: 40px; }
-        .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 1000; transition: transform 0.2s;}
-        .whatsapp-float:hover { transform: scale(1.1); }
-
-        /* --- RESPONSIVIDADE --- */
-        @media (max-width: 600px) {
-            .cta-buttons { flex-direction: column; width: 100%; }
-            .btn-hero { width: 100%; justify-content: center; }
-            
-            /* Grid de 2 colunas no mobile */
-            .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .card-body { padding: 10px; }
-            h4 { font-size: 0.85rem; min-height: 3.6em; }
-            .price-to { font-size: 1.1rem; }
-        }
-    </style>
+        .nav-links.active { display: flex; } /* Classe para mostrar via JS */
+        .hamburger { display: block; }
+        
+        .cta-row { flex-direction: column; width: 100%; }
+        .btn-hero { width: 100%; }
+        
+        /* Grid Mobile */
+        .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        .card-img-box { height: 140px; }
+        h4 { font-size: 0.8rem; }
+        .price-preview { font-size: 1rem; }
+    }
+</style>
 </head>
 <body>
 
-    <a href="https://wa.me/5527996962395" class="whatsapp-float" target="_blank" title="Fale Comigo">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                DEAB<br><span>OFERTAS INCRÍVEIS</span>
+            </a>
+            
+            <button class="hamburger" onclick="toggleMenu()">☰</button>
+            
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-item active">Início</a>
+                <a href="/Ofertas" class="nav-item">Ofertas Relâmpago</a>
+                <a href="/Cupons" class="nav-item">Cupons</a>
+                <a href="/catalogo" class="nav-item">Catálogo Completo</a>
+            </div>
+        </div>
+    </nav>
+
+    <a href="https://wa.me/5527996962395?text=Olá! Vim pelo site DEAB Ofertas e preciso de ajuda." class="whatsapp-float" target="_blank" title="Fale no WhatsApp">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35" height="35" alt="Zap">
     </a>
 
-    <header>
+    <div class="hero-section">
         <div class="container">
-            <div class="logo-area">
-                <h1>DEAB</h1> 
-                <span>OFERTAS INCRÍVEIS</span>
-            </div>
-            
-            <div class="main-nav">
-                <a href="/" class="nav-link active">Início</a>
-                <a href="/catalogo" class="nav-link">📂 Catálogo Completo</a>
-                <a href="/Ofertas" class="nav-link destaque">⚡ Ofertas</a>
-                <a href="/Cupons" class="nav-link destaque">🎟️ Cupons</a>
-            </div>
-
-            <p class="hero-text">
-                "O meu objetivo é buscar aquele produto que você tanto precisa, com a qualidade, melhor preço ou desconto que você merece."
+            <h1 class="hero-title">Encontre o Preço Que <span>Você Merece</span></h1>
+            <p class="hero-subtitle">
+                O meu objetivo é buscar aquele produto ou serviço que você tanto precisa, com a qualidade, melhor preço ou desconto que você tanto merece.
             </p>
 
             <div class="cta-buttons">
-                <a href="/Ofertas" class="btn-hero btn-primary">⚡ Ver Ofertas Relâmpago</a>
-                <a href="/Cupons" class="btn-hero btn-secondary">🎟️ Pegar Cupons</a>
+                <div class="cta-row">
+                    <a href="/Ofertas" class="btn-hero btn-primary">⚡ Ver Ofertas Relâmpago</a>
+                    <a href="/Cupons" class="btn-hero btn-secondary">🎟️ Pegar Cupons</a>
+                </div>
+                <a href="/catalogo" class="btn-hero btn-dark" style="background: #343a40;">📂 Acessar Catálogo Completo</a>
             </div>
         </div>
-    </header>
+    </div>
 
     <div class="container">
         <div class="benefits-grid">
@@ -119,7 +272,7 @@
             </div>
             <div class="benefit-card">
                 <h3>🛡️ Compra Segura</h3>
-                <p>Parceria oficial com Magalu, Amazon, Casas Bahia e outras gigantes. Você compra direto na loja.</p>
+                <p>Parceria oficial com Magalu, Amazon, Casas Bahia e outras gigantes. Você compra direto na loja oficial.</p>
             </div>
             <div class="benefit-card">
                 <h3>🤝 Consultoria</h3>
@@ -130,25 +283,31 @@
 
     <div class="preview-section">
         <div class="container">
-            <h2 style="color:#d32f2f; font-size:2rem; margin-bottom:5px;">🔥 Destaques de Hoje</h2>
-            <p>Uma amostra do que você encontra na área de Ofertas.</p>
+            <h2 style="color:#d32f2f; font-family: 'Montserrat', sans-serif;">🔥 Destaques de Hoje</h2>
             
             <div id="preview-grid" class="preview-grid">
                 <p style="grid-column: 1/-1;">Carregando melhores ofertas...</p>
             </div>
 
             <div style="margin-top: 40px;">
-                <a href="/Ofertas" class="btn-hero btn-primary" style="display:inline-flex; padding: 12px 25px; font-size: 1rem;">Ver Todas as Ofertas</a>
+                <a href="/Ofertas" class="btn-hero btn-primary" style="display:inline-flex; padding: 10px 25px; font-size: 0.9rem;">Ver Todas as Ofertas</a>
             </div>
         </div>
     </div>
 
     <footer>
         <p>DEAB - Ofertas Incríveis &copy; 2025</p>
-        <p style="font-size:0.9em; color:#aaa;">Participamos do Programa de Associados da Amazon, Magalu e Awin. Comprando pelos nossos links, você apoia nosso trabalho sem pagar nada a mais.</p>
+        <p style="font-size:0.9em; color:#aaa;">Participamos do Programa de Associados da Amazon, Magalu e Awin.</p>
     </footer>
 
     <script>
+        // SCRIPT DO MENU MOBILE
+        function toggleMenu() {
+            const nav = document.getElementById('navLinks');
+            nav.classList.toggle('active');
+        }
+
+        // SCRIPT DE CARREGAMENTO
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
 
         async function loadPreview() {
@@ -159,7 +318,6 @@
                 
                 if(!data.length) { grid.innerHTML = ''; return; }
 
-                // Pega 4 ofertas ativas
                 const activeOffers = data.filter(i => !i.expirado).slice(0, 4);
                 
                 grid.innerHTML = ''; 
@@ -168,21 +326,18 @@
                     const imgUrl = item.imagem || "https://via.placeholder.com/300?text=Oferta";
                     let htmlPreco = '';
                     if(item.por) {
-                        htmlPreco = `<div class="prices"><span class="price-from">${item.de ? 'De ' + item.de : ''}</span><span class="price-to">Por ${item.por}</span></div>`;
+                        htmlPreco = `<div class="price-preview">${item.por}</div>`;
                     }
 
-                    // Link para página de detalhes
                     const detailLink = `/p/${item.id}`;
 
                     grid.innerHTML += `
                         <div class="card">
                             <div class="card-img-box"><img src="${imgUrl}" class="card-img" loading="lazy"></div>
                             <div class="card-body">
-                                <div class="store-tag">${item.loja}</div>
                                 <h4>${item.titulo}</h4>
                                 ${htmlPreco}
-                                <a href="${detailLink}" class="btn-details">Mais Detalhes</a>
-                                <a href="${item.link}" target="_blank" class="btn-buy-small">PEGAR PROMOÇÃO</a>
+                                <a href="${detailLink}" class="btn-link">VER DETALHES</a>
                             </div>
                         </div>
                     `;
