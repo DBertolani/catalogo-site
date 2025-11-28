@@ -6,74 +6,107 @@
     <title>DEAB - Ofertas Incríveis</title>
     <style>
         /* --- ESTILOS GERAIS --- */
-        body { font-family: 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; }
-        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
-        h1, h2, h3 { color: #d32f2f; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; color: #333; line-height: 1.6; background-color: #f8f9fa; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px 15px; }
         a { text-decoration: none; }
         
-        /* --- CABEÇALHO E HERO --- */
+        /* --- CABEÇALHO --- */
         header { text-align: center; padding: 40px 20px; background: #fff; border-bottom: 1px solid #eee; }
-        .logo-area { max-width: 200px; margin: 0 auto 20px; } /* Local da sua Logo */
         
-        .hero-text { font-size: 1.2em; color: #555; max-width: 800px; margin: 0 auto; }
+        .logo-area h1 { margin: 0; color: #d32f2f; font-size: 2.5rem; letter-spacing: -1px; }
+        .logo-area span { color: #555; font-weight: bold; font-size: 0.9rem; letter-spacing: 2px; }
         
-        /* --- BOTÕES DE AÇÃO --- */
-        .cta-buttons { margin: 30px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
-        .btn { padding: 15px 30px; border-radius: 30px; font-weight: bold; color: white; transition: 0.3s; }
-        .btn-primary { background-color: #d32f2f; } /* Vermelho */
-        .btn-secondary { background-color: #007bff; } /* Azul */
-        .btn-success { background-color: #28a745; } /* Verde (WhatsApp) */
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .hero-text { font-size: 1.1em; color: #666; max-width: 700px; margin: 20px auto; }
 
-        /* --- SEÇÃO DE BENEFÍCIOS (GRID) --- */
-        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 40px 0; }
-        .benefit-card { background: #f9f9f9; padding: 20px; border-radius: 10px; border-left: 5px solid #d32f2f; }
-        
-        /* --- PARCEIROS --- */
-        .partners { text-align: center; padding: 40px 0; background: #fff; }
-        .partner-list { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; font-weight: bold; color: #777; margin-top: 15px;}
-        
-        /* --- PRÉVIA DE OFERTAS --- */
-        .preview-section { padding: 40px 20px; background: #f4f4f4; text-align: center; }
-        
-        /* --- WHATSAPP FLUTUANTE --- */
-        .whatsapp-float {
-            position: fixed; bottom: 20px; right: 20px;
-            background-color: #25d366; color: white;
-            width: 60px; height: 60px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-            z-index: 1000;
+        /* --- MENU DE NAVEGAÇÃO --- */
+        .main-nav { margin-top: 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .nav-link { padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; color: #555; font-weight: 600; font-size: 0.9rem; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: #333; color: white; border-color: #333; }
+        .nav-link.destaque { border-color: #d32f2f; color: #d32f2f; }
+        .nav-link.destaque:hover { background: #d32f2f; color: white; }
+
+        /* --- BOTÕES GRANDES (HERO) --- */
+        .cta-buttons { margin: 30px 0; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+        .btn-hero { padding: 15px 30px; border-radius: 50px; font-weight: bold; color: white; font-size: 1.1rem; transition: 0.3s; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-primary { background-color: #d32f2f; } 
+        .btn-secondary { background-color: #007bff; }
+        .btn-hero:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.2); filter: brightness(1.1); }
+
+        /* --- SEÇÃO DE BENEFÍCIOS --- */
+        .benefits-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 40px 0; }
+        .benefit-card { background: #fff; padding: 25px; border-radius: 12px; border-left: 5px solid #d32f2f; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .benefit-card h3 { margin-top: 0; color: #d32f2f; }
+
+        /* --- PRÉVIA DE OFERTAS (ESTILO IGUAL AO OFERTAS.HTML) --- */
+        .preview-section { padding: 40px 20px; background: #f0f2f5; text-align: center; }
+        .preview-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
+            gap: 20px; 
+            margin-top: 30px;
+            text-align: left; /* Texto dentro do card alinhado a esquerda */
         }
+
+        /* Card Estilo Ofertas */
+        .card { background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; flex-direction: column; height: 100%; transition: transform 0.2s; position: relative; }
+        .card:hover { transform: translateY(-5px); }
+        .card-img-box { width: 100%; padding-top: 100%; position: relative; background: #fff; border-bottom: 1px solid #f0f0f0; }
+        .card-img { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: auto; height: auto; max-width: 90%; max-height: 90%; margin: auto; object-fit: contain; }
+        .card-body { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; }
+        .store-tag { font-size: 0.7rem; text-transform: uppercase; font-weight: 800; color: #6f42c1; margin-bottom: 5px; }
+        h4 { font-size: 0.95rem; margin: 0 0 10px; line-height: 1.3; color: #222; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 3.9em; }
+        .prices { margin-top: auto; margin-bottom: 10px; }
+        .price-from { font-size: 0.8rem; color: #999; text-decoration: line-through; }
+        .price-to { font-size: 1.3rem; color: #28a745; font-weight: 800; display: block; }
+        .btn-small { background: #6c757d; color: white; text-align: center; padding: 8px; border-radius: 6px; font-size: 0.85rem; display: block; font-weight: 600; margin-bottom: 5px;}
+        .btn-buy-small { background: #28a745; color: white; text-align: center; padding: 8px; border-radius: 6px; font-size: 0.85rem; display: block; font-weight: bold; text-transform: uppercase;}
         
+        /* --- RODAPÉ --- */
+        footer { background: #333; color: white; text-align: center; padding: 30px 20px; margin-top: 40px; }
+        .whatsapp-float { position: fixed; bottom: 20px; right: 20px; background-color: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 2px 2px 10px rgba(0,0,0,0.3); z-index: 1000; transition: transform 0.2s;}
+        .whatsapp-float:hover { transform: scale(1.1); }
+
+        /* --- RESPONSIVIDADE --- */
         @media (max-width: 600px) {
-            .cta-buttons { flex-direction: column; }
-            .btn { width: 100%; text-align: center; }
+            .cta-buttons { flex-direction: column; width: 100%; }
+            .btn-hero { width: 100%; justify-content: center; }
+            
+            /* Grid de 2 colunas no mobile */
+            .preview-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .card-body { padding: 10px; }
+            h4 { font-size: 0.85rem; min-height: 3.6em; }
+            .price-to { font-size: 1.1rem; }
         }
     </style>
 </head>
 <body>
 
-    <a href="https://wa.me/5527996962395?text=Olá! Vim pelo site DEAB e preciso de ajuda." class="whatsapp-float" target="_blank">
+    <a href="https://wa.me/5527996962395" class="whatsapp-float" target="_blank" title="Fale Comigo">
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35" height="35" alt="Zap">
     </a>
 
     <header>
         <div class="container">
             <div class="logo-area">
-                <h1 style="margin:0;">DEAB</h1> 
-                <span style="color:#555; font-weight:bold;">OFERTAS INCRÍVEIS</span>
+                <h1>DEAB</h1> 
+                <span>OFERTAS INCRÍVEIS</span>
+            </div>
+            
+            <div class="main-nav">
+                <a href="/" class="nav-link active">Início</a>
+                <a href="/catalogo" class="nav-link">📂 Catálogo Completo</a>
+                <a href="/Ofertas" class="nav-link destaque">⚡ Ofertas</a>
+                <a href="/Cupons" class="nav-link destaque">🎟️ Cupons</a>
             </div>
 
-            <h1>Seu consultor de compras online</h1>
             <p class="hero-text">
-                "O meu objetivo é buscar aquele produto ou serviço que você tanto precisa, com a qualidade, melhor preço ou desconto que você tanto merece."
+                "O meu objetivo é buscar aquele produto que você tanto precisa, com a qualidade, melhor preço ou desconto que você merece."
             </p>
 
             <div class="cta-buttons">
-                <a href="/Ofertas" class="btn btn-primary">⚡ Ver Ofertas Relâmpago</a>
-                <a href="/Cupons" class="btn btn-secondary">🎟️ Pegar Cupons</a>
-                <a href="/catalogo" class="btn btn-primary" style="background:#333;">📂 Catálogo Completo</a>
+                <a href="/Ofertas" class="btn-hero btn-primary">⚡ Ver Ofertas Relâmpago</a>
+                <a href="/Cupons" class="btn-hero btn-secondary">🎟️ Pegar Cupons</a>
             </div>
         </div>
     </header>
@@ -82,49 +115,37 @@
         <div class="benefits-grid">
             <div class="benefit-card">
                 <h3>📉 Economia Real</h3>
-                <p>Sabia que compras pela internet podem ser até 15% mais baratas? Em eletrodomésticos e informática, essa diferença chega a 46%!</p>
+                <p>Sabia que compras pela internet podem ser até 46% mais baratas? Monitoramos as melhores oportunidades.</p>
             </div>
             <div class="benefit-card">
                 <h3>🛡️ Compra Segura</h3>
-                <p>Tenho parceria com grandes lojas como Americanas, Casas Bahia, Magalu, Amazon e Shopee. Segurança total para você.</p>
+                <p>Parceria oficial com Magalu, Amazon, Casas Bahia e outras gigantes. Você compra direto na loja.</p>
             </div>
             <div class="benefit-card">
-                <h3>🤝 Consultoria Grátis</h3>
-                <p>Não achou o que precisa? Eu vou atrás para você! Acompanho da escolha do produto até a chegada em sua casa.</p>
+                <h3>🤝 Consultoria</h3>
+                <p>Não achou? Eu procuro para você! Entre em contato pelo WhatsApp para ajuda personalizada.</p>
             </div>
-        </div>
-
-        <div class="partners">
-            <h2>Lojas Parceiras</h2>
-            <p>Garanto o melhor preço sem você perder tempo pesquisando.</p>
-            <div class="partner-list">
-                <span>MAGALU</span> • 
-                <span>AMAZON</span> • 
-                <span>CASAS BAHIA</span> • 
-                <span>SHOPEE</span> • 
-                <span>AMERICANAS</span>
-                </div>
         </div>
     </div>
 
     <div class="preview-section">
         <div class="container">
-            <h2>🔥 Destaques do Dia</h2>
-            <p>Uma amostra do que você encontra na nossa área de Ofertas.</p>
+            <h2 style="color:#d32f2f; font-size:2rem; margin-bottom:5px;">🔥 Destaques de Hoje</h2>
+            <p>Uma amostra do que você encontra na área de Ofertas.</p>
             
-            <div id="preview-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap:20px; margin-top:20px;">
-                <p style="grid-column: 1/-1;">Carregando ofertas...</p>
+            <div id="preview-grid" class="preview-grid">
+                <p style="grid-column: 1/-1;">Carregando melhores ofertas...</p>
             </div>
 
-            <div style="margin-top: 30px;">
-                <a href="/Ofertas" class="btn btn-primary">Ver Todas as Ofertas</a>
+            <div style="margin-top: 40px;">
+                <a href="/Ofertas" class="btn-hero btn-primary" style="display:inline-flex; padding: 12px 25px; font-size: 1rem;">Ver Todas as Ofertas</a>
             </div>
         </div>
     </div>
 
-    <footer style="background:#333; color:white; text-align:center; padding:20px; margin-top:40px;">
+    <footer>
         <p>DEAB - Ofertas Incríveis &copy; 2025</p>
-        <p>Entre em contato e encontre o melhor custo benefício!</p>
+        <p style="font-size:0.9em; color:#aaa;">Participamos do Programa de Associados da Amazon, Magalu e Awin. Comprando pelos nossos links, você apoia nosso trabalho sem pagar nada a mais.</p>
     </footer>
 
     <script>
@@ -138,21 +159,31 @@
                 
                 if(!data.length) { grid.innerHTML = ''; return; }
 
-                // Pega apenas as 4 primeiras ofertas ativas
+                // Pega 4 ofertas ativas
                 const activeOffers = data.filter(i => !i.expirado).slice(0, 4);
                 
-                grid.innerHTML = ''; // Limpa "Carregando"
+                grid.innerHTML = ''; 
 
                 activeOffers.forEach(item => {
-                    // Card Simplificado para a Home
+                    const imgUrl = item.imagem || "https://via.placeholder.com/300?text=Oferta";
+                    let htmlPreco = '';
+                    if(item.por) {
+                        htmlPreco = `<div class="prices"><span class="price-from">${item.de ? 'De ' + item.de : ''}</span><span class="price-to">Por ${item.por}</span></div>`;
+                    }
+
+                    // Link para página de detalhes
+                    const detailLink = `/p/${item.id}`;
+
                     grid.innerHTML += `
-                        <div style="background:white; padding:15px; border-radius:10px; text-align:left; box-shadow:0 2px 5px rgba(0,0,0,0.1);">
-                            <div style="height:150px; display:flex; align-items:center; justify-content:center; margin-bottom:10px;">
-                                <img src="${item.imagem || 'https://via.placeholder.com/150'}" style="max-height:100%; max-width:100%;">
+                        <div class="card">
+                            <div class="card-img-box"><img src="${imgUrl}" class="card-img" loading="lazy"></div>
+                            <div class="card-body">
+                                <div class="store-tag">${item.loja}</div>
+                                <h4>${item.titulo}</h4>
+                                ${htmlPreco}
+                                <a href="${detailLink}" class="btn-details">Mais Detalhes</a>
+                                <a href="${item.link}" target="_blank" class="btn-buy-small">PEGAR PROMOÇÃO</a>
                             </div>
-                            <h4 style="margin:0 0 5px 0; font-size:0.9em; height:2.4em; overflow:hidden;">${item.titulo}</h4>
-                            <div style="color:#28a745; font-weight:bold; font-size:1.2em;">${item.por ? item.por : 'Ver Preço'}</div>
-                            <a href="${item.link}" target="_blank" style="display:block; margin-top:10px; text-align:center; background:#6c757d; color:white; padding:5px; border-radius:5px; text-decoration:none; font-size:0.8em;">VER DETALHES</a>
                         </div>
                     `;
                 });
