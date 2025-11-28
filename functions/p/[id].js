@@ -1,49 +1,56 @@
 import { fetchProductById } from "../_utils/sheets.js";
 
-// URL do seu Script "Gestor de Ofertas" (Fallback)
+// URL do seu Script "Gestor de Ofertas" (Fallback para produtos manuais)
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfjjVm4HkUnQfUXv8U6iZx1lcJbkxwyVkLyYRjhHpap8_MunaY7goBE_Fwc-_UeNTi8w/exec";
 
 export async function onRequest(context) {
     const { params, env, request } = context;
-    
-    // VOLTANDO A LÓGICA SIMPLES QUE FUNCIONAVA NO ANTIGO
-    const id = params.id; 
+    const id = params.id; // Pega o ID puro, sem trim() ou conversões extras inicialmente
 
+    let produto = null;
+
+    // ---------------------------------------------------------
+    // 1. Tenta buscar no Catálogo Principal (KV) - Lógica Original
+    // ---------------------------------------------------------
     try {
-        // 1. Busca Principal no KV (Exatamente como no arquivo antigo)
-        let produto = await fetchProductById(env, id);
+        produto = await fetchProductById(env, id);
+    } catch (err) {
+        console.error(`Erro ao buscar ${id} no KV:`, err);
+    }
 
-        // 2. Se não achou no KV, tenta nas Ofertas Manuais (Apps Script)
-        if (!produto) {
-            try {
-                const res = await fetch(`${APPS_SCRIPT_URL}?type=ofertas`);
-                if (res.ok) {
-                    const ofertas = await res.json();
-                    // Compara convertendo para string para evitar erro de tipo
-                    const ofertaEncontrada = ofertas.find(o => String(o.id).trim() === String(id).trim());
-                    
-                    if (ofertaEncontrada) {
-                        produto = {
-                            nome: ofertaEncontrada.titulo,
-                            preco: ofertaEncontrada.por || ofertaEncontrada.de,
-                            imagem: ofertaEncontrada.imagem,
-                            lojaParceira: ofertaEncontrada.loja,
-                            marca: ofertaEncontrada.marca || "Oferta",
-                            categoria: "Oferta Relâmpago",
-                            descricao: ofertaEncontrada.descricao,
-                            linkAfiliado: ofertaEncontrada.link,
-                            facebookLink: ofertaEncontrada.link 
-                        };
-                    }
+    // ---------------------------------------------------------
+    // 2. Se não achou no KV, tenta nas Ofertas Manuais (Apps Script)
+    // ---------------------------------------------------------
+    if (!produto) {
+        try {
+            const res = await fetch(`${APPS_SCRIPT_URL}?type=ofertas`);
+            if (res.ok) {
+                const ofertas = await res.json();
+                // Aqui sim fazemos a comparação flexível (string/trim)
+                const ofertaEncontrada = ofertas.find(o => String(o.id).trim() === String(id).trim());
+                
+                if (ofertaEncontrada) {
+                    produto = {
+                        nome: ofertaEncontrada.titulo,
+                        preco: ofertaEncontrada.por || ofertaEncontrada.de,
+                        imagem: ofertaEncontrada.imagem,
+                        lojaParceira: ofertaEncontrada.loja,
+                        marca: ofertaEncontrada.marca || "Oferta",
+                        categoria: "Oferta Relâmpago",
+                        descricao: ofertaEncontrada.descricao,
+                        linkAfiliado: ofertaEncontrada.link,
+                        facebookLink: ofertaEncontrada.link 
+                    };
                 }
-            } catch (e) {
-                console.error("Erro ao buscar ofertas manuais:", e);
             }
+        } catch (e) {
+            console.error("Erro ao buscar ofertas manuais:", e);
         }
+    }
 
-        // Se depois das duas tentativas ainda for null, retorna 404
-        if (!produto) {
-            return new Response(`
+    // Se não achou em lugar nenhum
+    if (!produto) {
+        return new Response(`
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -63,46 +70,52 @@ export async function onRequest(context) {
         <h1>Produto não disponível</h1>
         <p>O produto com ID <strong>${id}</strong> não foi encontrado ou a oferta expirou.</p>
         <br>
-        <p><a href="/">Voltar para a página inicial</a></p>
+        <p><a href="/catalogo">Voltar para o catálogo</a></p>
     </div>
 </body>
 </html>`, { 
-                status: 404, 
-                headers: { "Content-Type": "text/html; charset=utf-8" } 
-            });
-        }
+            status: 404, 
+            headers: { "Content-Type": "text/html; charset=utf-8" } 
+        });
+    }
 
-        // --- LAYOUT E FORMATAÇÃO (VISUAL NOVO) ---
+    // --- LAYOUT E FORMATAÇÃO (VISUAL NOVO) ---
 
-        const formatMoney = (val) => {
-            if (!val) return "Consulte";
-            let num = typeof val === 'string' ? parseFloat(val.replace('R$', '').replace(',', '.')) : val;
-            if(isNaN(num)) return val;
-            return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-        };
-        const precoFormatado = formatMoney(produto.preco);
-        const buyLink = produto.linkAfiliado || '#';
-        const shareLink = request.url; 
-        const msgWhatsApp = `Olha que oferta!\n\n*${produto.nome}*\nPreço: _*${precoFormatado}*_\nLoja: _${produto.lojaParceira || "Parceiro"}_\n\nLink: ${shareLink}`;
+    const formatMoney = (val) => {
+        if (!val) return "Consulte";
+        let num = typeof val === 'string' ? parseFloat(val.replace('R$', '').replace(',', '.')) : val;
+        if(isNaN(num)) return val;
+        return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    };
+    const precoFormatado = formatMoney(produto.preco);
+    const buyLink = produto.linkAfiliado || '#';
+    const shareLink = request.url; 
+    const msgWhatsApp = `Olha que oferta!\n\n*${produto.nome}*\nPreço: _*${precoFormatado}*_\nLoja: _${produto.lojaParceira || "Parceiro"}_\n\nLink: ${shareLink}`;
 
-        // Lógica de descrição
-        const descCompleta = produto.descricao || '';
-        const isLongDesc = descCompleta.length > 200;
-        const descCurta = isLongDesc ? descCompleta.substring(0, 200) + '...' : descCompleta;
-        const displayReadMore = isLongDesc ? 'inline-block' : 'none';
+    // Lógica de descrição
+    const descCompleta = produto.descricao || '';
+    const isLongDesc = descCompleta.length > 200;
+    const descCurta = isLongDesc ? descCompleta.substring(0, 200) + '...' : descCompleta;
+    const displayReadMore = isLongDesc ? 'inline-block' : 'none';
 
-		const html = `
+    const html = `
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-	<meta charset="utf-8" />
-	<title>${produto.nome} — Melhor Oferta</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="utf-8" />
+    <title>${produto.nome} — Melhor Oferta</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    
+    <!-- Meta Tags para Redes Sociais (Open Graph) -->
     <meta property="og:title" content="${produto.nome}">
     <meta property="og:description" content="Confira essa oferta incrível por ${precoFormatado}">
     <meta property="og:image" content="${produto.imagem}">
+    <meta property="og:url" content="${currentPageUrl}">
+    
+    <!-- Fontes -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-	<style>
+    
+    <style>
         * { box-sizing: border-box; }
         body {
             font-family: 'Open Sans', sans-serif;
@@ -131,6 +144,7 @@ export async function onRequest(context) {
             position: relative;
         }
 
+        /* Coluna Imagem */
         .image-col {
             width: 45%;
             background-color: #fff;
@@ -147,6 +161,7 @@ export async function onRequest(context) {
             object-fit: contain;
         }
 
+        /* Coluna Detalhes */
         .details-col {
             width: 55%;
             padding: 40px;
@@ -192,6 +207,7 @@ export async function onRequest(context) {
         }
         .info-row strong { color: #333; }
 
+        /* Caixa de Descrição */
         .description-box {
              color: #666; 
              line-height: 1.6; 
@@ -243,7 +259,7 @@ export async function onRequest(context) {
             color: #007bff; text-decoration: none; font-size: 0.9em;
         }
 
-        /* MODAL DESCRIÇÃO */
+        /* --- MODAL DE DESCRIÇÃO (IDÊNTICO AO INDEX) --- */
         .modal {
             display: none;
             position: fixed;
@@ -282,17 +298,27 @@ export async function onRequest(context) {
             border: none;
             line-height: 1;
         }
-        
+        .close-modal:hover { color: #333; }
+
+        .modal-title {
+            margin-top: 0;
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            padding-right: 30px;
+            color: #222;
+        }
+
         .full-description {
-            white-space: pre-wrap;
+            white-space: pre-wrap; /* Respeita os Enters da planilha */
             line-height: 1.6;
             color: #444;
+            font-size: 1em;
         }
 
         /* Responsividade */
         @media (max-width: 768px) {
             .container { flex-direction: column; width: 95%; margin: 10px auto; }
-            .image-col { width: 100%; border-right: none; border-bottom: 1px solid #eee; padding: 20px; height: 250px; }
+            .image-col { width: 100%; border-right: none; border-bottom: 1px solid #eee; padding: 20px; height: 300px; }
             
             .details-col { 
                 width: 100%; padding: 20px; 
@@ -305,10 +331,10 @@ export async function onRequest(context) {
             .price { font-size: 2em; margin: 10px 0; }
             .description-box { text-align: left; width: 100%; }
             
-            .buttons { flex-direction: column; width: 100%; margin-bottom: 20px; }
+            .buttons { flex-direction: column; width: 100%; margin-bottom: 20px; } 
             .btn { width: 100%; padding: 14px; }
         }
-	</style>
+    </style>
 </head>
 <body>
 
@@ -341,15 +367,16 @@ export async function onRequest(context) {
             </div>
             
             <div class="back-home">
-                <a href="/">Voltar para o catálogo</a>
+                <a href="/catalogo">Voltar para o catálogo</a>
             </div>
         </div>
     </div>
 
+    <!-- MODAL DE DESCRIÇÃO -->
     <div id="descriptionModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" id="closeModalBtn">&times;</button>
-            <h3 style="margin-top:0; font-size:1.4em; margin-bottom:15px;">Detalhes do Produto</h3>
+            <h3 class="modal-title">Detalhes do Produto</h3>
             <div class="full-description">${descCompleta}</div>
         </div>
     </div>
@@ -385,9 +412,7 @@ export async function onRequest(context) {
 </html>
     `;
 
-    return new Response(html, { headers: { "Content-Type": "text/html" } });
-    
-    } catch (error) {
-        return new Response(`Erro interno: ${error.message}`, { status: 500 });
-    }
+    return new Response(html, {
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+    });
 }
