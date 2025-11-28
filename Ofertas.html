@@ -211,7 +211,7 @@
             // Botão Compartilhar com Link da Página
             document.getElementById('shareProductButton').onclick = () => {
                 const productPageLink = `${window.location.origin}/p/${item.id}`;
-                const msg = `Olha essa oferta!\n*${item.titulo}*\nPor: ${item.por}\nLoja: ${item.loja}\nLink: ${productPageLink}`;
+                const msg = `Olha que oferta!\n\n*${item.titulo}*\nPor: *_${item.por}_*\nLoja: _${item.loja}_\n\nLink: ${productPageLink}`;
                 window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
             };
 
