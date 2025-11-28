@@ -180,6 +180,7 @@ Link: ${shareLink}`;
              font-size: 0.95em;
              max-height: 150px;
              overflow-y: auto;
+			 white-space: pre-wrap;
         }
 
         .buttons {
