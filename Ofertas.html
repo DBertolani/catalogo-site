@@ -6,7 +6,7 @@
     
     <meta property="og:title" content="⚡ DEAB - Ofertas Relâmpago">
     <meta property="og:description" content="As melhores promoções do dia com preços incríveis. Corra antes que acabe!">
-    <meta property="og:image" content="https://drive.google.com/uc?export=view&id=1aqSCceBMMYU4C6WCHNkHmvAtcj2B89Ng">
+    <meta property="og:image" content="https://drive.google.com/uc?export=view&id=1errZurMAuCW6priW-HcdwkXqUWOUmiNI">
     <meta property="og:type" content="website">
     <title>Ofertas Relâmpago</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Segoe+UI&display=swap" rel="stylesheet">
@@ -38,6 +38,25 @@
         /* FILTRO */
         .filter-bar { margin: 20px 0; display: flex; justify-content: flex-end; }
         #storeFilter { padding: 8px; border-radius: 6px; border: 1px solid #ccc; font-size: 0.9rem; min-width: 200px; }
+
+            /* Botão de Chamada para o Catálogo */
+            .btn-catalogo-cta {
+                display: inline-block;
+                padding: 12px 30px;
+                background-color: #2c3e50; /* Azul escuro profissional */
+                color: white;
+                text-decoration: none;
+                border-radius: 50px;
+                font-weight: bold;
+                font-size: 1rem;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                transition: transform 0.2s, background-color 0.2s;
+                margin: 10px 0;
+            }
+            .btn-catalogo-cta:hover {
+                background-color: #1a252f;
+                transform: translateY(-2px);
+            }
 
         /* GRID DE PRODUTOS */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
@@ -139,7 +158,17 @@
         </div>
 
         <div id="loader" style="text-align:center; margin-top:50px;">Carregando...</div>
+        
+                <div style="text-align: center; margin-bottom: 20px;">
+                <a href="/catalogo" class="btn-catalogo-cta">📂 Ver Catálogo Completo</a>
+                 </div>
+        
         <div id="grid" class="grid"></div>
+        <div style="text-align: center; margin: 40px 0 20px;">
+        <p style="color: #666; margin-bottom: 10px; font-size: 1.1em;">Não encontrou a oferta que queria?</p>
+        <a href="/catalogo" class="btn-catalogo-cta">🔍 Pesquisar em 30.000+ Produtos</a>
+            </div>
+        
     </div>
 
     <div id="productModal" class="modal">
