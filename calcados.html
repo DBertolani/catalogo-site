@@ -35,6 +35,17 @@
       /* Botão Flutuante */
       .floating-cart { position: fixed; right: 20px; bottom: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; }
       .btn-float { box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top: 5px; border-radius: 50px; padding: 10px 20px; font-weight: bold; }
+	  
+	  /* Deixar o fundo do modal mais escuro para destaque */
+      .modal-backdrop.show {
+          opacity: 0.85 !important;
+      }
+      
+      /* Ajuste para garantir que o modal de descrição fique acima de tudo */
+      #modalDescricao {
+          background: rgba(0,0,0,0.5); /* Escurece extra apenas para este modal */
+      }
+	  
     </style>
   </head>
   <body>
@@ -122,22 +133,21 @@
       </div>
     </div>
 
-    <div class="modal fade" id="modalDescricao" tabindex="-1" style="z-index: 1060;">
-      <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Detalhes do Produto</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            <p id="textoDescricaoCompleta" style="white-space: pre-wrap;"></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-          </div>
-        </div>
+<div class="modal fade" id="modalDescricao" tabindex="-1" aria-hidden="true" style="z-index: 1060;">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+    <div class="modal-content shadow-lg"> <div class="modal-header bg-light">
+        <h5 class="modal-title fw-bold">Detalhes do Produto</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p id="textoDescricaoCompleta" style="white-space: pre-wrap; font-size: 0.95rem; line-height: 1.6;"></p>
+      </div>
+      <div class="modal-footer bg-light">
+        <button type="button" class="btn btn-primary w-100" data-bs-dismiss="modal">Entendi, voltar</button>
       </div>
     </div>
+  </div>
+</div>
 
     <div class='modal' id='modalCarrito' tabindex='-1'>
       <div class='modal-dialog'>
@@ -928,15 +938,26 @@ var items = carrinho.map(i => {
 		
 
 			// --- CORREÇÃO VISUAL: ESCONDER BOTÃO FLUTUANTE ---
-			var modalCarrinhoEl = document.getElementById('modalCarrito');
-			if (modalCarrinhoEl) {
-				modalCarrinhoEl.addEventListener('show.bs.modal', function () {
-					document.querySelector('.floating-cart').style.display = 'none';
-				});
-				modalCarrinhoEl.addEventListener('hidden.bs.modal', function () {
-					document.querySelector('.floating-cart').style.display = 'flex';
-				});
+			// Função para gerenciar visibilidade do botão flutuante
+			function gerenciarBotaoFlutuante(idModal) {
+				var el = document.getElementById(idModal);
+				if (el) {
+					el.addEventListener('show.bs.modal', function () {
+						document.querySelector('.floating-cart').style.display = 'none';
+					});
+					el.addEventListener('hidden.bs.modal', function () {
+						// Só mostra de novo se não houver outro modal aberto
+						if (!document.querySelector('.modal.show')) {
+							document.querySelector('.floating-cart').style.display = 'flex';
+						}
+					});
+				}
 			}
+
+			// Aplica a regra para o Carrinho, Produto e Checkout
+			gerenciarBotaoFlutuante('modalCarrito');
+			gerenciarBotaoFlutuante('modalProduto');
+			gerenciarBotaoFlutuante('modalCheckout');
 
 
 
