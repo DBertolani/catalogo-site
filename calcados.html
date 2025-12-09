@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset='utf-8'/>
+    <meta content='width=device-width, initial-scale=1' name='viewport'/>
+    <title>Loja de Calçados</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;family=Roboto:wght@300;400;500&amp;display=swap" rel="stylesheet"/>
+    <link crossorigin='anonymous' href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css' integrity='sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We' rel='stylesheet'/>
+    
+    <style>
+      :root { --cor-principal: #0d6efd; --fonte-principal: 'Poppins', sans-serif; }
+      body { min-height: 75rem; padding-top: 4.5rem; font-family: var(--fonte-principal); background-color: #f8f9fa; }
+      
+      /* Cores */
+      .bg-custom { background-color: var(--cor-principal) !important; }
+      .text-custom { color: var(--cor-principal) !important; }
+      .btn-custom { background-color: var(--cor-principal); color: white; border: none; }
+      .btn-custom:hover { background-color: #333; color: white; }
+
+      /* Imagens */
+      .card-img-top { height: 220px; object-fit: contain; padding: 10px; background: white; }
+      .carousel-item img { height: 350px; object-fit: contain; }
+      
+      /* Setas do Carrossel */
+      .carousel-control-prev, .carousel-control-next {
+        background-color: rgba(0,0,0,0.3); width: 40px; height: 40px; top: 50%; transform: translateY(-50%); border-radius: 50%;
+      }
+
+      /* Botões de Tamanho */
+      .btn-size { border: 1px solid #ced4da; margin: 0 5px 5px 0; min-width: 40px; background: white; color: #333; }
+      .btn-size:hover { background-color: #e9ecef; }
+      .btn-size.active { background-color: var(--cor-principal); color: white; border-color: var(--cor-principal); }
+
+      /* Botão Flutuante */
+      .floating-cart { position: fixed; right: 20px; bottom: 20px; z-index: 9999; display: flex; flex-direction: column; align-items: flex-end; }
+      .btn-float { box-shadow: 0 4px 8px rgba(0,0,0,0.2); margin-top: 5px; border-radius: 50px; padding: 10px 20px; font-weight: bold; }
+    </style>
+  </head>
+  <body>
+  
+
+
+
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js'></script>
+    <script crossorigin='anonymous' integrity='sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj' src='https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js'></script>
+    <script src='https://sdk.mercadopago.com/js/v2'></script>
+    
+    <nav class='navbar navbar-expand-md navbar-dark fixed-top bg-custom'>
+      <div class='container-fluid'>
+        <a class='navbar-brand' href='#' id="logo_site"><b>LOJA</b></a>
+        <button class='navbar-toggler' type='button' data-bs-toggle='collapse' data-bs-target='#navbarCollapse'><span class='navbar-toggler-icon'></span></button>
+        <div class='collapse navbar-collapse' id='navbarCollapse'>
+          <ul class='navbar-nav me-auto mb-2 mb-md-0'>
+            <li class='nav-item'><a class='nav-link active' href='#'>Produtos</a></li>
+            <li class='nav-item dropdown'>
+              <a class='nav-link active dropdown-toggle' href='#' id='navbarDropdown' role='button' data-bs-toggle='dropdown'>Categorias</a>
+              <ul class='dropdown-menu' id='categoria_menu'></ul>
+            </li>
+          </ul>
+          <form class='d-flex'>
+            <input class='form-control me-2' id='txt_search' placeholder='Buscar...' type='search'/>
+            <button class='btn btn-light' onclick='print_productos("Pesquisa", document.getElementById("txt_search").value);' type='button'>🔍</button>
+          </form>
+        </div>
+      </div>
+    </nav>
+    
+    <main class='container'>
+      <div class="floating-cart">
+        <button class='btn btn-danger btn-float' onclick="abrirCarrinho()">🛒 Ver Carrinho</button>
+        <button class='btn btn-custom btn-float' type='button'><span id='valorTotalWidget'>R$ 0.00</span></button>
+      </div>
+      <div class='row mt-2' id='div_produtos'></div>
+    </main>
+
+    <div class="modal fade" id="modalProduto" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTituloProduto">Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div id="carouselProduto" class="carousel slide" data-bs-ride="carousel">
+              <div class="carousel-inner" id="carouselImagensContainer"></div>
+              <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduto" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+              <button class="carousel-control-next" type="button" data-bs-target="#carouselProduto" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+            </div>
+            
+            <div class="mt-4">
+                <h3 id="modalPreco" class="text-custom fw-bold"></h3>
+                
+                <div class="mb-3">
+                    <label class="fw-bold d-block">Tamanho:</label>
+                    <div id="modalTamanhosContainer" class="d-flex flex-wrap mt-1"></div>
+                    <input type="hidden" id="tamanhoSelecionado">
+                </div>
+
+                <div class="bg-light p-3 rounded mb-3 border">
+                    <label class="fw-bold small">Simular Frete:</label>
+                    <div class="input-group input-group-sm mt-1">
+                        <input type="text" class="form-control" id="cep_simulacao" placeholder="00000-000" maxlength="9">
+                        <button class="btn btn-outline-secondary" type="button" onclick="simularFreteProduto()">Calcular</button>
+                    </div>
+                    <div id="resultado_frete_produto" class="small mt-2"></div>
+                </div>
+
+                <hr>
+                <h6>Descrição:</h6>
+                <div id="areaDescricao">
+                    <p id="descResumo"></p>
+                    <button class="btn btn-link p-0" id="btnLerMais" style="display:none;">Ler mais</button>
+                </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+            <button type="button" class="btn btn-custom" id="btnAdicionarModal">Adicionar ao Carrinho</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalDescricao" tabindex="-1" style="z-index: 1060;">
+      <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Detalhes do Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <p id="textoDescricaoCompleta" style="white-space: pre-wrap;"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class='modal' id='modalCarrito' tabindex='-1'>
+      <div class='modal-dialog'>
+        <div class='modal-content'>
+          <div class='modal-header'><h5 class='modal-title'>Carrinho</h5><button class='btn-close' data-bs-dismiss='modal'></button></div>
+				<div class='modal-body'>
+					<div id='div_carrito'></div>
+					
+					<hr>
+					<div class="mb-3">
+						<label class="form-label small fw-bold">Calcular Frete do Pedido:</label>
+						<div class="input-group">
+							<input type="text" class="form-control" id="cep_carrinho" placeholder="Seu CEP" maxlength="9">
+							<button class="btn btn-outline-secondary" type="button" onclick="calcularFreteCarrinho()">Calcular</button>
+						</div>
+						<div id="opcoes_frete_carrinho" class="mt-2 small"></div>
+					</div>
+
+					<h4 class='text-end mt-3'>Total: <span id='total_carro_modal'>R$ 0.00</span></h4>
+					<div class='d-grid gap-2 mt-3'>
+						<button class='btn btn-success btn-lg' onclick="validarECheckout()">Finalizar Compra</button>
+					</div>
+				</div>
+        </div>
+      </div>
+    </div>
+
+<div class="modal fade" id="modalCheckout" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Finalizar Pedido</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form id="form-checkout">
+          <h6 class="text-custom border-bottom pb-2">1. Identificação</h6>
+          
+          <div class="mb-3">
+              <label class="form-label small fw-bold">CPF (Digite para buscar cadastro)</label>
+              <input type="text" id="checkout_cpf" class="form-control" placeholder="000.000.000-00" onblur="buscarDadosCliente(this.value)" required>
+              <small id="msg_busca_cliente" class="text-muted"></small>
+          </div>
+		  
+		  <div class="mb-3">
+				<label class="form-label small">E-mail (Para receber o comprovante)</label>
+				<input type="email" id="checkout_email" class="form-control" placeholder="seu@email.com" required>
+			</div>
+
+          <div class="row mb-2">
+              <div class="col-6">
+                  <label class="form-label small">Nome</label>
+                  <input type="text" id="checkout_nome" class="form-control" required>
+              </div>
+              <div class="col-6">
+                  <label class="form-label small">Sobrenome</label>
+                  <input type="text" id="checkout_sobrenome" class="form-control" required>
+              </div>
+          </div>
+          
+          <div class="mb-3">
+              <label class="form-label small">Telefone / WhatsApp</label>
+              <input type="text" id="checkout_telefone" class="form-control" placeholder="(XX) 9XXXX-XXXX" required>
+          </div>
+
+          <h6 class="text-custom border-bottom pb-2 mt-4">2. Endereço de Entrega</h6>
+          
+          <div class="row mb-2">
+              <div class="col-5">
+                  <label class="form-label small">CEP</label>
+                  <input type="text" id="checkout_cep" class="form-control" onblur="pesquisarCep(this.value); verificarMudancaCep(this.value)" required>
+              </div>
+              <div class="col-7 pt-4">
+                  <small class="text-muted" id="msg_cep_checkout">Digite o CEP para preencher</small>
+              </div>
+          </div>
+
+          <div class="row mb-2">
+              <div class="col-9">
+                  <input type="text" id="checkout_rua" class="form-control" placeholder="Rua" required>
+              </div>
+              <div class="col-3">
+                  <input type="text" id="checkout_numero" class="form-control" placeholder="Nº" required>
+              </div>
+          </div>
+
+          <div class="row mb-2">
+              <div class="col-6">
+                  <input type="text" id="checkout_bairro" class="form-control" placeholder="Bairro" required>
+              </div>
+              <div class="col-6">
+                  <input type="text" id="checkout_complemento" class="form-control" placeholder="Complemento">
+              </div>
+          </div>
+
+          <div class="row mb-2">
+              <div class="col-9">
+                  <input type="text" id="checkout_cidade" class="form-control" placeholder="Cidade" required>
+              </div>
+              <div class="col-3">
+                  <input type="text" id="checkout_uf" class="form-control" placeholder="UF" required>
+              </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Voltar</button>
+        <button type="button" class="btn btn-success" onclick="iniciarPagamento()">Gerar Pagamento</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+    <script>
+var urlScript = "https://script.google.com/macros/s/AKfycbzRULFJ7Lr3QwfQJnkILtt53IMtOYKtalsWF-91-a2LpCm-KSXJNgQMVe20BbTPNCTaIQ/exec";
+        
+        var configGlobal = {};
+        var produtoAtual = null;
+        // RECUPERA FRETE SALVO OU INICIA COM 0
+        var freteValor = parseFloat(localStorage.getItem('frete_selecionado')) || 0;
+
+        // --- INICIALIZAÇÃO ---
+        function carregar_tudo() {
+           var url = urlScript + "?rota=config&nocache=" + new Date().getTime();
+           var cache = JSON.parse(localStorage.getItem('loja_config'));
+           if(cache) { configGlobal = cache; aplicar_config(cache); }
+
+           fetch(url).then(r => r.json()).then(data => {
+                if(!data.erro) {
+                    var conf = Array.isArray(data) ? data.reduce((acc,cur) => ({...acc, [cur.Chave]: cur.Valor}), {}) : data;
+                    localStorage.setItem("loja_config", JSON.stringify(conf));
+                    configGlobal = conf;
+                    aplicar_config(conf);
+                    carregar_produtos();
+                }
+            });
+        }
+
+        function aplicar_config(config) {
+            if(config.NomeDoSite) { document.title = config.NomeDoSite; document.getElementById('logo_site').innerHTML = config.NomeDoSite; }
+            if(config.CorPrincipal) document.documentElement.style.setProperty('--cor-principal', config.CorPrincipal);
+            if(config.LogoDoSite && config.LogoDoSite.length > 5) {
+                var src = config.LogoDoSite.replace('/view', '/preview');
+                document.getElementById('logo_site').innerHTML = `<img src="${src}" style="height:40px; margin-right:10px;"> ${config.NomeDoSite}`;
+            }
+        }
+
+        function carregar_produtos() {
+            var url = urlScript + "?rota=produtos&nocache=" + new Date().getTime();
+            fetch(url).then(r => r.json()).then(data => {
+                localStorage.setItem("calçados", JSON.stringify(data));
+                mostrar_produtos(data);
+            });
+        }
+
+        function mostrar_produtos(produtos) {
+            const container = document.getElementById('div_produtos');
+            container.innerHTML = '';
+            var colD = configGlobal.ColunasDesktop ? parseInt(configGlobal.ColunasDesktop) : 4;
+            var colM = configGlobal.ColunasMobile ? parseInt(configGlobal.ColunasMobile) : 2;
+            var classe = `col-${12/colM} col-md-${12/colD} mb-4`;
+
+            produtos.forEach(p => {
+                const item = document.createElement('div');
+                item.className = classe;
+                item.innerHTML = `
+                    <div class="card h-100 shadow-sm border-0">
+                        <img src="${p.ImagemPrincipal}" class="card-img-top" alt="${p.Produto}">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title fw-bold" style="font-size: 0.9rem;">${p.Produto}</h6>
+                            <p class="text-custom fw-bold">R$ ${parseFloat(p.Preço).toFixed(2)}</p>
+                            <button class="btn btn-outline-secondary btn-sm mt-auto w-100" onclick="abrir_modal_ver('${p.ID}')">Ver Detalhes</button>
+                        </div>
+                    </div>`;
+                container.appendChild(item);
+            });
+            
+            const cats = [...new Set(produtos.map(p => p.Categoria))].filter(c=>c);
+            document.getElementById('categoria_menu').innerHTML = cats.map(c => `<li><a class="dropdown-item" href="#" onclick="print_productos('Categoria','${c}')">${c}</a></li>`).join('');
+        }
+
+        // --- FUNÇÃO CORRIGIDA DO MODAL DE PRODUTO ---
+        function abrir_modal_ver(id) {
+            var dados = JSON.parse(localStorage.getItem('calçados'));
+            produtoAtual = dados.find(x => x.ID === id);
+            if(!produtoAtual) return;
+
+            // 1. Título e Preço
+            document.getElementById('modalTituloProduto').innerText = produtoAtual.Produto;
+            document.getElementById('modalPreco').innerText = 'R$ ' + parseFloat(produtoAtual.Preço).toFixed(2);
+            
+            // 2. Descrição (CORRIGIDO ERRO NULL)
+            var desc = produtoAtual.Descrição || "";
+            var pResumo = document.getElementById('descResumo');
+            var btnLer = document.getElementById('btnLerMais');
+            
+            if(pResumo) {
+                if(desc.length > 150) {
+                    pResumo.innerText = desc.substring(0, 150) + "...";
+                    btnLer.style.display = 'inline-block';
+                    btnLer.innerText = "Ler mais"; // Texto ajustado
+                    btnLer.onclick = function() {
+                        document.getElementById('textoDescricaoCompleta').innerText = desc;
+                        new bootstrap.Modal(document.getElementById('modalDescricao')).show();
+                    };
+                } else {
+                    pResumo.innerText = desc;
+                    btnLer.style.display = 'none';
+                }
+            }
+
+            // 3. Tamanhos
+            var containerTam = document.getElementById('modalTamanhosContainer');
+            containerTam.innerHTML = '';
+            document.getElementById('tamanhoSelecionado').value = ""; // Resetar tamanho
+            
+            if(produtoAtual.Tamanhos) {
+                produtoAtual.Tamanhos.toString().split(',').forEach(tam => {
+                    var btn = document.createElement('button');
+                    btn.className = 'btn btn-size'; 
+                    btn.innerText = tam.trim();
+                    btn.onclick = function() {
+                        document.querySelectorAll('.btn-size').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        document.getElementById('tamanhoSelecionado').value = tam.trim();
+                    };
+                    containerTam.appendChild(btn);
+                });
+            } else {
+                containerTam.innerHTML = '<span class="text-muted small">Tamanho Único</span>';
+                document.getElementById('tamanhoSelecionado').value = "Único";
+            }
+
+            // 4. Imagens
+            var carousel = document.getElementById('carouselImagensContainer');
+            carousel.innerHTML = '';
+            var imgs = [produtoAtual.ImagemPrincipal];
+            if(produtoAtual.ImagensExtras) imgs = imgs.concat(produtoAtual.ImagensExtras.split(','));
+            imgs.forEach((src, i) => {
+                if(src.trim().length > 5) {
+                    var div = document.createElement('div');
+                    div.className = i===0 ? 'carousel-item active' : 'carousel-item';
+                    div.innerHTML = `<img src="${src}" class="d-block w-100">`;
+                    carousel.appendChild(div);
+                }
+            });
+
+            // Limpa frete
+            document.getElementById('resultado_frete_produto').innerHTML = "";
+            document.getElementById('cep_simulacao').value = "";
+            
+            // 5. Configura Botão Adicionar (CRÍTICO: AGORA FUNCIONA)
+            document.getElementById('btnAdicionarModal').onclick = function() {
+                var tam = document.getElementById('tamanhoSelecionado').value;
+                if(!tam) { alert("Selecione um tamanho!"); return; }
+                
+                adicionar_carrinho(produtoAtual.ID, produtoAtual.Produto, produtoAtual.Preço, produtoAtual.ImagemPrincipal, tam);
+                bootstrap.Modal.getInstance(document.getElementById('modalProduto')).hide();
+            };
+
+            new bootstrap.Modal(document.getElementById('modalProduto')).show();
+        }
+
+        // --- CARRINHO ---
+        function abrirCarrinho() {
+            new bootstrap.Modal(document.getElementById('modalCarrito')).show();
+        }
+		
+		
+// Variável global para guardar o frete (null = não escolhido, 0 = grátis, >0 = pago)
+var freteCarrinhoSelecionado = null; 
+
+function calcularFreteCarrinho() {
+    var cep = document.getElementById('cep_carrinho').value.replace(/\D/g, '');
+    if(cep.length !== 8) return alert("CEP inválido");
+    
+    var div = document.getElementById('opcoes_frete_carrinho');
+    div.innerHTML = "<div class='text-muted small'>Calculando...</div>";
+    
+    freteCarrinhoSelecionado = null; 
+    atualizar_carrinho();
+
+    var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+    if(carrinho.length === 0) { div.innerHTML = "Carrinho vazio."; return; }
+
+    // --- CORREÇÃO: Inicia em 0 para pegar o valor real do produto ---
+    var pesoTotal = 0;
+    var maxComp = 0, maxAlt = 0, maxLarg = 0;
+    var todosProdutos = JSON.parse(localStorage.getItem('calçados')) || [];
+
+carrinho.forEach(item => {
+        var pCompleto = todosProdutos.find(p => p.ID === item.id);
+        if(pCompleto) {
+            var pesoUnit = parseFloat(String(pCompleto.Peso || "0.3").replace(',', '.'));
+            var comp = parseFloat(String(pCompleto.Comprimento || "0").replace(',', '.'));
+            var alt = parseFloat(String(pCompleto.Altura || "0").replace(',', '.'));
+            var larg = parseFloat(String(pCompleto.Largura || "0").replace(',', '.'));
+
+            pesoTotal += (pesoUnit * item.quantidade);
+            
+            // LÓGICA DE EMPILHAMENTO:
+            // 1. Pega a maior base (Comprimento e Largura) para caber o maior item
+            if(comp > maxComp) maxComp = comp;
+            if(larg > maxLarg) maxLarg = larg;
+            
+            // 2. Soma a altura (Empilha um em cima do outro)
+            maxAlt += (alt * item.quantidade); 
+        }
+    });
+
+    // --- APLICA MÍNIMOS DOS CORREIOS APÓS SOMAR ---
+    // Mínimos: 15cm comp, 10cm larg, 1cm alt (SuperFrete recomenda um pouco mais)
+    if(maxComp < 15) maxComp = 15;
+    if(maxLarg < 10) maxLarg = 10;
+    if(maxAlt < 2) maxAlt = 2;
+    // ----------------------------------------------
+
+    // 2. Verifica Regra de Frete Grátis
+    fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r=>r.json()).then(d => {
+        if(d.erro) { div.innerHTML = "<span class='text-danger'>CEP não encontrado</span>"; return; }
+        
+        var todosGratis = true;
+        carrinho.forEach(item => {
+            var pCompleto = todosProdutos.find(p => p.ID === item.id);
+            if(pCompleto) {
+                var ufs = pCompleto.FreteGratis ? pCompleto.FreteGratis.toUpperCase().split(',').map(s=>s.trim()) : [];
+                if(!ufs.includes(d.uf)) todosGratis = false;
+            }
+        });
+
+        if(todosGratis) {
+            freteCarrinhoSelecionado = 0;
+            atualizar_carrinho();
+            div.innerHTML = `<div class="alert alert-success p-2 small mb-0"><i class="bi bi-gift-fill"></i> Frete Grátis para todo o pedido!</div>`;
+        } else {
+            // 3. Busca Opções Pagas (Com medidas reais!)
+            fetch(urlScript, { 
+                method: 'POST', 
+                body: JSON.stringify({
+                    op: "calcular_frete", cep: cep, peso: pesoTotal, 
+                    comprimento: maxComp, altura: maxAlt, largura: maxLarg
+                }) 
+            })
+            .then(r=>r.json()).then(res => {
+                if(res.erro) div.innerHTML = `<span class="text-danger small">${res.erro}</span>`;
+                else if (res.opcoes) {
+                    var html = `<div class="text-muted small mb-2">Destino: ${d.localidade}-${d.uf} (${pesoTotal.toFixed(2)}kg)</div>`;
+                    res.opcoes.forEach(opt => {
+                        html += `
+                        <div class="d-flex justify-content-between align-items-center border p-2 mb-1 rounded bg-white">
+                            <div class="small lh-1">
+                                <strong>${opt.nome}</strong> <span class="text-muted">(${opt.prazo} dias)</span><br>
+                                <span class="fw-bold text-dark">R$ ${parseFloat(opt.valor).toFixed(2)}</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline-primary btn-frete-cart" 
+                                onclick="escolherFreteFinal(this, ${opt.valor})">
+                                Selecionar
+                            </button>
+                        </div>`;
+                    });
+                    div.innerHTML = html;
+                }
+            });
+        }
+    });
+}
+
+function escolherFreteFinal(btn, valor) {
+    // 1. Reseta visual de todos os botões
+    document.querySelectorAll('.btn-frete-cart').forEach(b => {
+        b.className = 'btn btn-sm btn-outline-primary btn-frete-cart';
+        b.innerText = 'Selecionar';
+    });
+
+    // 2. Destaca o escolhido
+    btn.className = 'btn btn-sm btn-success btn-frete-cart';
+    btn.innerText = 'Selecionado';
+
+    // 3. Atualiza valor e total
+    freteCarrinhoSelecionado = parseFloat(valor);
+    atualizar_carrinho();
+}
+
+function validarECheckout() {
+    // 1. Validação do Frete
+    if (freteCarrinhoSelecionado === null) {
+        alert("Por favor, calcule e selecione uma opção de frete antes de finalizar.");
+        document.getElementById('cep_carrinho').focus();
+        return;
+    }
+
+    // 2. Transfere o CEP do Carrinho para o Checkout
+    var cepCarrinho = document.getElementById('cep_carrinho').value;
+    var campoCepCheckout = document.getElementById('checkout_cep');
+    
+    if(cepCarrinho) {
+        campoCepCheckout.value = cepCarrinho;
+        // Aciona a busca automática para preencher Rua, Bairro, Cidade...
+        pesquisarCep(cepCarrinho); 
+    }
+
+    // 3. Abre o Checkout
+    var modalCheckout = new bootstrap.Modal(document.getElementById('modalCheckout'));
+    modalCheckout.show();
+    
+    // Fecha o carrinho
+    var modalCarrinhoEl = document.getElementById('modalCarrito');
+    var modalCarrinho = bootstrap.Modal.getInstance(modalCarrinhoEl);
+    if(modalCarrinho) modalCarrinho.hide();
+}
+
+
+
+        function adicionar_carrinho(id, prod, preco, img, varia) {
+            var c = JSON.parse(localStorage.getItem('carrinho')) || [];
+            var uid = id + '-' + varia;
+            var item = c.find(i => i.uid === uid);
+            if(item) item.quantidade++; else c.push({uid, id, producto:prod, preco, imagem:img, variacao:varia, quantidade:1});
+            localStorage.setItem('carrinho', JSON.stringify(c));
+            atualizar_carrinho();
+        }
+        function remover_carrinho(uid) {
+            var c = JSON.parse(localStorage.getItem('carrinho'));
+            c.splice(c.findIndex(i => i.uid === uid), 1);
+            localStorage.setItem('carrinho', JSON.stringify(c));
+            atualizar_carrinho();
+        }
+		
+	function esvaziarCarrinho() {
+    if(confirm("Tem certeza que deseja remover todos os itens?")) {
+        // Limpa o carrinho e o frete selecionado
+        localStorage.removeItem('carrinho');
+        freteCarrinhoSelecionado = null;
+        
+        // Limpa visualmente a seleção de frete se estiver visível
+        document.getElementById('opcoes_frete_carrinho').innerHTML = "";
+        document.getElementById('cep_carrinho').value = "";
+        
+        atualizar_carrinho();
+    }
+}	
+		
+function atualizar_carrinho() {
+    var c = JSON.parse(localStorage.getItem('carrinho')) || [];
+    var div = document.getElementById('div_carrito');
+    div.innerHTML = '';
+    var totalProdutos = 0;
+
+    if(c.length === 0) {
+        div.innerHTML = "<div class='text-center py-4 text-muted'><span style='font-size: 2rem;'>🛒</span><br>Seu carrinho está vazio.</div>";
+        freteCarrinhoSelecionado = null; 
+    } else {
+        // --- CABEÇALHO DO CARRINHO (Novo) ---
+        div.innerHTML += `
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+            <span class="small fw-bold text-muted">${c.length} item(ns)</span>
+            <button class="btn btn-sm btn-outline-danger" style="font-size: 0.75rem;" onclick="esvaziarCarrinho()">
+                Esvaziar Carrinho 🗑️
+            </button>
+        </div>`;
+
+        // LISTA DE ITENS
+        c.forEach(i => {
+            div.innerHTML += `
+            <div class="d-flex align-items-center mb-3 border-bottom pb-2">
+                <div style="flex: 1;">
+                    <span class="fw-bold" style="font-size: 0.9rem;">${i.producto}</span><br>
+                    <small class="text-muted">${i.variacao}</small>
+                </div> 
+                
+                <div class="d-flex flex-column align-items-end ms-2">
+                    <div class="d-flex align-items-center mb-1">
+                        <span class="me-2 fw-bold" style="font-size: 0.9rem;">R$ ${(i.preco*i.quantidade).toFixed(2)}</span>
+                        <button class="btn btn-sm btn-light border text-danger p-1 lh-1" title="Remover item" onclick="remover_carrinho('${i.uid}')">
+                            🗑️
+                        </button>
+                    </div>
+                    
+                    <div class="input-group input-group-sm" style="width: 80px;">
+                        <button class="btn btn-outline-secondary px-1" onclick="alterarQuantidade('${i.uid}', -1)">-</button>
+                        <input type="text" class="form-control text-center p-0" value="${i.quantidade}" readonly style="font-size: 0.8rem;">
+                        <button class="btn btn-outline-secondary px-1" onclick="alterarQuantidade('${i.uid}', 1)">+</button>
+                    </div>
+                </div>
+            </div>`;
+            totalProdutos += i.preco * i.quantidade;
+        });
+    }
+
+    // Soma Frete
+    var valorFrete = (freteCarrinhoSelecionado !== null) ? freteCarrinhoSelecionado : 0;
+    
+    if (freteCarrinhoSelecionado !== null) {
+        var labelFrete = freteCarrinhoSelecionado === 0 ? "Grátis" : `R$ ${freteCarrinhoSelecionado.toFixed(2)}`;
+        var corTexto = freteCarrinhoSelecionado === 0 ? "text-success" : "text-dark";
+        div.innerHTML += `<div class="d-flex justify-content-between mb-2 pt-2 ${corTexto} border-top"><strong>Frete:</strong><strong>${labelFrete}</strong></div>`;
+    }
+
+    var totalFinal = totalProdutos + valorFrete;
+    var txt = 'R$ ' + totalFinal.toFixed(2);
+    
+    document.getElementById('total_carro_modal').innerText = txt;
+    document.getElementById('valorTotalWidget').innerText = txt;
+}
+
+
+function alterarQuantidade(uid, delta) {
+    var c = JSON.parse(localStorage.getItem('carrinho')) || [];
+    var item = c.find(i => i.uid === uid);
+    
+    if (item) {
+        item.quantidade += delta;
+        
+        // Se chegar a 0, pergunta se quer remover
+        if (item.quantidade <= 0) {
+            var confirmar = confirm("Deseja remover este item?");
+            if (confirmar) {
+                c.splice(c.findIndex(i => i.uid === uid), 1);
+            } else {
+                item.quantidade = 1; // Volta para 1 se cancelar
+            }
+        }
+        
+        // SALVA E RESETA O FRETE (Pois o peso mudou)
+        localStorage.setItem('carrinho', JSON.stringify(c));
+        
+        // Reseta o frete visualmente e na memória para forçar novo cálculo
+        freteCarrinhoSelecionado = null;
+        document.getElementById('opcoes_frete_carrinho').innerHTML = "<small class='text-warning'>Quantidade mudou. Calcule o frete novamente.</small>";
+        
+        atualizar_carrinho();
+    }
+}
+
+
+        // --- FRETE E CHECKOUT ---
+// Apenas mostra o valor, sem botão de selecionar
+function simularFreteProduto() {
+    var cep = document.getElementById('cep_simulacao').value.replace(/\D/g, '');
+    if(cep.length !== 8) return alert("CEP inválido");
+    
+    var div = document.getElementById('resultado_frete_produto');
+    div.innerHTML = "Consultando...";
+    
+    // Verifica Frete Grátis (Visual apenas)
+    fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r=>r.json()).then(d => {
+        if(d.erro) { div.innerHTML = "CEP não encontrado"; return; }
+        
+        var ufs = produtoAtual.FreteGratis ? produtoAtual.FreteGratis.toUpperCase().split(',').map(s=>s.trim()) : [];
+        var localInfo = `<div class="mb-1 small"><strong>${d.localidade}-${d.uf}</strong></div>`;
+
+        if(ufs.includes(d.uf)) {
+            div.innerHTML = localInfo + `<div class="text-success small"><i class="bi bi-gift-fill"></i> Frete Grátis neste produto!</div>`;
+        } else {
+            // Consulta valor apenas para mostrar
+            fetch(urlScript, { 
+                method: 'POST', 
+                body: JSON.stringify({
+                    op: "calcular_frete", 
+                    cep: cep, 
+                    peso: produtoAtual.Peso, 
+                    comprimento: produtoAtual.Comprimento, 
+                    altura: produtoAtual.Altura, 
+                    largura: produtoAtual.Largura
+                }) 
+            })
+            .then(r=>r.json()).then(res => {
+                if(res.erro) div.innerHTML = `<span class="text-danger small">${res.erro}</span>`;
+                else if (res.opcoes) {
+                    var html = localInfo;
+                    res.opcoes.forEach(opt => {
+                        html += `<div class="d-flex justify-content-between small border-bottom">
+                                    <span>${opt.nome} (${opt.prazo}d)</span>
+                                    <strong>R$ ${parseFloat(opt.valor).toFixed(2)}</strong>
+                                 </div>`;
+                    });
+                    div.innerHTML = html;
+                }
+            });
+        }
+    });
+}
+
+
+function selecionarFrete(btn, valor) {
+    // 1. Visual do botão
+    document.querySelectorAll('.btn-frete').forEach(b => {
+        b.className = 'btn btn-sm btn-outline-primary btn-frete';
+        b.innerText = 'Escolher';
+    });
+    btn.className = 'btn btn-sm btn-success btn-frete';
+    btn.innerText = 'Selecionado';
+
+    // 2. Atualiza variável e SALVA NA MEMÓRIA
+    freteValor = parseFloat(valor);
+    localStorage.setItem('frete_selecionado', freteValor);
+
+    // 3. Recalcula
+    atualizar_carrinho();
+}
+
+        function pesquisarCep(val) {
+            var cep = val.replace(/\D/g, '');
+            if(cep.length === 8) fetch(`https://viacep.com.br/ws/${cep}/json/`).then(r=>r.json()).then(d => {
+                if(!d.erro) {
+                    document.getElementById('checkout_rua').value = d.logradouro;
+                    document.getElementById('checkout_bairro').value = d.bairro;
+                    document.getElementById('checkout_cidade').value = d.localidade;
+                    document.getElementById('checkout_uf').value = d.uf;
+                    document.getElementById('checkout_numero').focus();
+                }
+            });
+        }
+		
+function verificarMudancaCep(novoCep) {
+    var cepOriginal = document.getElementById('cep_carrinho').value.replace(/\D/g, '');
+    var cepNovo = novoCep.replace(/\D/g, '');
+
+    // Se o usuário digitou um CEP diferente do calculado no carrinho
+    if (cepOriginal && cepNovo !== cepOriginal) {
+        var confirmar = confirm("Ao mudar o CEP, o valor do frete pode mudar. Deseja voltar ao carrinho para recalcular?");
+        if (confirmar) {
+            // Fecha checkout e abre carrinho
+            bootstrap.Modal.getInstance(document.getElementById('modalCheckout')).hide();
+            new bootstrap.Modal(document.getElementById('modalCarrito')).show();
+            // Preenche o novo CEP lá
+            document.getElementById('cep_carrinho').value = novoCep;
+            document.getElementById('opcoes_frete_carrinho').innerHTML = "Clique em calcular.";
+            freteCarrinhoSelecionado = null;
+            atualizar_carrinho();
+        } else {
+            // Se cancelar, volta o CEP antigo
+            document.getElementById('checkout_cep').value = cepOriginal;
+        }
+    } else {
+        // Se for o mesmo CEP ou vazio, só busca o endereço normal
+        pesquisarCep(novoCep);
+    }
+}
+
+// --- BUSCA DE CLIENTE (NOVO) ---
+function buscarDadosCliente(cpf) {
+    var cpfLimpo = cpf.replace(/\D/g, '');
+    if (cpfLimpo.length < 11) return;
+
+    document.getElementById('msg_busca_cliente').innerText = "Buscando cadastro...";
+    
+    fetch(urlScript, {
+        method: 'POST',
+        body: JSON.stringify({ op: "buscar_cliente", cpf: cpfLimpo })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.encontrado) {
+            document.getElementById('msg_busca_cliente').innerHTML = "<span class='text-success'>Cliente encontrado!</span>";
+            // Preenche os campos
+            document.getElementById('checkout_nome').value = data.nome;
+            document.getElementById('checkout_sobrenome').value = data.sobrenome;
+            document.getElementById('checkout_telefone').value = data.telefone;
+            // Preenche endereço também se quiser
+            document.getElementById('checkout_cep').value = data.cep;
+            document.getElementById('checkout_rua').value = data.rua;
+            document.getElementById('checkout_numero').value = data.numero;
+            document.getElementById('checkout_bairro').value = data.bairro;
+            document.getElementById('checkout_cidade').value = data.cidade;
+            document.getElementById('checkout_uf').value = data.uf;
+            document.getElementById('checkout_complemento').value = data.complemento;
+        } else {
+            document.getElementById('msg_busca_cliente').innerText = "Novo cliente. Por favor, preencha os dados.";
+        }
+    })
+    .catch(e => document.getElementById('msg_busca_cliente').innerText = "Erro na busca.");
+}
+
+// --- PAGAMENTO CORRIGIDO (Envia todos os dados) ---
+function iniciarPagamento() {
+    // 1. Coleta dados
+    var cliente = {
+        cpf: document.getElementById('checkout_cpf').value,
+        nome: document.getElementById('checkout_nome').value,
+        sobrenome: document.getElementById('checkout_sobrenome').value,
+        email: document.getElementById('checkout_email').value, 
+        telefone: document.getElementById('checkout_telefone').value,
+        cep: document.getElementById('checkout_cep').value,
+        rua: document.getElementById('checkout_rua').value,
+        numero: document.getElementById('checkout_numero').value,
+        complemento: document.getElementById('checkout_complemento').value,
+        bairro: document.getElementById('checkout_bairro').value,
+        cidade: document.getElementById('checkout_cidade').value,
+        uf: document.getElementById('checkout_uf').value,
+    };
+
+    if (!cliente.cpf || !cliente.nome || !cliente.email || !cliente.rua) {
+        alert("Preencha todos os campos obrigatórios."); return;
+    }
+    
+    var carrinho = JSON.parse(localStorage.getItem('carrinho')) || [];
+    if (carrinho.length === 0) { alert("Carrinho vazio!"); return; }
+
+    var btn = event.target;
+    btn.innerText = "Processando...";
+    btn.disabled = true;
+
+    // --- CORREÇÃO: LÓGICA DE MEDIDAS (Igual à anterior) ---
+    var pesoTotal = 0;
+    var maxComp = 0, maxAlt = 0, maxLarg = 0;
+    var todosProdutos = JSON.parse(localStorage.getItem('calçados')) || [];
+    
+var items = carrinho.map(i => {
+        var pCompleto = todosProdutos.find(p => p.ID === i.id);
+        if(pCompleto) {
+            var pesoUnit = parseFloat(String(pCompleto.Peso || "0.3").replace(',', '.'));
+            var comp = parseFloat(String(pCompleto.Comprimento || "0").replace(',', '.'));
+            var alt = parseFloat(String(pCompleto.Altura || "0").replace(',', '.'));
+            var larg = parseFloat(String(pCompleto.Largura || "0").replace(',', '.'));
+
+            pesoTotal += (pesoUnit * i.quantidade);
+            
+            // LÓGICA DE EMPILHAMENTO AQUI TAMBÉM
+            if(comp > maxComp) maxComp = comp;
+            if(larg > maxLarg) maxLarg = larg;
+            maxAlt += (alt * i.quantidade); // <--- Soma a altura
+        }
+        return {
+            title: `${i.producto} (${i.variacao})`, 
+            quantity: i.quantidade, 
+            currency_id: 'BRL', 
+            unit_price: parseFloat(i.preco)
+        };
+    });
+
+    // Mínimos de Segurança
+    if(maxComp < 15) maxComp = 15;
+    if(maxLarg < 10) maxLarg = 10;
+    if(maxAlt < 2) maxAlt = 2;
+    // ------------------------------------------------------
+
+    // Identifica Serviço de Frete
+    var nomeServicoFrete = "Retirada/Outro";
+    if(freteCarrinhoSelecionado !== null && freteCarrinhoSelecionado > 0) {
+        items.push({title: "Frete de Envio", quantity: 1, currency_id: 'BRL', unit_price: freteCarrinhoSelecionado});
+        
+        var btnSelecionado = document.querySelector('.btn-frete-cart.btn-success');
+        if(btnSelecionado) {
+            var textoFrete = btnSelecionado.previousElementSibling.innerText;
+            if(textoFrete.includes("PAC")) nomeServicoFrete = "PAC";
+            else if(textoFrete.includes("SEDEX")) nomeServicoFrete = "SEDEX";
+        }
+    } else if (freteCarrinhoSelecionado === 0) {
+        nomeServicoFrete = "Frete Grátis";
+    }
+
+    // Monta Dados Logísticos com os valores REAIS calculados
+    var logistica = {
+        servico: nomeServicoFrete,
+        peso: pesoTotal.toFixed(2),
+        dimensoes: `${maxComp}x${maxLarg}x${maxAlt}`
+    };
+    
+    // Envia
+    fetch(urlScript, {
+        method: 'POST',
+        body: JSON.stringify({
+            cliente: cliente, 
+            items: items,
+            logistica: logistica
+        })
+    })
+    .then(r => r.text())
+    .then(link => { window.location.href = link; })
+    .catch(e => { 
+        console.error(e); alert("Erro: " + e); btn.innerText = "Tentar Novamente"; btn.disabled = false; 
+    });
+}
+
+
+
+        function print_productos(tipo, valor) {
+             var dados = JSON.parse(localStorage.getItem('calçados')) || [];
+             var filtro = dados;
+             if(tipo === 'Categoria') filtro = dados.filter(p => p.Categoria === valor);
+             if(tipo === 'Pesquisa') filtro = dados.filter(p => p.Produto.toLowerCase().includes(valor.toLowerCase()));
+             mostrar_produtos(filtro);
+        }
+
+        carregar_tudo();
+        atualizar_carrinho();
+		
+
+			// --- CORREÇÃO VISUAL: ESCONDER BOTÃO FLUTUANTE ---
+			var modalCarrinhoEl = document.getElementById('modalCarrito');
+			if (modalCarrinhoEl) {
+				modalCarrinhoEl.addEventListener('show.bs.modal', function () {
+					document.querySelector('.floating-cart').style.display = 'none';
+				});
+				modalCarrinhoEl.addEventListener('hidden.bs.modal', function () {
+					document.querySelector('.floating-cart').style.display = 'flex';
+				});
+			}
+
+
+
+    </script>
+  </body>
+</html>
