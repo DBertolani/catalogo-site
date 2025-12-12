@@ -262,6 +262,8 @@ function gerarHtmlProduto(produto, currentUrl) {
             if(e.target == modal) { modal.style.display = 'none'; document.body.classList.remove('no-scroll'); }
         }
     </script>
+
+	<script src="https://www.dwin2.com/pub.750521.min.js" defer="defer"></script>
 </body>
 </html>
     `;
