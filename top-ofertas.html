@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top 5 Smartphones até R$ 1.500 | Seleção de Hoje</title>
+    <meta name="description" content="Confira os melhores smartphones custando até 1500 reais. Ofertas atualizadas automaticamente.">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f4f7f6; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { text-align: center; padding: 40px 0; }
+        .header h1 { color: #2c3e50; margin-bottom: 10px; }
+        .header p { color: #7f8c8d; font-size: 1.1em; }
+        .product-list { display: grid; gap: 20px; }
+        .product-card { background: white; border-radius: 12px; padding: 20px; display: flex; align-items: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); transition: transform 0.2s; }
+        .product-card:hover { transform: translateY(-5px); }
+        .product-img { width: 120px; height: 120px; object-fit: contain; margin-right: 20px; }
+        .product-info { flex: 1; }
+        .product-info h3 { margin: 0 0 10px 0; font-size: 1.2em; color: #34495e; }
+        .price { font-size: 1.5em; color: #27ae60; font-weight: bold; margin-bottom: 15px; }
+        .buy-btn { background: #e67e22; color: white; text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; display: inline-block; }
+        .loading { text-align: center; padding: 50px; font-size: 1.2em; color: #95a5a6; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Top 5 Smartphones</h1>
+            <p>Os melhores preços encontrados até <b>R$ 1.500,00</b></p>
+        </div>
+
+        <div id="lista-produtos" class="product-list">
+            <div class="loading">A procurar as melhores ofertas...</div>
+        </div>
+    </div>
+
+    <script>
+        async function carregarDestaques() {
+            try {
+                // Chamada para a tua API do Cloudflare (certifica-te que o path /api/produtos existe)
+                const response = await fetch('/api/produtos');
+                const produtos = await response.json();
+
+                const top5 = produtos
+                    .filter(p => {
+                        const categoriaMatch = p.categoria && p.categoria.toLowerCase().includes("celulares e smartphones");
+                        const precoLimpo = p.preco ? parseFloat(p.preco.replace("R$", "").replace(/\./g, "").replace(",", ".")) : 0;
+                        return categoriaMatch && precoLimpo > 0 && precoLimpo <= 1500;
+                    })
+                    .sort((a, b) => {
+                        const precoA = parseFloat(a.preco.replace("R$", "").replace(/\./g, "").replace(",", "."));
+                        const precoB = parseFloat(b.preco.replace("R$", "").replace(/\./g, "").replace(",", "."));
+                        return precoB - precoA; // Mais próximos de 1500 primeiro
+                    })
+                    .slice(0, 5);
+
+                const container = document.getElementById('lista-produtos');
+                container.innerHTML = '';
+
+                if (top5.length === 0) {
+                    container.innerHTML = '<div class="loading">Nenhuma oferta encontrada neste momento. Tente mais tarde!</div>';
+                    return;
+                }
+
+                top5.forEach(p => {
+                    container.innerHTML += `
+                        <div class="product-card">
+                            <img src="${p.imagem}" alt="${p.nome}" class="product-img">
+                            <div class="product-info">
+                                <h3>${p.nome}</h3>
+                                <div class="price">${p.preco}</div>
+                                <a href="/p/${p.id}" class="buy-btn">VER PROMOÇÃO</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                console.error("Erro:", error);
+                document.getElementById('lista-produtos').innerHTML = '<div class="loading">Erro ao carregar ofertas.</div>';
+            }
+        }
+
+        window.onload = carregarDestaques;
+    </script>
+</body>
+</html>
