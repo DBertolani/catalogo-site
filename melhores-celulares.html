@@ -494,57 +494,88 @@ function renderizarProdutos(dadosGerais, cards) {
 
         const priceBox = card.querySelector('.price-box');
         const imgTag = card.querySelector('.product-image-target');
-        
+
         if (priceBox.getAttribute('data-rendered') === 'true') return;
-        
+
         // Reconstrói a caixa de preço
         priceBox.innerHTML = '<span class="live-price loading-skeleton"></span>';
         const labelPreco = priceBox.querySelector('.live-price');
 
-
-
-        if (data) {
-            // AJUSTE DE ÍNDICE: Conforme sua planilha, o preço é o índice 6
-            const precoBruto = data[6]; 
-            const preco = limparPrecoJS(data[6]);
-            
-            // Tenta pegar imagem da planilha, se falhar ou não tiver, o HTML mantém a sua manual
-            const imagemPlanilha = data[9];
-            if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
-                imgTag.src = imagemPlanilha;
-            }
-
-            if (preco > 0) {
-                const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
-                labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
-            } else {
-                labelPreco.innerHTML = "Verificar Preço";
-            }
+        // ✅ PROTEÇÃO: se não vier array válido da API
+        if (!Array.isArray(data) || data.length < 4) {
+            labelPreco.innerHTML = "Ver Ofertas";
             labelPreco.classList.remove('loading-skeleton');
 
             const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
             const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
-            priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Ver Oferta na Casas Bahia</a>`;
+            priceBox.innerHTML += `
+                <a href="${linkCasasBahiaBusca}" target="_blank"
+                   class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
+                   Buscar na Casas Bahia
+                </a>
+            `;
 
-        } else {
-            labelPreco.innerHTML = "Verificar Ofertas";
-            labelPreco.classList.remove('loading-skeleton');
-            
-            const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
-            const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
-            priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Buscar na Casas Bahia</a>`;
+            // Botão Magalu (mantido)
+            const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
+            priceBox.innerHTML += `
+                <a href="${linkMagaluBusca}" target="_blank"
+                   class="btn-buy" style="background:#0086ff;">
+                   Buscar na Magalu
+                </a>
+                <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
+                   Links seguros e verificados.
+                </p>
+            `;
+
+            priceBox.setAttribute('data-rendered', 'true');
+            return; // ⛔ PARA AQUI ESTE CARD
         }
 
-        // RECOLOCA O BOTÃO DA MAGALU (Que você solicitou manter)
+        // ✅ DAQUI PRA BAIXO: produto válido
+        const preco = limparPrecoJS(data[2]);   // PREÇO
+        const imagemPlanilha = data[3];          // IMAGEM
+
+        if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
+            imgTag.src = imagemPlanilha;
+        }
+
+        if (preco > 0) {
+            const precoFormatado = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(preco);
+            labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
+        } else {
+            labelPreco.innerHTML = "Verificar Preço";
+        }
+
+        labelPreco.classList.remove('loading-skeleton');
+
+        const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
+        const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
+        priceBox.innerHTML += `
+            <a href="${linkCasasBahiaBusca}" target="_blank"
+               class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
+               Ver Oferta na Casas Bahia
+            </a>
+        `;
+
+        // Botão Magalu (mantido)
         const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
         priceBox.innerHTML += `
-            <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff;">Buscar na Magalu</a>
-            <p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>
+            <a href="${linkMagaluBusca}" target="_blank"
+               class="btn-buy" style="background:#0086ff;">
+               Buscar na Magalu
+            </a>
+            <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
+               Links seguros e verificados.
+            </p>
         `;
-        
+
         priceBox.setAttribute('data-rendered', 'true');
     });
 }
+
 
 
 
