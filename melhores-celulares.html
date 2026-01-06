@@ -494,105 +494,63 @@
 
 
 
-        function renderizarProdutos(dadosGerais, cards) {
+function renderizarProdutos(dadosGerais, cards) {
+    cards.forEach(card => {
+        const termo = card.getAttribute('data-search').toLowerCase().trim();
+        const data = dadosGerais[termo];
+        const nomeCompleto = card.getAttribute('data-full-name') || termo;
 
-            cards.forEach(card => {
+        const priceBox = card.querySelector('.price-box');
+        const labelPreco = card.querySelector('.live-price');
+        const imgTag = card.querySelector('.product-image-target');
 
-                // Termo curto para API
+        if (priceBox.getAttribute('data-rendered') === 'true') return;
 
-                const termo = card.getAttribute('data-search').toLowerCase().trim();
+        // Limpa a caixa de preço para reconstruir
+        priceBox.innerHTML = ''; 
 
-                const data = dadosGerais[termo];
+        if (data) {
+            // AJUSTE DE ÍNDICE: Conforme sua planilha, o preço é o índice 6
+            const precoBruto = data[6]; 
+            const preco = limparPrecoJS(precoBruto);
+            
+            // Tenta pegar imagem da planilha, se falhar ou não tiver, o HTML mantém a sua manual
+            const imagemPlanilha = data[9]; 
+            if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
+                imgTag.src = imagemPlanilha;
+            }
 
-                
+            if (preco > 0) {
+                const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
+                labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
+            } else {
+                labelPreco.innerHTML = "Verificar Preço";
+            }
+            labelPreco.classList.remove('loading-skeleton');
 
-                // Nome completo para link da loja
+            const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
+            const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
+            priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Ver Oferta na Casas Bahia</a>`;
 
-                const nomeCompleto = card.getAttribute('data-full-name') || termo;
-
-
-
-                const priceBox = card.querySelector('.price-box');
-
-                const labelPreco = card.querySelector('.live-price');
-
-                const imgTag = card.querySelector('.product-image-target');
-
-
-
-                if (priceBox.getAttribute('data-rendered') === 'true') return;
-
-
-
-                // Monta links usando o nome completo
-
-                const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
-
-                const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
-
-                const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
-
-
-
-                priceBox.innerHTML = ''; 
-
-
-
-                if (data) {
-
-                    const preco = limparPrecoJS(data[2]); 
-
-                    const imagemPlanilha = data[3];
-
-
-
-                    // Atualiza imagem apenas se a planilha tiver algo válido
-
-                        if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
-
-                            imgTag.src = imagemPlanilha;
-
-                        }
-
-
-
-                    const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
-
-                    labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
-
-                    labelPreco.classList.remove('loading-skeleton');
-
-
-
-                    priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Ver Oferta na Casas Bahia</a>`;
-
-                } else {
-
-                    labelPreco.innerHTML = "Verificar Ofertas";
-
-                    labelPreco.classList.remove('loading-skeleton');
-
-                    priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Buscar na Casas Bahia</a>`;
-
-                }
-
-
-
-                priceBox.innerHTML += `
-
-                    <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff;">Buscar na Magalu</a>
-
-                    <p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>
-
-                `;
-
-                
-
-                priceBox.setAttribute('data-rendered', 'true');
-
-            });
-
+        } else {
+            labelPreco.innerHTML = "Verificar Ofertas";
+            labelPreco.classList.remove('loading-skeleton');
+            
+            const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
+            const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
+            priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Buscar na Casas Bahia</a>`;
         }
+
+        // RECOLOCA O BOTÃO DA MAGALU (Que você solicitou manter)
+        const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
+        priceBox.innerHTML += `
+            <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff;">Buscar na Magalu</a>
+            <p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>
+        `;
+        
+        priceBox.setAttribute('data-rendered', 'true');
+    });
+}
 
 
 
