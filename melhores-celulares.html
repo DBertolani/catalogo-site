@@ -115,7 +115,7 @@
                 </div>
                 
                 <div class="review-img-container">
-                    <img src="https://images.samsung.com/is/image/samsung/p6pim/br/sm-a556elbazto/gallery/br-galaxy-a55-5g-sm-a556-sm-a556elbazto-thumb-540209689" alt="Galaxy A55" class="review-img product-image-target">
+                    <img src="https://m.media-amazon.com/images/I/61av2p3tXPL._AC_SL1000_.jpg" alt="Galaxy A55" class="review-img product-image-target">
                 </div>
 
                 <div class="pros-cons">
@@ -228,10 +228,10 @@
 
     <script>
         const SUA_LOJA_MAGALU = "adbertolani";
-        // LINK DO SCRIPT (Confirme se é o V12)
+        // LINK DO SCRIPT (Confirme se é o URL da implantação V12)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec';
 
-        // Função para limpar preço no Navegador também (Prepara para erros de digitação na planilha)
+        // Função de limpeza no JS (Frontend)
         function limparPrecoJS(valor) {
             if (!valor) return 0;
             if (typeof valor === 'number') return valor;
@@ -248,11 +248,11 @@
 
         function renderizarProdutos(dadosGerais, cards) {
             cards.forEach(card => {
-                // Aqui usamos o termo CURTO para achar no JSON do Google
+                // Termo curto para API
                 const termo = card.getAttribute('data-search').toLowerCase().trim();
                 const data = dadosGerais[termo];
                 
-                // Aqui usamos o nome COMPLETO para criar o link da loja
+                // Nome completo para link da loja
                 const nomeCompleto = card.getAttribute('data-full-name') || termo;
 
                 const priceBox = card.querySelector('.price-box');
@@ -261,7 +261,7 @@
 
                 if (priceBox.getAttribute('data-rendered') === 'true') return;
 
-                // Monta links usando o nome completo para busca ficar bonita na loja
+                // Monta links usando o nome completo
                 const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
                 const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
                 const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
@@ -272,6 +272,7 @@
                     const preco = limparPrecoJS(data[2]); 
                     const imagemPlanilha = data[3];
 
+                    // Atualiza imagem apenas se a planilha tiver algo válido
                     if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
                         if (imgTag.naturalWidth === 0 || imgTag.src === "" || imgTag.src.includes('window.location')) {
                             imgTag.src = imagemPlanilha;
@@ -302,7 +303,7 @@
             const cards = document.querySelectorAll('.product-review');
             const termosParaBuscar = Array.from(cards).map(c => c.getAttribute('data-search')).join(',');
             
-            // CACHE V12 (Para garantir que limpamos o cache da ventoinha)
+            // CACHE V12
             const cacheKey = "precos_cache_v12_" + termosParaBuscar.replace(/\s/g, '');
             const cacheValidade = 1000 * 60 * 60; 
             const dadosLocais = localStorage.getItem(cacheKey);
