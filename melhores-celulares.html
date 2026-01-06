@@ -672,55 +672,58 @@ function renderizarProdutos(dadosGerais, cards) {
 
         if (priceBox.getAttribute('data-rendered') === 'true') return;
 
-        // Reconstrói a caixa de preço
+        // Base inicial
         priceBox.innerHTML = '<span class="live-price loading-skeleton"></span>';
         const labelPreco = priceBox.querySelector('.live-price');
 
-        // ✅ PROTEÇÃO: se não vier array válido da API
+        // 🔹 URLs base (centralizadas)
+        const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
+
+        const linkCasasBahiaBusca =
+            `https://www.casasbahia.com.br/${termoUrl}/b`;
+
+        const linkMagaluBusca =
+            `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
+
+        const linkMercadoLivreBusca =
+            `https://www.mercadolivre.com.br/social/deabertolani` +
+            `?matt_tool=${MERCADO_LIVRE_TOOL}` +
+            `&matt_word=${MERCADO_LIVRE_WORD}` +
+            `&forceInApp=true`;
+
+        // 🔴 CASO 1: produto inválido / não encontrado
         if (!Array.isArray(data) || data.length < 4) {
             labelPreco.innerHTML = "Ver Ofertas";
             labelPreco.classList.remove('loading-skeleton');
 
-            const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
-            const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
             priceBox.innerHTML += `
                 <a href="${linkCasasBahiaBusca}" target="_blank"
                    class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
                    Buscar na Casas Bahia
                 </a>
+
+                <a href="${linkMagaluBusca}" target="_blank"
+                   class="btn-buy" style="background:#0086ff; margin-bottom:10px;">
+                   Buscar na Magalu
+                </a>
+
+                <a href="${linkMercadoLivreBusca}" target="_blank"
+                   class="btn-buy" style="background:#ffe600; color:#000;">
+                   Buscar no Mercado Livre
+                </a>
+
+                <p style="font-size:0.7em; margin-top:10px; color:#999;">
+                   Links seguros e verificados.
+                </p>
             `;
 
-// Botão Magalu (mantido)
-const linkMagaluBusca =
-    `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
-
-// Botão Mercado Livre (novo)
-const linkMercadoLivreBusca =
-    `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
-
-priceBox.innerHTML += `
-    <a href="${linkMagaluBusca}" target="_blank"
-       class="btn-buy" style="background:#0086ff;">
-       Buscar na Magalu
-    </a>
-
-    <a href="${linkMercadoLivreBusca}" target="_blank"
-       class="btn-buy" style="background:#ffe600; color:#000;">
-       Buscar no Mercado Livre
-    </a>
-
-    <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
-       Links seguros e verificados.
-    </p>
-`;
-
             priceBox.setAttribute('data-rendered', 'true');
-            return; // ⛔ PARA AQUI ESTE CARD
+            return;
         }
 
-        // ✅ DAQUI PRA BAIXO: produto válido
-        const preco = limparPrecoJS(data[2]);   // PREÇO
-        const imagemPlanilha = data[3];          // IMAGEM
+        // 🟢 CASO 2: produto válido
+        const preco = limparPrecoJS(data[2]);
+        const imagemPlanilha = data[3];
 
         if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
             imgTag.src = imagemPlanilha;
@@ -731,46 +734,35 @@ priceBox.innerHTML += `
                 style: 'currency',
                 currency: 'BRL'
             }).format(preco);
-            labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
+
+            labelPreco.innerHTML =
+                `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
         } else {
             labelPreco.innerHTML = "Verificar Preço";
         }
 
         labelPreco.classList.remove('loading-skeleton');
 
-        const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
-        const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
         priceBox.innerHTML += `
             <a href="${linkCasasBahiaBusca}" target="_blank"
                class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
                Ver Oferta na Casas Bahia
             </a>
+
+            <a href="${linkMagaluBusca}" target="_blank"
+               class="btn-buy" style="background:#0086ff; margin-bottom:10px;">
+               Buscar na Magalu
+            </a>
+
+            <a href="${linkMercadoLivreBusca}" target="_blank"
+               class="btn-buy" style="background:#ffe600; color:#000;">
+               Buscar no Mercado Livre
+            </a>
+
+            <p style="font-size:0.7em; margin-top:10px; color:#999;">
+               Links seguros e verificados.
+            </p>
         `;
-
-// Botão Magalu (mantido)
-const linkMagaluBusca =
-    `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
-
-// Botão Mercado Livre (novo)
-const linkMercadoLivreBusca =
-    `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
-
-priceBox.innerHTML += `
-    <a href="${linkMagaluBusca}" target="_blank"
-       class="btn-buy" style="background:#0086ff;">
-       Buscar na Magalu
-    </a>
-
-    <a href="${linkMercadoLivreBusca}" target="_blank"
-       class="btn-buy" style="background:#ffe600; color:#000;">
-       Buscar no Mercado Livre
-    </a>
-
-    <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
-       Links seguros e verificados.
-    </p>
-`;
-
 
         priceBox.setAttribute('data-rendered', 'true');
     });
