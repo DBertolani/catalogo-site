@@ -34,53 +34,52 @@
         </div>
     </div>
 
-    <script>
-        async function carregarDestaques() {
-            try {
-                // Chamada para a tua API do Cloudflare (certifica-te que o path /api/produtos existe)
-                const response = await fetch('/api/produtos');
-                const produtos = await response.json();
+<script>
+    async function carregarDestaques() {
+        const container = document.getElementById('lista-produtos');
+        try {
+            // Chamada direta para a rota otimizada que já testamos no Google Script
+            const response = await fetch('https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?api=top_smartphones');
+            const top5Raw = await response.json();
 
-                const top5 = produtos
-                    .filter(p => {
-                        const categoriaMatch = p.categoria && p.categoria.toLowerCase().includes("celulares e smartphones");
-                        const precoLimpo = p.preco ? parseFloat(p.preco.replace("R$", "").replace(/\./g, "").replace(",", ".")) : 0;
-                        return categoriaMatch && precoLimpo > 0 && precoLimpo <= 1500;
-                    })
-                    .sort((a, b) => {
-                        const precoA = parseFloat(a.preco.replace("R$", "").replace(/\./g, "").replace(",", "."));
-                        const precoB = parseFloat(b.preco.replace("R$", "").replace(/\./g, "").replace(",", "."));
-                        return precoB - precoA; // Mais próximos de 1500 primeiro
-                    })
-                    .slice(0, 5);
+            container.innerHTML = '';
 
-                const container = document.getElementById('lista-produtos');
-                container.innerHTML = '';
-
-                if (top5.length === 0) {
-                    container.innerHTML = '<div class="loading">Nenhuma oferta encontrada neste momento. Tente mais tarde!</div>';
-                    return;
-                }
-
-                top5.forEach(p => {
-                    container.innerHTML += `
-                        <div class="product-card">
-                            <img src="${p.imagem}" alt="${p.nome}" class="product-img">
-                            <div class="product-info">
-                                <h3>${p.nome}</h3>
-                                <div class="price">${p.preco}</div>
-                                <a href="/p/${p.id}" class="buy-btn">VER PROMOÇÃO</a>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error("Erro:", error);
-                document.getElementById('lista-produtos').innerHTML = '<div class="loading">Erro ao carregar ofertas.</div>';
+            if (!top5Raw || top5Raw.length === 0) {
+                container.innerHTML = '<div class="loading">Nenhuma oferta encontrada neste momento. Tente mais tarde!</div>';
+                return;
             }
-        }
 
-        window.onload = carregarDestaques;
-    </script>
+            // Mapeamento dos índices do Google Script (o formato que você postou antes)
+            top5Raw.forEach(p => {
+                const nome   = p[0]; // Título
+                const preco  = p[6]; // Preço (numérico)
+                const id     = p[2]; // ID (para o link /p/id)
+                const imagem = p[9]; // URL da Imagem
+
+                // Formatação do preço de número para Real
+                const precoFormatado = new Intl.NumberFormat('pt-BR', { 
+                    style: 'currency', 
+                    currency: 'BRL' 
+                }).format(preco);
+
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${imagem}" alt="${nome}" class="product-img" onerror="this.src='https://via.placeholder.com/150?text=Sem+Imagem'">
+                        <div class="product-info">
+                            <h3>${nome}</h3>
+                            <div class="price">${precoFormatado}</div>
+                            <a href="/p/${id}" class="buy-btn">VER PROMOÇÃO</a>
+                        </div>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error("Erro detalhado:", error);
+            container.innerHTML = '<div class="loading">Erro ao carregar ofertas. Tente atualizar a página.</div>';
+        }
+    }
+
+    window.onload = carregarDestaques;
+</script>
 </body>
 </html>
