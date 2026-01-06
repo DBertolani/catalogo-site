@@ -72,8 +72,11 @@
             font-size: 1.1em; 
             display: inline-block; 
             transition: transform 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            text-align: center;
         }
-        .btn-buy:hover { transform: translateY(-2px); background: #d35400; }
+        .btn-buy:hover { transform: translateY(-2px); opacity: 0.9; }
         
         /* Conteúdo de Texto (SEO) */
         .content-block { margin: 40px 0; padding: 20px; background: #fdfdfd; border-left: 4px solid var(--primary); }
@@ -135,9 +138,7 @@
 
                 <div class="price-box">
                     <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
-                    <a href="#" class="btn-buy" target="_blank" style="visibility: hidden">Ver Preço e Comprar</a>
-                    <p style="font-size: 0.8em; margin-top: 10px; color: #777;">Vendido e entregue por <span class="store-name-target">Loja Parceira</span></p>
-                </div>
+                    </div>
             </article>
 
             <article class="product-review" data-search="G84" data-store="Motorola">
@@ -171,8 +172,6 @@
 
                 <div class="price-box">
                     <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
-                    <a href="#" class="btn-buy" target="_blank" style="visibility: hidden">Ver Preço e Comprar</a>
-                    <p style="font-size: 0.8em; margin-top: 10px; color: #777;">Vendido e entregue por <span class="store-name-target">Loja Parceira</span></p>
                 </div>
             </article>
 
@@ -189,8 +188,22 @@
 
                 <div class="price-box">
                     <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
-                    <a href="#" class="btn-buy" target="_blank" style="visibility: hidden">Ver Preço e Comprar</a>
-                    <p style="font-size: 0.8em; margin-top: 10px; color: #777;">Vendido e entregue por <span class="store-name-target">Loja Parceira</span></p>
+                </div>
+            </article>
+
+             <article class="product-review" data-search="S23 FE" data-store="Samsung">
+                <span class="badge-destaque">📸 Câmera Pro</span>
+                <div class="review-header">
+                    <h2>4. Samsung Galaxy S23 FE</h2>
+                    <p>A porta de entrada para o mundo premium. Tem as mesmas câmeras da linha S principal e processador para rodar qualquer jogo.</p>
+                </div>
+
+                <div class="review-img-container">
+                    <img src="" alt="Galaxy S23 FE" class="review-img product-image-target">
+                </div>
+
+                <div class="price-box">
+                    <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
                 </div>
             </article>
 
@@ -211,71 +224,89 @@
 
     </div>
 
-    <script>
-        async function carregarPrecosReais() {
-            // URL do seu Script Google (usando a rota completa para garantir busca em tudo)
-            // DICA: Usamos 'top_smartphones' porque é rápido, mas se faltar algum modelo, 
-            // podemos mudar para buscar no catalogo geral.
-            const API_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?api=top_smartphones';
+    <script src="https://www.dwin2.com/pub.750521.min.js"></script>
 
+    <script>
+        // CONFIGURAÇÕES
+        const SUA_LOJA_MAGALU = "adbertolani"; 
+        // URL da API (usando a rota top_smartphones que já configuramos)
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?api=top_smartphones';
+
+        async function carregarInteligente() {
             try {
                 const response = await fetch(API_URL);
                 const produtos = await response.json();
 
-                // Para cada card de produto na tela
                 document.querySelectorAll('.product-review').forEach(card => {
                     const termoBusca = card.getAttribute('data-search').toLowerCase();
-                    const lojaPreferida = (card.getAttribute('data-store') || '').toLowerCase();
-
-                    // 1. Tenta encontrar o produto na lista que baixamos
-                    // Procura um produto onde o Título contenha o termo de busca (ex: "A55")
-                    // E tenta evitar capas/películas filtrando pelo preço > 500
-                    const produtoEncontrado = produtos.find(p => {
-                        const titulo = String(p[0]).toLowerCase(); // Índice 0 é o titulo
-                        const preco = parseFloat(p[6]); // Índice 6 é o preço
-                        return titulo.includes(termoBusca) && preco > 500; 
+                    
+                    // 1. TENTA ACHAR NA PLANILHA (AWIN - Dados Reais)
+                    const produtoAwin = produtos.find(p => {
+                        const titulo = String(p[0]).toLowerCase();
+                        const preco = parseFloat(p[6]);
+                        // Filtro para garantir que é o celular e não uma capa (acima de R$ 600)
+                        return titulo.includes(termoBusca) && preco > 600;
                     });
 
-                    if (produtoEncontrado) {
-                        // Se achou, preenche os dados
-                        const nome = produtoEncontrado[0];
-                        const preco = parseFloat(produtoEncontrado[6]);
-                        const link = produtoEncontrado[8];
-                        const imagem = produtoEncontrado[9];
-                        const loja = produtoEncontrado[11]; // Loja parceira
+                    const priceBox = card.querySelector('.price-box');
+                    priceBox.innerHTML = ''; // Limpa o "carregando..."
 
-                        // Atualiza o HTML
+                    // --- BOTÃO 1: AWIN (Preço Exato ou Busca) ---
+                    if (produtoAwin) {
+                        const preco = parseFloat(produtoAwin[6]);
+                        const link = produtoAwin[8];
+                        const loja = produtoAwin[11];
+                        const img = produtoAwin[9];
+
                         const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
                         
-                        card.querySelector('.live-price').textContent = precoFormatado;
-                        card.querySelector('.live-price').classList.remove('loading-skeleton');
-                        
-                        const btn = card.querySelector('.btn-buy');
-                        btn.href = link;
-                        btn.style.visibility = 'visible';
-                        
-                        const img = card.querySelector('.product-image-target');
-                        if(img && !img.src) img.src = imagem;
+                        // Atualiza imagem
+                        const imgTag = card.querySelector('.product-image-target');
+                        if(imgTag && !imgTag.src && img) imgTag.src = img;
 
-                        const storeSpan = card.querySelector('.store-name-target');
-                        if(storeSpan) storeSpan.textContent = loja;
-
+                        priceBox.innerHTML += `
+                            <p class="live-price">${precoFormatado}</p>
+                            <a href="${link}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
+                                Comprar na ${loja}
+                            </a>
+                        `;
                     } else {
-                        // Se não achou na planilha
-                        card.querySelector('.live-price').textContent = "Esgotado ou Indisponível";
-                        card.querySelector('.btn-buy').textContent = "Ver Outras Ofertas";
-                        card.querySelector('.btn-buy').href = "/catalogo.html";
-                        card.querySelector('.btn-buy').style.visibility = 'visible';
+                        // Se não achou na planilha, gera botão de busca Casas Bahia (Awin converte o link)
+                        const linkBuscaCB = `https://www.casasbahia.com.br/b?q=${encodeURIComponent(termoBusca)}`;
+                        
+                        priceBox.innerHTML += `
+                            <p class="live-price" style="font-size:1.1em; color:#777">Verificar Ofertas</p>
+                            <a href="${linkBuscaCB}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
+                                Buscar na Casas Bahia
+                            </a>
+                        `;
                     }
+
+                    // --- BOTÃO 2: MAGALU (Sempre gera o link de busca) ---
+                    const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoBusca)}/`;
+                    
+                    priceBox.innerHTML += `
+                        <a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">
+                            Buscar na Magalu
+                        </a>
+                    `;
+
+                    priceBox.innerHTML += `<p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>`;
                 });
 
             } catch (error) {
-                console.error("Erro ao carregar preços:", error);
+                console.error("Erro na API:", error);
+                // Fallback se a API falhar: mostra botões de busca para todos
+                document.querySelectorAll('.product-review').forEach(card => {
+                    const termoBusca = card.getAttribute('data-search').toLowerCase();
+                    const priceBox = card.querySelector('.price-box');
+                    const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoBusca)}/`;
+                    priceBox.innerHTML = `<a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">Ver Preço na Magalu</a>`;
+                });
             }
         }
 
-        // Inicia assim que a página carrega
-        window.onload = carregarPrecosReais;
+        window.onload = carregarInteligente;
     </script>
 
 </body>
