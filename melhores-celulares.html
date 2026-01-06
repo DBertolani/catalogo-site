@@ -227,51 +227,64 @@
 <script src="https://www.dwin2.com/pub.750521.min.js"></script>
 
     <script>
-        const SUA_LOJA_MAGALU = "adbertolani"; 
-        // URL do seu script
+        const SUA_LOJA_MAGALU = "adbertolani";
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec';
 
         async function carregarPrecos() {
             const cards = document.querySelectorAll('.product-review');
             
-            // CRIA UM ARRAY DE PROMESSAS (Carrega tudo junto, não um por um)
-            const promises = Array.from(cards).map(async (card) => {
-                const termo = card.getAttribute('data-search');
-                const priceBox = card.querySelector('.price-box');
-                const labelPreco = card.querySelector('.live-price');
+            // 1. Coleta todos os termos de busca da página (ex: "Galaxy A55,Moto G84,Redmi Note 13")
+            const termosParaBuscar = Array.from(cards).map(c => c.getAttribute('data-search')).join(',');
 
-                // Prepara links de busca (Sempre seguros)
-                const termoHifen = termo.trim().replace(/\s+/g, '-');
-                const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoHifen}/b`;
-                const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termo)}/`;
+            try {
+                // 2. Faz UMA ÚNICA chamada para a API (Muito mais rápido)
+                const response = await fetch(`${SCRIPT_URL}?api=buscar_produtos_batch&q=${encodeURIComponent(termosParaBuscar)}`);
+                const dadosGerais = await response.json();
 
-                try {
-                    // Chama a API
-                    const response = await fetch(`${SCRIPT_URL}?api=buscar_produto&q=${encodeURIComponent(termo)}`);
-                    const data = await response.json();
+                // 3. Distribui os resultados para cada card
+                cards.forEach(card => {
+                    const termoOriginal = card.getAttribute('data-search');
+                    const termoKey = termoOriginal.toLowerCase().trim(); // A chave no JSON vem minúscula
+                    const data = dadosGerais[termoKey]; // Pega o dado específico deste produto
+
+                    const priceBox = card.querySelector('.price-box');
+                    const labelPreco = card.querySelector('.live-price');
+                    const imgTag = card.querySelector('.product-image-target');
+
+                    // Prepara links de busca
+                    const termoHifen = termoOriginal.trim().replace(/\s+/g, '-');
+                    const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoHifen}/b`;
+                    const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoOriginal)}/`;
 
                     if (data) {
-                        // --- CENÁRIO: PRODUTO ENCONTRADO NA PLANILHA ---
-                        const preco = parseFloat(data[2]); // Índice 2 = Preço
-                        // Não vamos usar o link direto (data[4]) para evitar "Produto Indisponível"
-                        
+                        // --- PRODUTO ENCONTRADO ---
+                        // data = [ID, Titulo, Preco, Imagem, Link, Loja] (baseado no compactCatalog)
+                        const preco = parseFloat(data[2]); 
+                        const imagemPlanilha = data[3];
+
+                        // ATUALIZAÇÃO DE IMAGEM: 
+                        // Se a imagem fixa do HTML falhou ou está vazia, usa a da planilha
+                        if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
+                            // Só troca se a imagem atual estiver quebrada ou for placeholder
+                            if (imgTag.naturalWidth === 0 || imgTag.src === "") {
+                                imgTag.src = imagemPlanilha;
+                            }
+                        }
+
                         const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
                         
-                        // 1. Mostra o preço real encontrado ("Teaser")
                         labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
                         labelPreco.classList.remove('loading-skeleton');
 
-                        // 2. Botão leva para a BUSCA da Casas Bahia (Segurança de estoque)
-                        // O script da Awin vai monetizar esse link de busca automaticamente
+                        // Botão Link de Busca (Casas Bahia)
                         priceBox.innerHTML += `
                             <a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
                                 Ver Oferta na Casas Bahia
                             </a>
                         `;
                     } else {
-                        // --- CENÁRIO: NÃO ENCONTRADO ---
-                        labelPreco.innerHTML = "Verificar Ofertas do Dia";
-                        labelPreco.style.fontSize = "1.2em";
+                        // --- NÃO ENCONTRADO ---
+                        labelPreco.innerHTML = "Verificar Ofertas";
                         labelPreco.classList.remove('loading-skeleton');
                         
                         priceBox.innerHTML += `
@@ -281,25 +294,25 @@
                         `;
                     }
 
-                    // Botão Magalu (Sempre aparece como segunda opção)
+                    // Botão Magalu (Sempre aparece)
                     priceBox.innerHTML += `
                         <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff;">
                             Buscar na Magalu
                         </a>
                         <p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>
                     `;
+                });
 
-                } catch (e) {
-                    console.error("Erro ao buscar " + termo, e);
-                    // Fallback visual
-                    labelPreco.innerHTML = "Verificar Disponibilidade";
-                    labelPreco.classList.remove('loading-skeleton');
-                    priceBox.innerHTML += `<a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff;">Ver na Magalu</a>`;
-                }
-            });
-
-            // Aguarda todas as requisições terminarem (Muito mais rápido)
-            await Promise.all(promises);
+            } catch (e) {
+                console.error("Erro geral na API:", e);
+                // Fallback para todos os cards se a API falhar
+                cards.forEach(card => {
+                    const priceBox = card.querySelector('.price-box');
+                    const labelPreco = card.querySelector('.live-price');
+                    labelPreco.innerHTML = "Verificar Preços";
+                    // Adiciona botões genéricos...
+                });
+            }
         }
 
         window.onload = carregarPrecos;
