@@ -629,6 +629,9 @@
     <script>
 
         const SUA_LOJA_MAGALU = "adbertolani";
+        const MERCADO_LIVRE_TOOL = "13296915";
+        const MERCADO_LIVRE_WORD = "sitedeab";
+
 
         // LINK DO SCRIPT (Confirme se é o URL da implantação V12)
 
@@ -687,17 +690,29 @@ function renderizarProdutos(dadosGerais, cards) {
                 </a>
             `;
 
-            // Botão Magalu (mantido)
-            const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
-            priceBox.innerHTML += `
-                <a href="${linkMagaluBusca}" target="_blank"
-                   class="btn-buy" style="background:#0086ff;">
-                   Buscar na Magalu
-                </a>
-                <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
-                   Links seguros e verificados.
-                </p>
-            `;
+// Botão Magalu (mantido)
+const linkMagaluBusca =
+    `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
+
+// Botão Mercado Livre (novo)
+const linkMercadoLivreBusca =
+    `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
+
+priceBox.innerHTML += `
+    <a href="${linkMagaluBusca}" target="_blank"
+       class="btn-buy" style="background:#0086ff;">
+       Buscar na Magalu
+    </a>
+
+    <a href="${linkMercadoLivreBusca}" target="_blank"
+       class="btn-buy" style="background:#ffe600; color:#000;">
+       Buscar no Mercado Livre
+    </a>
+
+    <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
+       Links seguros e verificados.
+    </p>
+`;
 
             priceBox.setAttribute('data-rendered', 'true');
             return; // ⛔ PARA AQUI ESTE CARD
@@ -732,17 +747,30 @@ function renderizarProdutos(dadosGerais, cards) {
             </a>
         `;
 
-        // Botão Magalu (mantido)
-        const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
-        priceBox.innerHTML += `
-            <a href="${linkMagaluBusca}" target="_blank"
-               class="btn-buy" style="background:#0086ff;">
-               Buscar na Magalu
-            </a>
-            <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
-               Links seguros e verificados.
-            </p>
-        `;
+// Botão Magalu (mantido)
+const linkMagaluBusca =
+    `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
+
+// Botão Mercado Livre (novo)
+const linkMercadoLivreBusca =
+    `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
+
+priceBox.innerHTML += `
+    <a href="${linkMagaluBusca}" target="_blank"
+       class="btn-buy" style="background:#0086ff;">
+       Buscar na Magalu
+    </a>
+
+    <a href="${linkMercadoLivreBusca}" target="_blank"
+       class="btn-buy" style="background:#ffe600; color:#000;">
+       Buscar no Mercado Livre
+    </a>
+
+    <p style="font-size: 0.7em; margin-top: 10px; color: #999;">
+       Links seguros e verificados.
+    </p>
+`;
+
 
         priceBox.setAttribute('data-rendered', 'true');
     });
