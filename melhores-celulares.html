@@ -679,42 +679,24 @@ function renderizarProdutos(dadosGerais, cards) {
         // 🔹 URLs base (centralizadas)
         const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
 
-        const linkCasasBahiaBusca =
-            `https://www.casasbahia.com.br/${termoUrl}/b`;
+        const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
 
-        const linkMagaluBusca =
-            `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
+        const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
 
-        const linkMercadoLivreBusca =
-            `https://www.mercadolivre.com.br/social/deabertolani` +
-            `?matt_tool=${MERCADO_LIVRE_TOOL}` +
-            `&matt_word=${MERCADO_LIVRE_WORD}` +
-            `&forceInApp=true`;
+        // ✅ AJUSTE MERCADO LIVRE: Link de busca real para garantir comissão e funcionalidade
+        const linkMercadoLivreBusca = `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
 
         // 🔴 CASO 1: produto inválido / não encontrado
-        if (!Array.isArray(data) || data.length < 4) {
+        if (!Array.isArray(data)) {
             labelPreco.innerHTML = "Ver Ofertas";
             labelPreco.classList.remove('loading-skeleton');
 
             priceBox.innerHTML += `
-                <a href="${linkCasasBahiaBusca}" target="_blank"
-                   class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
-                   Buscar na Casas Bahia
-                </a>
-
-                <a href="${linkMagaluBusca}" target="_blank"
-                   class="btn-buy" style="background:#0086ff; margin-bottom:10px;">
-                   Buscar na Magalu
-                </a>
-
-                <a href="${linkMercadoLivreBusca}" target="_blank"
-                   class="btn-buy" style="background:#ffe600; color:#000;">
-                   Buscar no Mercado Livre
-                </a>
-
-                <p style="font-size:0.7em; margin-top:10px; color:#999;">
-                   Links seguros e verificados.
-                </p>
+                <a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Buscar na Casas Bahia</a>
+                <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff; margin-bottom:10px;">Buscar na Magalu</a>
+                <a href="${linkMercadoLivreBusca}" target="_blank" class="btn-buy" style="background:#ffe600; color:#000; margin-bottom:5px;">Buscar no Mercado Livre</a>
+                <p style="font-size:0.65em; margin-top:5px; color:#666;">Afiliado verificado: <strong>DEABERTOLANI</strong></p>
+                <p style="font-size:0.7em; margin-top:5px; color:#999;">Links seguros e verificados.</p>
             `;
 
             priceBox.setAttribute('data-rendered', 'true');
@@ -722,6 +704,7 @@ function renderizarProdutos(dadosGerais, cards) {
         }
 
         // 🟢 CASO 2: produto válido
+        // Mantendo seus índices data[2] e data[3] que você confirmou que funcionam
         const preco = limparPrecoJS(data[2]);
         const imagemPlanilha = data[3];
 
@@ -735,8 +718,7 @@ function renderizarProdutos(dadosGerais, cards) {
                 currency: 'BRL'
             }).format(preco);
 
-            labelPreco.innerHTML =
-                `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
+            labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
         } else {
             labelPreco.innerHTML = "Verificar Preço";
         }
@@ -744,24 +726,11 @@ function renderizarProdutos(dadosGerais, cards) {
         labelPreco.classList.remove('loading-skeleton');
 
         priceBox.innerHTML += `
-            <a href="${linkCasasBahiaBusca}" target="_blank"
-               class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
-               Ver Oferta na Casas Bahia
-            </a>
-
-            <a href="${linkMagaluBusca}" target="_blank"
-               class="btn-buy" style="background:#0086ff; margin-bottom:10px;">
-               Buscar na Magalu
-            </a>
-
-            <a href="${linkMercadoLivreBusca}" target="_blank"
-               class="btn-buy" style="background:#ffe600; color:#000;">
-               Buscar no Mercado Livre
-            </a>
-
-            <p style="font-size:0.7em; margin-top:10px; color:#999;">
-               Links seguros e verificados.
-            </p>
+            <a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Ver Oferta na Casas Bahia</a>
+            <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff; margin-bottom:10px;">Buscar na Magalu</a>
+            <a href="${linkMercadoLivreBusca}" target="_blank" class="btn-buy" style="background:#ffe600; color:#000; margin-bottom:5px;">Buscar no Mercado Livre</a>
+            <p style="font-size:0.65em; margin-top:5px; color:#666;">Afiliado verificado: <strong>DEABERTOLANI</strong></p>
+            <p style="font-size:0.7em; margin-top:5px; color:#999;">Links seguros e verificados.</p>
         `;
 
         priceBox.setAttribute('data-rendered', 'true');
