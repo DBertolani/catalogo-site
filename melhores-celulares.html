@@ -107,7 +107,7 @@
 
         <div id="product-list">
 
-            <article class="product-review" data-search="A55" data-store="Samsung">
+            <article class="product-review" data-search="Galaxy A55" data-store="Samsung">
                 <span class="badge-destaque">🏆 A Escolha Segura</span>
                 <div class="review-header">
                     <h2>1. Samsung Galaxy A55</h2>
@@ -115,7 +115,7 @@
                 </div>
                 
                 <div class="review-img-container">
-                    <img src="" alt="Galaxy A55" class="review-img product-image-target">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/br/sm-a556elbazto/gallery/br-galaxy-a55-5g-sm-a556-sm-a556elbazto-thumb-540209689" alt="Galaxy A55" class="review-img product-image-target">
                 </div>
 
                 <div class="pros-cons">
@@ -137,11 +137,11 @@
                 </div>
 
                 <div class="price-box">
-                    <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
-                    </div>
+                    <span class="live-price loading-skeleton">Consultando preço...</span>
+                </div>
             </article>
 
-            <article class="product-review" data-search="G84" data-store="Motorola">
+            <article class="product-review" data-search="Moto G84" data-store="Motorola">
                 <span class="badge-destaque">💎 Melhor Design</span>
                 <div class="review-header">
                     <h2>2. Motorola Moto G84</h2>
@@ -149,7 +149,7 @@
                 </div>
 
                 <div class="review-img-container">
-                    <img src="" alt="Moto G84" class="review-img product-image-target">
+                    <img src="https://motorolabr.vtexassets.com/arquivos/ids/166948/moto-g84-pdp-hero-viva-magenta-1.png" alt="Moto G84" class="review-img product-image-target">
                 </div>
 
                 <div class="pros-cons">
@@ -171,11 +171,11 @@
                 </div>
 
                 <div class="price-box">
-                    <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
+                    <span class="live-price loading-skeleton">Consultando preço...</span>
                 </div>
             </article>
 
-            <article class="product-review" data-search="Note 13" data-store="Amazon">
+            <article class="product-review" data-search="Redmi Note 13" data-store="Amazon">
                 <span class="badge-destaque">💰 Preço Baixo</span>
                 <div class="review-header">
                     <h2>3. Xiaomi Redmi Note 13</h2>
@@ -183,15 +183,15 @@
                 </div>
 
                 <div class="review-img-container">
-                    <img src="" alt="Redmi Note 13" class="review-img product-image-target">
+                    <img src="https://i01.appmifile.com/v1/MI_18455B3E4DA706226CF7535A58E875F0267/pms_1705912443.23847352.png" alt="Redmi Note 13" class="review-img product-image-target">
                 </div>
 
                 <div class="price-box">
-                    <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
+                    <span class="live-price loading-skeleton">Consultando preço...</span>
                 </div>
             </article>
 
-             <article class="product-review" data-search="S23 FE" data-store="Samsung">
+             <article class="product-review" data-search="Galaxy S23 FE" data-store="Samsung">
                 <span class="badge-destaque">📸 Câmera Pro</span>
                 <div class="review-header">
                     <h2>4. Samsung Galaxy S23 FE</h2>
@@ -199,11 +199,11 @@
                 </div>
 
                 <div class="review-img-container">
-                    <img src="" alt="Galaxy S23 FE" class="review-img product-image-target">
+                    <img src="https://images.samsung.com/is/image/samsung/p6pim/br/sm-s711blgjzto/gallery/br-galaxy-s23-fe-s711-sm-s711blgjzto-thumb-538467472" alt="Galaxy S23 FE" class="review-img product-image-target">
                 </div>
 
                 <div class="price-box">
-                    <span class="live-price loading-skeleton">Buscando melhor oferta...</span>
+                    <span class="live-price loading-skeleton">Consultando preço...</span>
                 </div>
             </article>
 
@@ -226,64 +226,55 @@
 
     <script src="https://www.dwin2.com/pub.750521.min.js"></script>
 
-<script>
-        // CONFIGURAÇÕES
-        const SUA_LOJA_MAGALU = "adbertolani";
-        // URL Base do seu script (sem parâmetros)
+    <script>
+        const SUA_LOJA_MAGALU = "adbertolani"; 
+        // URL Base do seu script (IMPORTANTE: Verifique se é a URL atualizada do seu deploy)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec';
 
         async function carregarPrecos() {
             const cards = document.querySelectorAll('.product-review');
 
-            // Processa um cartão por vez
+            // Processa um por um
             for (const card of cards) {
                 const termo = card.getAttribute('data-search');
                 const priceBox = card.querySelector('.price-box');
                 const labelPreco = card.querySelector('.live-price');
 
                 try {
-                    // MUDANÇA CRUCIAL: Chama a API específica de busca
+                    // Chama a API nova de busca específica
                     const response = await fetch(`${SCRIPT_URL}?api=buscar_produto&q=${encodeURIComponent(termo)}`);
                     const data = await response.json();
 
-                    // Prepara links de busca (Plano B)
+                    // Prepara links de busca (Plano B e Magalu)
                     const termoHifen = termo.replace(/\s+/g, '-');
-                    // Link Casas Bahia corrigido
                     const linkCasasBahia = `https://www.casasbahia.com.br/${termoHifen}/b`;
                     const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termo)}/`;
 
                     if (data) {
-                        // A API achou o produto nos 40 mil itens!
-                        // No formato compactCatalog: [0]=Id, [1]=Nome, [2]=Preço, [4]=Link, [5]=Loja, [3]=Imagem
+                        // Se a API achou o produto na planilha
+                        // OBS: No 'compactCatalog', o índice 2 é o preço e o 4 é o link (confirme se sua função getFullCompactCatalog segue isso)
                         const preco = parseFloat(data[2]); 
-                        const link = data[4];
+                        const link = data[4]; 
                         const loja = data[5] || "Parceiro";
-                        const img = data[3];
-
+                        
                         const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
                         
-                        // Atualiza preço
                         labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
                         labelPreco.classList.remove('loading-skeleton');
 
-                        // Tenta atualizar a imagem se a API trouxe uma
-                        const imgTag = card.querySelector('.product-image-target');
-                        if(imgTag && img && img.length > 10) imgTag.src = img;
-
-                        // Botão Principal (Link direto da Planilha)
+                        // Botão AWIN (Link direto)
                         priceBox.innerHTML += `
-                            <a href="${link}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px">
+                            <a href="${link}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
                                 Comprar na ${loja}
                             </a>
                         `;
                     } else {
-                        // Não achou na planilha
+                        // Se não achou (ou API retornou null)
                         labelPreco.innerHTML = "Verificar Ofertas";
                         labelPreco.classList.remove('loading-skeleton');
                         
-                        // Botão de Busca Casas Bahia
                         priceBox.innerHTML += `
-                            <a href="${linkCasasBahia}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px">
+                            <a href="${linkCasasBahia}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
                                 Buscar na Casas Bahia
                             </a>
                         `;
@@ -291,17 +282,17 @@
 
                     // Botão Magalu (Sempre aparece)
                     priceBox.innerHTML += `
-                        <a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff">
+                        <a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">
                             Buscar na Magalu
                         </a>
-                        <p style="font-size:0.7em; color:#888; margin-top:5px">Links seguros e verificados</p>
+                        <p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>
                     `;
 
                 } catch (e) {
-                    console.error("Erro no produto " + termo, e);
-                    // Em caso de erro, mostra só Magalu
+                    console.error("Erro ao buscar " + termo, e);
+                    // Fallback de erro
                     const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termo)}/`;
-                    priceBox.innerHTML = `<a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff">Ver na Magalu</a>`;
+                    priceBox.innerHTML = `<a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">Ver na Magalu</a>`;
                 }
             }
         }
