@@ -273,11 +273,9 @@
                     const imagemPlanilha = data[3];
 
                     // Atualiza imagem apenas se a planilha tiver algo válido
-                    if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
-                        if (imgTag.naturalWidth === 0 || imgTag.src === "" || imgTag.src.includes('window.location')) {
+                        if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
                             imgTag.src = imagemPlanilha;
                         }
-                    }
 
                     const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
                     labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
@@ -304,7 +302,7 @@
             const termosParaBuscar = Array.from(cards).map(c => c.getAttribute('data-search')).join(',');
             
             // CACHE V12
-            const cacheKey = "precos_cache_v12_" + termosParaBuscar.replace(/\s/g, '');
+            const cacheKey = "precos_cache_v13_" + termosParaBuscar.replace(/\s/g, '');
             const cacheValidade = 1000 * 60 * 60; 
             const dadosLocais = localStorage.getItem(cacheKey);
             const horaSalva = localStorage.getItem(cacheKey + '_time');
