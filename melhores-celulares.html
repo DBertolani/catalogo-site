@@ -686,10 +686,12 @@ function renderizarProdutos(dadosGerais, cards) {
             `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
 
         const linkMercadoLivreBusca =
-            `https://www.mercadolivre.com.br/social/deabertolani` +
-            `?matt_tool=${MERCADO_LIVRE_TOOL}` +
-            `&matt_word=${MERCADO_LIVRE_WORD}` +
-            `&forceInApp=true`;
+        `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
+        <p style="font-size:0.7em; color:#666;">
+        Afiliado Mercado Livre: <strong>DEABERTOLANI</strong>
+        </p>
+
+
 
         // 🔴 CASO 1: produto inválido / não encontrado
         if (!Array.isArray(data) || data.length < 4) {
