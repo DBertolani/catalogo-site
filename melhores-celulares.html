@@ -466,31 +466,23 @@
 
         // Função de limpeza no JS (Frontend)
 
-        function limparPrecoJS(valor) {
-
+          function limparPrecoJS(valor) {
             if (!valor) return 0;
-
             if (typeof valor === 'number') return valor;
-
-            let str = String(valor);
-
-            
-
-            // Lógica Híbrida: Se tem vírgula, é BR. Se não, é Ponto (API)
-
+        
+            let str = String(valor).trim();
+        
             if (str.includes(',')) {
-
-                str = str.replace(/[^\d,]/g, '').replace(',', '.');
-
+                // Formato BR
+                str = str.replace(/\./g, '').replace(/[^\d,]/g, '').replace(',', '.');
             } else {
-
+                // Formato US
                 str = str.replace(/[^\d.]/g, '');
-
             }
-
-            return parseFloat(str);
-
+        
+            return parseFloat(str) || 0;
         }
+
 
 
 
@@ -501,21 +493,23 @@ function renderizarProdutos(dadosGerais, cards) {
         const nomeCompleto = card.getAttribute('data-full-name') || termo;
 
         const priceBox = card.querySelector('.price-box');
-        const labelPreco = card.querySelector('.live-price');
         const imgTag = card.querySelector('.product-image-target');
-
+        
         if (priceBox.getAttribute('data-rendered') === 'true') return;
+        
+        // Reconstrói a caixa de preço
+        priceBox.innerHTML = '<span class="live-price loading-skeleton"></span>';
+        const labelPreco = priceBox.querySelector('.live-price');
 
-        // Limpa a caixa de preço para reconstruir
-        priceBox.innerHTML = ''; 
+
 
         if (data) {
             // AJUSTE DE ÍNDICE: Conforme sua planilha, o preço é o índice 6
             const precoBruto = data[6]; 
-            const preco = limparPrecoJS(precoBruto);
+            const preco = limparPrecoJS(data[6]);
             
             // Tenta pegar imagem da planilha, se falhar ou não tiver, o HTML mantém a sua manual
-            const imagemPlanilha = data[9]; 
+            const imagemPlanilha = data[9];
             if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
                 imgTag.src = imagemPlanilha;
             }
