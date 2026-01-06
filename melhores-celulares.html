@@ -107,7 +107,7 @@
 
         <div id="product-list">
 
-            <article class="product-review" data-search="Galaxy A55" data-store="Samsung">
+            <article class="product-review" data-search="a55" data-full-name="Samsung Galaxy A55">
                 <span class="badge-destaque">🏆 A Escolha Segura</span>
                 <div class="review-header">
                     <h2>1. Samsung Galaxy A55</h2>
@@ -141,7 +141,7 @@
                 </div>
             </article>
 
-            <article class="product-review" data-search="Moto G84" data-store="Motorola">
+            <article class="product-review" data-search="g84" data-full-name="Motorola Moto G84">
                 <span class="badge-destaque">💎 Melhor Design</span>
                 <div class="review-header">
                     <h2>2. Motorola Moto G84</h2>
@@ -175,7 +175,7 @@
                 </div>
             </article>
 
-            <article class="product-review" data-search="Redmi Note 13" data-store="Amazon">
+            <article class="product-review" data-search="note 13" data-full-name="Xiaomi Redmi Note 13">
                 <span class="badge-destaque">💰 Preço Baixo</span>
                 <div class="review-header">
                     <h2>3. Xiaomi Redmi Note 13</h2>
@@ -191,7 +191,7 @@
                 </div>
             </article>
 
-             <article class="product-review" data-search="Galaxy S23 FE" data-store="Samsung">
+             <article class="product-review" data-search="s23 fe" data-full-name="Samsung Galaxy S23 FE">
                 <span class="badge-destaque">📸 Câmera Pro</span>
                 <div class="review-header">
                     <h2>4. Samsung Galaxy S23 FE</h2>
@@ -224,30 +224,36 @@
 
     </div>
 
-<script src="https://www.dwin2.com/pub.750521.min.js"></script>
+    <script src="https://www.dwin2.com/pub.750521.min.js"></script>
 
-<script>
+    <script>
         const SUA_LOJA_MAGALU = "adbertolani";
-        // URL DO SEU SCRIPT (Mantenha a sua URL de deploy atualizada)
+        // LINK DO SCRIPT (Confirme se é o V12)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec';
 
-        // Função para limpar preço no Navegador também
+        // Função para limpar preço no Navegador também (Prepara para erros de digitação na planilha)
         function limparPrecoJS(valor) {
             if (!valor) return 0;
             if (typeof valor === 'number') return valor;
             let str = String(valor);
-            // Remove R$, pontos e espaços
-            str = str.replace(/[^\d,]/g, '').replace('.', ''); 
-            // Troca vírgula por ponto
-            str = str.replace(',', '.');
+            
+            // Lógica Híbrida: Se tem vírgula, é BR. Se não, é Ponto (API)
+            if (str.includes(',')) {
+                str = str.replace(/[^\d,]/g, '').replace(',', '.');
+            } else {
+                str = str.replace(/[^\d.]/g, '');
+            }
             return parseFloat(str);
         }
 
         function renderizarProdutos(dadosGerais, cards) {
             cards.forEach(card => {
-                const termoOriginal = card.getAttribute('data-search');
-                const termoKey = termoOriginal.toLowerCase().trim();
-                const data = dadosGerais[termoKey];
+                // Aqui usamos o termo CURTO para achar no JSON do Google
+                const termo = card.getAttribute('data-search').toLowerCase().trim();
+                const data = dadosGerais[termo];
+                
+                // Aqui usamos o nome COMPLETO para criar o link da loja
+                const nomeCompleto = card.getAttribute('data-full-name') || termo;
 
                 const priceBox = card.querySelector('.price-box');
                 const labelPreco = card.querySelector('.live-price');
@@ -255,14 +261,14 @@
 
                 if (priceBox.getAttribute('data-rendered') === 'true') return;
 
-                const termoHifen = termoOriginal.trim().replace(/\s+/g, '-');
-                const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoHifen}/b`;
-                const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoOriginal)}/`;
+                // Monta links usando o nome completo para busca ficar bonita na loja
+                const termoUrl = nomeCompleto.trim().replace(/\s+/g, '-');
+                const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoUrl}/b`;
+                const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
 
                 priceBox.innerHTML = ''; 
 
                 if (data) {
-                    // Limpa o preço recebido (se vier como "1.500,00" texto)
                     const preco = limparPrecoJS(data[2]); 
                     const imagemPlanilha = data[3];
 
@@ -296,8 +302,8 @@
             const cards = document.querySelectorAll('.product-review');
             const termosParaBuscar = Array.from(cards).map(c => c.getAttribute('data-search')).join(',');
             
-            // CACHE V4 (Mudei para v4 para limpar o cache antigo errado)
-            const cacheKey = "precos_cache_v4_" + termosParaBuscar.replace(/\s/g, '');
+            // CACHE V12 (Para garantir que limpamos o cache da ventoinha)
+            const cacheKey = "precos_cache_v12_" + termosParaBuscar.replace(/\s/g, '');
             const cacheValidade = 1000 * 60 * 60; 
             const dadosLocais = localStorage.getItem(cacheKey);
             const horaSalva = localStorage.getItem(cacheKey + '_time');
@@ -324,8 +330,8 @@
                 cards.forEach(card => {
                     const priceBox = card.querySelector('.price-box');
                     if (!priceBox.innerHTML.includes('btn-buy')) {
-                        const termo = card.getAttribute('data-search');
-                        const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termo)}/`;
+                        const nomeCompleto = card.getAttribute('data-full-name') || card.getAttribute('data-search');
+                        const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
                         card.querySelector('.live-price').innerText = "Ver Ofertas";
                         priceBox.innerHTML = `<a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">Ver na Magalu</a>`;
                     }
