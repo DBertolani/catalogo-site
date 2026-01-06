@@ -228,9 +228,21 @@
 
 <script>
         const SUA_LOJA_MAGALU = "adbertolani";
+        // URL DO SEU SCRIPT (Mantenha a sua URL de deploy atualizada)
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec';
 
-        // Função para renderizar os dados na tela (usada tanto pelo cache quanto pela API)
+        // Função para limpar preço no Navegador também
+        function limparPrecoJS(valor) {
+            if (!valor) return 0;
+            if (typeof valor === 'number') return valor;
+            let str = String(valor);
+            // Remove R$, pontos e espaços
+            str = str.replace(/[^\d,]/g, '').replace('.', ''); 
+            // Troca vírgula por ponto
+            str = str.replace(',', '.');
+            return parseFloat(str);
+        }
+
         function renderizarProdutos(dadosGerais, cards) {
             cards.forEach(card => {
                 const termoOriginal = card.getAttribute('data-search');
@@ -241,21 +253,19 @@
                 const labelPreco = card.querySelector('.live-price');
                 const imgTag = card.querySelector('.product-image-target');
 
-                // Evita duplicar botões se rodar duas vezes
                 if (priceBox.getAttribute('data-rendered') === 'true') return;
 
-                // Links
                 const termoHifen = termoOriginal.trim().replace(/\s+/g, '-');
                 const linkCasasBahiaBusca = `https://www.casasbahia.com.br/${termoHifen}/b`;
                 const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoOriginal)}/`;
 
-                priceBox.innerHTML = ''; // Limpa o "Consultando preço..."
+                priceBox.innerHTML = ''; 
 
                 if (data) {
-                    const preco = parseFloat(data[2]); 
+                    // Limpa o preço recebido (se vier como "1.500,00" texto)
+                    const preco = limparPrecoJS(data[2]); 
                     const imagemPlanilha = data[3];
 
-                    // Imagem
                     if (imgTag && imagemPlanilha && imagemPlanilha.length > 10) {
                         if (imgTag.naturalWidth === 0 || imgTag.src === "" || imgTag.src.includes('window.location')) {
                             imgTag.src = imagemPlanilha;
@@ -273,13 +283,11 @@
                     priceBox.innerHTML += `<a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Buscar na Casas Bahia</a>`;
                 }
 
-                // Magalu
                 priceBox.innerHTML += `
                     <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff;">Buscar na Magalu</a>
                     <p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>
                 `;
                 
-                // Marca como renderizado para evitar duplicação
                 priceBox.setAttribute('data-rendered', 'true');
             });
         }
@@ -288,39 +296,31 @@
             const cards = document.querySelectorAll('.product-review');
             const termosParaBuscar = Array.from(cards).map(c => c.getAttribute('data-search')).join(',');
             
-            // 1. TENTA LER DO LOCALSTORAGE (Cache do Navegador - Instantâneo)
+            // CACHE V4 (Mudei para v4 para limpar o cache antigo errado)
             const cacheKey = "precos_cache_v4_" + termosParaBuscar.replace(/\s/g, '');
-            const cacheValidade = 1000 * 60 * 60; // 1 Hora
+            const cacheValidade = 1000 * 60 * 60; 
             const dadosLocais = localStorage.getItem(cacheKey);
             const horaSalva = localStorage.getItem(cacheKey + '_time');
 
             if (dadosLocais && horaSalva && (Date.now() - horaSalva < cacheValidade)) {
-                // Se o cache é recente (menos de 1h), usa ele e não chama a API
-                console.log("Usando cache local");
                 try {
                     renderizarProdutos(JSON.parse(dadosLocais), cards);
-                    return; // Sai da função, não gasta internet
+                    return; 
                 } catch(e) { localStorage.removeItem(cacheKey); }
             }
 
-            // 2. SE NÃO TEM CACHE, CHAMA A API
             try {
-                console.log("Buscando na API...");
                 const response = await fetch(`${SCRIPT_URL}?api=buscar_produtos_batch&q=${encodeURIComponent(termosParaBuscar)}`);
                 if (!response.ok) throw new Error('Erro API');
                 
                 const dadosGerais = await response.json();
-
-                // Renderiza
                 renderizarProdutos(dadosGerais, cards);
 
-                // Salva no LocalStorage para a próxima vez ser instantânea
                 localStorage.setItem(cacheKey, JSON.stringify(dadosGerais));
                 localStorage.setItem(cacheKey + '_time', Date.now());
 
             } catch (e) {
-                console.error("Erro ou Fallback:", e);
-                // Fallback visual
+                console.error("Erro:", e);
                 cards.forEach(card => {
                     const priceBox = card.querySelector('.price-box');
                     if (!priceBox.innerHTML.includes('btn-buy')) {
