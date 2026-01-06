@@ -228,95 +228,85 @@
 
 <script>
         // CONFIGURAÇÕES
-        const SUA_LOJA_MAGALU = "adbertolani"; 
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?api=top_smartphones';
+        const SUA_LOJA_MAGALU = "adbertolani";
+        // URL Base do seu script (sem parâmetros)
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec';
 
-        async function carregarInteligente() {
-            try {
-                const response = await fetch(API_URL);
-                const produtos = await response.json();
+        async function carregarPrecos() {
+            const cards = document.querySelectorAll('.product-review');
 
-                document.querySelectorAll('.product-review').forEach(card => {
-                    // Pega o termo e converte para minúsculo
-                    const termoBusca = card.getAttribute('data-search').toLowerCase();
-                    // Divide o termo em palavras para garantir que TODAS estejam no título
-                    // Ex: "A55 256GB" -> tem que ter "a55" E "256gb"
-                    const palavrasChave = termoBusca.split(" ");
+            // Processa um cartão por vez
+            for (const card of cards) {
+                const termo = card.getAttribute('data-search');
+                const priceBox = card.querySelector('.price-box');
+                const labelPreco = card.querySelector('.live-price');
 
-                    // 1. TENTA ACHAR NA PLANILHA (AWIN - Dados Reais)
-                    const produtoAwin = produtos.find(p => {
-                        const titulo = String(p[0]).toLowerCase();
-                        const preco = parseFloat(p[6]);
-                        
-                        // Verifica se TODAS as palavras do termo estão no título do produto
-                        const matchNome = palavrasChave.every(palavra => titulo.includes(palavra));
-                        
-                        return matchNome && preco > 600;
-                    });
+                try {
+                    // MUDANÇA CRUCIAL: Chama a API específica de busca
+                    const response = await fetch(`${SCRIPT_URL}?api=buscar_produto&q=${encodeURIComponent(termo)}`);
+                    const data = await response.json();
 
-                    const priceBox = card.querySelector('.price-box');
-                    priceBox.innerHTML = ''; 
+                    // Prepara links de busca (Plano B)
+                    const termoHifen = termo.replace(/\s+/g, '-');
+                    // Link Casas Bahia corrigido
+                    const linkCasasBahia = `https://www.casasbahia.com.br/${termoHifen}/b`;
+                    const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termo)}/`;
 
-                    // --- BOTÃO 1: AWIN (Preço Exato ou Busca) ---
-                    if (produtoAwin) {
-                        const preco = parseFloat(produtoAwin[6]);
-                        const link = produtoAwin[8];
-                        const loja = produtoAwin[11];
-                        const img = produtoAwin[9]; // Imagem da API
+                    if (data) {
+                        // A API achou o produto nos 40 mil itens!
+                        // No formato compactCatalog: [0]=Id, [1]=Nome, [2]=Preço, [4]=Link, [5]=Loja, [3]=Imagem
+                        const preco = parseFloat(data[2]); 
+                        const link = data[4];
+                        const loja = data[5] || "Parceiro";
+                        const img = data[3];
 
                         const precoFormatado = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(preco);
                         
-                        // Tenta atualizar a imagem, mas só se a API trouxer uma válida
-                        const imgTag = card.querySelector('.product-image-target');
-                        if(imgTag && img && img.length > 10) {
-                            imgTag.src = img;
-                        }
+                        // Atualiza preço
+                        labelPreco.innerHTML = `Melhor oferta: <span style="color:#27ae60">${precoFormatado}</span>`;
+                        labelPreco.classList.remove('loading-skeleton');
 
+                        // Tenta atualizar a imagem se a API trouxe uma
+                        const imgTag = card.querySelector('.product-image-target');
+                        if(imgTag && img && img.length > 10) imgTag.src = img;
+
+                        // Botão Principal (Link direto da Planilha)
                         priceBox.innerHTML += `
-                            <p class="live-price">${precoFormatado}</p>
-                            <a href="${link}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
+                            <a href="${link}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px">
                                 Comprar na ${loja}
                             </a>
                         `;
                     } else {
-                        // --- CORREÇÃO CASAS BAHIA ---
-                        // Transforma "galaxy a55" em "galaxy-a55" para o link funcionar
-                        const termoHifen = termoBusca.replace(/\s+/g, '-'); 
-                        const linkBuscaCB = `https://www.casasbahia.com.br/${termoHifen}/b`;
+                        // Não achou na planilha
+                        labelPreco.innerHTML = "Verificar Ofertas";
+                        labelPreco.classList.remove('loading-skeleton');
                         
+                        // Botão de Busca Casas Bahia
                         priceBox.innerHTML += `
-                            <p class="live-price" style="font-size:1.1em; color:#777">Verificar Ofertas</p>
-                            <a href="${linkBuscaCB}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">
+                            <a href="${linkCasasBahia}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px">
                                 Buscar na Casas Bahia
                             </a>
                         `;
                     }
 
-                    // --- BOTÃO 2: MAGALU ---
-                    const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoBusca)}/`;
-                    
+                    // Botão Magalu (Sempre aparece)
                     priceBox.innerHTML += `
-                        <a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">
+                        <a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff">
                             Buscar na Magalu
                         </a>
+                        <p style="font-size:0.7em; color:#888; margin-top:5px">Links seguros e verificados</p>
                     `;
 
-                    priceBox.innerHTML += `<p style="font-size: 0.7em; margin-top: 10px; color: #999;">Links seguros e verificados.</p>`;
-                });
-
-            } catch (error) {
-                console.error("Erro na API:", error);
-                // Fallback em caso de erro total da API
-                document.querySelectorAll('.product-review').forEach(card => {
-                    const termoBusca = card.getAttribute('data-search');
-                    const priceBox = card.querySelector('.price-box');
-                    const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termoBusca)}/`;
-                    priceBox.innerHTML = `<a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff;">Ver na Magalu</a>`;
-                });
+                } catch (e) {
+                    console.error("Erro no produto " + termo, e);
+                    // Em caso de erro, mostra só Magalu
+                    const linkMagalu = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(termo)}/`;
+                    priceBox.innerHTML = `<a href="${linkMagalu}" target="_blank" class="btn-buy" style="background:#0086ff">Ver na Magalu</a>`;
+                }
             }
         }
 
-        window.onload = carregarInteligente;
+        window.onload = carregarPrecos;
     </script>
 
 </body>
