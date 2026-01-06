@@ -289,7 +289,7 @@
             const termosParaBuscar = Array.from(cards).map(c => c.getAttribute('data-search')).join(',');
             
             // 1. TENTA LER DO LOCALSTORAGE (Cache do Navegador - Instantâneo)
-            const cacheKey = "precos_cache_v2_" + termosParaBuscar.replace(/\s/g, '');
+            const cacheKey = "precos_cache_v3_" + termosParaBuscar.replace(/\s/g, '');
             const cacheValidade = 1000 * 60 * 60; // 1 Hora
             const dadosLocais = localStorage.getItem(cacheKey);
             const horaSalva = localStorage.getItem(cacheKey + '_time');
