@@ -1,0 +1,55 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste AWIN API</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { padding: 10px; margin: 5px; }
+    .produto { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Teste AWIN Product API</h1>
+  <input type="text" id="query" placeholder="Digite o nome do produto">
+  <button onclick="buscarProduto()">Buscar</button>
+  <div id="resultados"></div>
+
+  <script>
+    async function buscarProduto() {
+      const query = document.getElementById('query').value;
+      const token = '7053ab4a-1278-4067-8b33-f852ae6e7d7f'; // Insira seu OAuth2 Token da AWIN
+      const url = `https://api.awin.com/products?search=${encodeURIComponent(query)}&limit=5`;
+
+      try {
+        const res = await fetch(url, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await res.json();
+
+        const container = document.getElementById('resultados');
+        container.innerHTML = '';
+
+        if (data.products && data.products.length > 0) {
+          data.products.forEach(p => {
+            container.innerHTML += `
+              <div class="produto">
+                <h3>${p.name}</h3>
+                <p><strong>Preço:</strong> R$ ${p.price.amount}</p>
+                <p><strong>Loja:</strong> ${p.advertiser.name}</p>
+                <a href="${p.awinAffiliateLink}" target="_blank">Comprar</a>
+              </div>
+            `;
+          });
+        } else {
+          container.innerHTML = '<p>Nenhum produto encontrado.</p>';
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('resultados').innerHTML = '<p>Erro ao buscar produtos.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
