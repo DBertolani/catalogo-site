@@ -1,9 +1,52 @@
 
-<script>
-async function buscarPreco(produto) {
-  const url = `https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?action=buscar_awin&query=${encodeURIComponent(produto)}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  console.log(data);
-}
-</script>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste AWIN API via Proxy</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    input, button { padding: 10px; margin: 5px; }
+    .produto { border: 1px solid #ccc; padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+  <h1>Teste AWIN Product API</h1>
+  <input type="text" id="query" placeholder="Digite o nome do produto">
+  <button onclick="buscarProduto()">Buscar</button>
+  <div id="resultados"></div>
+
+  <script>
+    async function buscarProduto() {
+      const query = document.getElementById('query').value;
+      const url = `https://script.google.com/macros/s/AKfycbzsLa-esaH96QQnIeQltFvgI2xFOFytbYZwOqW-w565ILJvIBUmI5RNNbNm8-_9S0IaXA/exec?action=buscar_awin&query=${encodeURIComponent(query)}`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const container = document.getElementById('resultados');
+        container.innerHTML = '';
+
+        if (data && data.length > 0) {
+          data.forEach(p => {
+            container.innerHTML += `
+              <div class="produto">
+                <h3>${p.nome}</h3>
+                <p><strong>Preço:</strong> R$ ${p.preco}</p>
+                <p><strong>Loja:</strong> ${p.loja}</p>
+                <a href="${p.linkAfiliado}" target="_blank">Comprar</a>
+              </div>
+            `;
+          });
+        } else {
+          container.innerHTML = '<p>Nenhum produto encontrado.</p>';
+        }
+      } catch (error) {
+        console.error(error);
+        document.getElementById('resultados').innerHTML = '<p>Erro ao buscar produtos.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
