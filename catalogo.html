@@ -14,7 +14,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catálogo Completo - DEAB</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+    <meta name="description" content="Encontre as melhores ofertas, promoções e cupons de desconto das maiores lojas do Brasil: Casas Bahia, Magalu, Amazon e muito mais. Catálogo completo atualizado diariamente.">
+    <meta name="keywords" content="ofertas, promoções, desconto, cupom, smartphone, eletrodomésticos, casas bahia, magalu, amazon, barato">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://ofertasincriveis.deab.com.br/catalogo">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ofertasincriveis.deab.com.br/catalogo">
+    <meta property="og:title" content="Catálogo Completo de Ofertas - DEAB">
+    <meta property="og:description" content="Compare preços e aproveite ofertas imperdíveis em eletrônicos, móveis e muito mais. Economize agora!">
+    <meta property="og:image" content="https://ofertasincriveis.deab.com.br/logo.png"> <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ofertasincriveis.deab.com.br/catalogo">
+    <meta property="twitter:title" content="Catálogo Completo de Ofertas - DEAB">
+    <meta property="twitter:description" content="Compare preços e aproveite ofertas imperdíveis.">
+    <meta property="twitter:image" content="https://ofertasincriveis.deab.com.br/logo.png">
+    
+    
     <!-- CSS IDÊNTICO AO INDEX PARA MANTER PADRÃO -->
     <style>
         * { box-sizing: border-box; }
@@ -42,7 +59,16 @@
 
         .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 25px; justify-content: center; }
         .product-card { background-color: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow: hidden; text-align: center; display: flex; flex-direction: column; transition: transform 0.2s; border: 1px solid #eee; height: 100%; }
-        .product-card-image-container { position: relative; width: 100%; padding-top: 100%; background-color: #fff; border-bottom: 1px solid #f0f0f0;}
+        
+/* Adicionar aspect-ratio ajuda o navegador a calcular espaço antes da imagem carregar */
+.product-card-image-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%; /* Mantém quadrado */
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    aspect-ratio: 1 / 1; /* NOVO: Reforço para browsers modernos */
+}
         .product-card-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: contain; padding: 15px; }
         .product-card-content { padding: 15px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
         .product-card-title { color: #333; font-size: 1rem; margin: 0 0 10px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; min-height: 4.2em; }
@@ -94,9 +120,33 @@
         }
         .no-scroll { overflow: hidden; }
     </style>
+    
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "DEAB Ofertas Incríveis",
+  "url": "https://ofertasincriveis.deab.com.br/",
+  "potentialAction": {
+    "@type": "SearchAction",
+    "target": "https://ofertasincriveis.deab.com.br/catalogo?query={search_term_string}",
+    "query-input": "required name=search_term_string"
+  }
+}
+</script>
+
+    
 </head>
 <body>
 
+    <noscript>
+    <div style="padding: 20px;">
+        <h2>Catálogo de Ofertas DEAB</h2>
+        <p>Habilite o JavaScript para ver milhares de ofertas da Kabum, Casas Bahia, Magalu e muito mais.</p>
+        <p>Visite nossas <a href="/Ofertas">Ofertas Relâmpago</a>.</p>
+    </div>
+</noscript>
+    
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">DEAB<br><span>OFERTAS INCRÍVEIS</span></a>
@@ -114,7 +164,7 @@
         <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" width="35" height="35" alt="Zap">
     </a>
 
-    <div class="container">
+   <main class="container">
         <div class="header">
             <h1>Catálogo Completo</h1>
         </div>
@@ -134,7 +184,7 @@
             <button id="loadMoreBtn" class="btn-details" style="display:none; width: 200px; margin: 0 auto; background:#007bff; color:white;">Carregar Mais</button>
             <p id="noMoreProducts" style="display:none; color: #888;">Fim dos resultados.</p>
         </div>
-    </div>
+    </main>
 
     <!-- MODAIS -->
     <div id="productModal" class="modal">
@@ -235,7 +285,7 @@
         function hideLoader() { loaderContainer.style.display = 'none'; productGrid.style.display = 'grid'; }
 
         function createProductCard(product) {
-            const card = document.createElement('div');
+            const card = document.createElement('article');
             card.className = 'product-card';
             const priceFormatted = formatMoney(product.preco);
             const productString = JSON.stringify(product).replace(/'/g, "&apos;");
