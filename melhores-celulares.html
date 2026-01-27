@@ -632,6 +632,11 @@
         const MERCADO_LIVRE_TOOL = "13296915";
         const MERCADO_LIVRE_WORD = "sitedeab";
 
+        // ✅ LINK BASE OFICIAL DO SEU AFILIADO NO ML (gerado pela plataforma)
+        // Use sempre o /sec/... (melhor) ou o /social/... que contém ref=
+        const MERCADO_LIVRE_SEC_BASE = "https://mercadolivre.com/sec/11mvtST";
+
+
 
         // LINK DO SCRIPT (Confirme se é o URL da implantação V12)
 
@@ -684,7 +689,9 @@ function renderizarProdutos(dadosGerais, cards) {
         const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
 
         // ✅ AJUSTE MERCADO LIVRE: Link de busca real para garantir comissão e funcionalidade
-        const linkMercadoLivreBusca = `https://lista.mercadolivre.com.br/${termoUrl}?matt_tool=${MERCADO_LIVRE_TOOL}&matt_word=${MERCADO_LIVRE_WORD}`;
+        // ✅ GARANTE o carimbo de afiliado (sec) + leva para a busca (termo)
+        const linkMercadoLivreBusca = `${MERCADO_LIVRE_SEC_BASE}?q=${encodeURIComponent(nomeCompleto)}`;
+
 
         // 🔴 CASO 1: produto inválido / não encontrado
         if (!Array.isArray(data)) {
