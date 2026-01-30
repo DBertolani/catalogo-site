@@ -636,6 +636,19 @@
         // Use sempre o /sec/... (melhor) ou o /social/... que contém ref=
         const MERCADO_LIVRE_SEC_BASE = "https://mercadolivre.com/sec/11mvtST";
 
+        // ✅ LINKS DO MERCADO LIVRE GERADOS NO “GERADOR DE LINKS” (1 por modelo)
+                // const ML_LINKS = {
+                //   "Samsung Galaxy A55": "https://mercadolivre.com/sec/342vKPG",
+                //   "Motorola Moto G84": "...",
+                //   "Xiaomi Redmi Note 13": "...",
+                //   "Samsung Galaxy S23 FE": "..."
+                // };
+
+            
+            // (Opcional) link da sua lista geral (caso queira fallback)
+            const ML_LISTA_2026 = "https://mercadolivre.com/sec/1UrwEB8";
+
+
 
 
         // LINK DO SCRIPT (Confirme se é o URL da implantação V12)
@@ -688,9 +701,10 @@ function renderizarProdutos(dadosGerais, cards) {
 
         const linkMagaluBusca = `https://www.magazinevoce.com.br/magazine${SUA_LOJA_MAGALU}/busca/${encodeURIComponent(nomeCompleto)}/`;
 
-        // ✅ AJUSTE MERCADO LIVRE: Link de busca real para garantir comissão e funcionalidade
-        // ✅ GARANTE o carimbo de afiliado (sec) + leva para a busca (termo)
-        const linkMercadoLivreBusca = `${MERCADO_LIVRE_SEC_BASE}?q=${encodeURIComponent(nomeCompleto)}`;
+            // ✅ POR ENQUANTO: usa só o link da LISTA (para todos os modelos)
+            const linkMercadoLivreBusca = ML_LISTA_2026;
+
+
 
 
         // 🔴 CASO 1: produto inválido / não encontrado
@@ -701,7 +715,12 @@ function renderizarProdutos(dadosGerais, cards) {
             priceBox.innerHTML += `
                 <a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Buscar na Casas Bahia</a>
                 <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff; margin-bottom:10px;">Buscar na Magalu</a>
-                <a href="${linkMercadoLivreBusca}" target="_blank" class="btn-buy" style="background:#ffe600; color:#000; margin-bottom:5px;">Buscar no Mercado Livre</a>
+               
+                    <a href="${linkMercadoLivreBusca}" target="_blank" rel="sponsored nofollow"
+                       class="btn-buy" style="background:#ffe600; color:#000; margin-bottom:5px;">
+                       Buscar no Mercado Livre
+                    </a>
+                    
                 <p style="font-size:0.65em; margin-top:5px; color:#666;">Afiliado verificado: <strong>DEABERTOLANI</strong></p>
                 <p style="font-size:0.7em; margin-top:5px; color:#999;">Links seguros e verificados.</p>
             `;
@@ -735,7 +754,11 @@ function renderizarProdutos(dadosGerais, cards) {
         priceBox.innerHTML += `
             <a href="${linkCasasBahiaBusca}" target="_blank" class="btn-buy" style="background:#0033a0; margin-bottom:10px;">Ver Oferta na Casas Bahia</a>
             <a href="${linkMagaluBusca}" target="_blank" class="btn-buy" style="background:#0086ff; margin-bottom:10px;">Buscar na Magalu</a>
-            <a href="${linkMercadoLivreBusca}" target="_blank" class="btn-buy" style="background:#ffe600; color:#000; margin-bottom:5px;">Buscar no Mercado Livre</a>
+            <a href="${linkMercadoLivreBusca}" target="_blank" rel="sponsored nofollow"
+               class="btn-buy" style="background:#ffe600; color:#000; margin-bottom:5px;">
+               Buscar no Mercado Livre
+            </a>
+
             <p style="font-size:0.65em; margin-top:5px; color:#666;">Afiliado verificado: <strong>DEABERTOLANI</strong></p>
             <p style="font-size:0.7em; margin-top:5px; color:#999;">Links seguros e verificados.</p>
         `;
