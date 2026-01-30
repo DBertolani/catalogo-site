@@ -225,6 +225,49 @@
         let allOffers = [];
 
         // ==========================
+// PREÇO: formatação BRL (3.899,00)
+// ==========================
+function formatBRL(input) {
+  if (input === null || input === undefined) return "";
+
+  let s = String(input).trim();
+  if (!s) return "";
+
+  // Se já tem milhar com ponto tipo "3.899,00", mantém
+  if (/\d{1,3}(\.\d{3})+,\d{2}/.test(s)) return s;
+
+  // Remove "R$" e espaços, mantém dígitos, ponto e vírgula
+  const hasRS = /^R\$\s*/.test(s);
+  s = s.replace(/^R\$\s*/i, "").trim();
+
+  // Caso venha só números tipo "3899" ou "3899,00" ou "3,899.00" etc.
+  // Estratégia:
+  // - tira tudo que não é dígito, ponto ou vírgula
+  // - decide decimal final
+  let raw = s.replace(/[^\d.,-]/g, "");
+  if (!raw) return (hasRS ? "R$ " : "") + String(input);
+
+  // Se tiver vírgula, assume vírgula como decimal (pt-BR)
+  // e remove pontos (milhar) que possam estar bagunçados
+  if (raw.includes(",")) {
+    raw = raw.replace(/\./g, "");       // remove pontos
+    raw = raw.replace(/,/g, ".");       // vírgula vira ponto p/ parse
+  } else {
+    // se não tiver vírgula e tiver ponto, pode ser decimal em estilo US
+    // Ex: "3899.00" -> ok
+  }
+
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return (hasRS ? "R$ " : "") + String(input);
+
+  // Formata pt-BR com milhar e 2 casas
+  const out = n.toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  return (hasRS ? "R$ " : "") + out;
+}
+
+
+        // ==========================
         // EXTRA JSON (safe helpers)
         // ==========================
         function safeJsonParse(raw) {
@@ -301,7 +344,7 @@
             document.getElementById('modalImage').src = item.imagem || "https://via.placeholder.com/300x300?text=Oferta";
             document.getElementById('modalTitle').textContent = item.titulo;
             document.getElementById('modalStoreBadge').textContent = item.loja;
-            document.getElementById('modalPrice').textContent = item.por || "";
+            document.getElementById('modalPrice').textContent = item.por ? `Por ${formatBRL(item.por)}` : "";
             
             const desc = item.descricao || "Sem descrição.";
             const MAX_LEN = 250;
@@ -382,7 +425,10 @@
 
                 let htmlPreco = '';
                 if(item.por) {
-                   htmlPreco = `<div class="prices"><span class="price-from">${item.de ? 'De ' + item.de : ''}</span><span class="price-to">Por ${item.por}</span></div>`;
+                   htmlPreco = `<div class="prices">
+                          <span class="price-from">${item.de ? 'De ' + formatBRL(item.de) : ''}</span>
+                          <span class="price-to">Por ${formatBRL(item.por)}</span>
+                        </div>`;
                 }
                 
                 let htmlCupom = '';
