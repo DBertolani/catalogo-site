@@ -199,6 +199,23 @@
 
         .loading-skeleton { color: #7f8c8d; font-style: italic; }
 
+        .loading-skeleton::after {
+          content: "";
+          display: inline-block;
+          width: 18px;
+          text-align: left;
+          animation: dots 1.2s steps(4, end) infinite;
+        }
+        
+        @keyframes dots {
+          0%   { content: ""; }
+          25%  { content: "."; }
+          50%  { content: ".."; }
+          75%  { content: "..."; }
+          100% { content: ""; }
+        }
+
+
 
 
         @media (max-width: 600px) {
@@ -387,7 +404,7 @@
 
                 <div class="price-box">
 
-                    <span class="live-price loading-skeleton">Consultando preço...</span>
+                    <span class="live-price loading-skeleton">Buscando a melhor oferta pra você… 🔎</span>
 
                 </div>
 
@@ -691,7 +708,7 @@ function renderizarProdutos(dadosGerais, cards) {
         if (priceBox.getAttribute('data-rendered') === 'true') return;
 
         // Base inicial
-        priceBox.innerHTML = '<span class="live-price loading-skeleton"></span>';
+        priceBox.innerHTML = '<span class="live-price loading-skeleton">Buscando a melhor oferta pra você… 🔎</span>';
         const labelPreco = priceBox.querySelector('.live-price');
 
         // 🔹 URLs base (centralizadas)
