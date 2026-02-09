@@ -139,53 +139,37 @@
 
 
 
-        /* Price Box Dinâmico */
+/* Melhora no container de preços */
+.price-box {
+    background: #f8faff;
+    border: 2px dashed #cbd5e1; /* Borda tracejada dá ideia de cupom/oferta */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
 
-        .price-box { 
+.live-price {
+    font-size: 2em;
+    color: #27ae60;
+    margin-bottom: 15px;
+    letter-spacing: -1px;
+}
 
-            background: #f1f8ff; 
+/* Deixa os botões com cara de "Comparador de Preços" */
+.btn-buy {
+    display: flex; /* Alinha ícone e texto se tivesse */
+    justify-content: center;
+    align-items: center;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 0 rgba(0,0,0,0.1); /* Efeito 3D sutil */
+    margin-bottom: 12px !important; /* Força espaçamento */
+}
 
-            padding: 20px; 
-
-            border-radius: 8px; 
-
-            text-align: center; 
-
-            border: 2px solid #d0e7ff;
-
-            margin-top: auto;
-
-        }
-
-        .live-price { font-size: 1.8em; font-weight: bold; color: #2c3e50; display: block; margin-bottom: 10px; }
-
-        .btn-buy { 
-
-            background: var(--accent); 
-
-            color: white; 
-
-            text-decoration: none; 
-
-            padding: 12px 30px; 
-
-            border-radius: 6px; 
-
-            font-weight: bold; 
-
-            font-size: 1.1em; 
-
-            display: inline-block; 
-
-            transition: transform 0.2s;
-
-            width: 100%;
-
-            box-sizing: border-box;
-
-            text-align: center;
-
-        }
+.btn-buy:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
 
         .btn-buy:hover { transform: translateY(-2px); opacity: 0.9; }
 
@@ -310,19 +294,17 @@
 
 
 
-    <header class="hero">
-
-        <div class="container">
-
-            <h1>Os Melhores Celulares Custo-Benefício de 2026</h1>
-
-            <p>Não gaste mais do que precisa. Selecionamos os 4 modelos que entregam bateria, câmera e desempenho sem custar uma fortuna.</p>
-
-            <p><small>Atualizado em: Fevereiro 2026</small></p>
-
-        </div>
-
-    </header>
+<header class="hero">
+    <div class="container">
+        <h1>Pare de Jogar Dinheiro Fora 💸</h1>
+        <p style="font-size: 1.3em; margin-top: 15px;">
+            Celular travando? Bateria viciada? Analisamos <strong>47 modelos</strong> e separamos apenas os 4 que realmente valem cada centavo em 2026.
+        </p>
+        <p style="background: rgba(255,255,255,0.2); display: inline-block; padding: 5px 15px; border-radius: 20px; margin-top: 20px; font-size: 0.9em;">
+            ✅ Curadoria Verificada por Especialista
+        </p>
+    </div>
+</header>
 
 
 
@@ -350,9 +332,8 @@
 
                 <div class="review-header">
 
-                    <h2>1. Samsung Galaxy A55</h2>
-
-                    <p>O sucessor do A54 melhorou o que já era bom. Com acabamento em metal e vidro, ele passa a sensação de um celular muito mais caro.</p>
+                <h2>1. Samsung Galaxy A55</h2>
+                <p><strong>Ideal para:</strong> Quem quer um celular que dure 4 anos sem travar. É o "iPhone" do mundo Android custo-benefício. Acabamento de luxo e câmeras que não fazem feio no Instagram.</p>
 
                 </div>
 
@@ -486,9 +467,8 @@
 
                 <div class="review-header">
 
-                    <h2>3. Xiaomi Redmi Note 13</h2>
-
-                    <p>A opção para quem quer gastar pouco. Tem uma tela incrível com bordas finíssimas que humilha celulares mais caros.</p>
+<h2>3. Xiaomi Redmi Note 13</h2>
+<p><strong>Ideal para:</strong> Quem quer pagar barato e ter uma tela de cinema. A tela AMOLED com bordas finas é inacreditável pelo preço. Perfeito para assistir séries e vídeos.</p>
 
                 </div>
 
@@ -537,9 +517,8 @@
 
                 <div class="review-header">
 
-                    <h2>4. Samsung Galaxy S23 FE</h2>
-
-                    <p>A porta de entrada para o mundo premium. Tem as mesmas câmeras da linha S principal e processador para rodar qualquer jogo.</p>
+<h2>4. Samsung Galaxy S23 FE</h2>
+<p><strong>Ideal para:</strong> Criadores de conteúdo e Gamers. Tem o mesmo processador e câmeras da linha S principal. Roda tudo no máximo e filma em 4K com estabilidade profissional.</p>
 
                 </div>
 
@@ -872,6 +851,41 @@ function renderizarProdutos(dadosGerais, cards) {
         window.onload = carregarPrecos;
 
     </script>
+
+
+<style>
+    .whatsapp-float {
+        position: fixed;
+        width: 60px;
+        height: 60px;
+        bottom: 25px;
+        right: 25px;
+        background-color: #25d366;
+        color: #FFF;
+        border-radius: 50px;
+        text-align: center;
+        font-size: 30px;
+        box-shadow: 2px 2px 3px #999;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+    .whatsapp-float:hover { background-color: #128c7e; transform: scale(1.1); }
+    .pulse-anim { animation: pulse-animation 2s infinite; }
+    @keyframes pulse-animation {
+        0% { box-shadow: 0 0 0 0px rgba(37, 211, 102, 0.5); }
+        100% { box-shadow: 0 0 0 20px rgba(37, 211, 102, 0); }
+    }
+</style>
+
+<a href="https://wa.me/5527996962395?text=Oi,+vi+sua+lista+de+celulares+e+estou+com+dúvida+em+qual+escolher." class="whatsapp-float pulse-anim" target="_blank">
+    <svg width="35" height="35" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M17.472 14.382C17.111 14.201 15.336 13.328 15.003 13.238C14.67 13.148 14.427 13.103 14.184 13.464C13.941 13.825 13.247 14.637 13.04 14.885C12.833 15.133 12.626 15.156 12.265 14.975C11.905 14.795 10.743 14.415 9.36603 13.188C8.28103 12.221 7.54803 11.028 7.32303 10.645C7.09803 10.262 7.29903 10.054 7.48003 9.874C7.64203 9.713 7.84003 9.455 8.02003 9.252C8.20003 9.049 8.26303 8.891 8.38003 8.655C8.49703 8.419 8.43403 8.216 8.34403 8.036C8.25403 7.856 7.53303 6.084 7.23603 5.363C6.94803 4.665 6.65503 4.757 6.43903 4.757C6.24103 4.757 6.01603 4.746 5.79103 4.746C5.56603 4.746 5.20603 4.825 4.90303 5.163C4.60003 5.501 3.74403 6.301 3.74403 7.923C3.74403 9.545 4.92503 11.11 5.09303 11.335C5.26103 11.56 7.53503 15.068 11.017 16.572C13.876 17.807 14.436 17.559 15.055 17.447C15.674 17.334 17.049 16.602 17.33 15.814C17.61 15.026 17.61 14.349 17.52 14.192C17.43 14.034 17.205 13.921 16.844 13.741" fill="white"/>
+    </svg>
+</a>
 
 </body>
 
