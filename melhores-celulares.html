@@ -139,39 +139,76 @@
 
 
 
-/* Melhora no container de preços */
-.price-box {
-    background: #f8faff;
-    border: 2px dashed #cbd5e1; /* Borda tracejada dá ideia de cupom/oferta */
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+/* --- INÍCIO DO AJUSTE DOS BOTÕES --- */
+
+/* Caixa de Preço: Mais limpa e destacada */
+.price-box { 
+    background: #fdfdfd; 
+    border: 1px solid #e1e4e8; 
+    border-radius: 12px; 
+    padding: 20px; 
+    text-align: center; 
+    margin-top: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05); /* Sombra suave para destacar do fundo */
 }
 
-.live-price {
-    font-size: 2em;
-    color: #27ae60;
-    margin-bottom: 15px;
+/* Preço: Grande e Verde */
+.live-price { 
+    font-size: 2.2em; /* Aumentei para chamar atenção */
+    font-weight: 800; 
+    color: #27ae60; 
+    display: block; 
+    margin-bottom: 15px; 
     letter-spacing: -1px;
 }
 
-/* Deixa os botões com cara de "Comparador de Preços" */
-.btn-buy {
-    display: flex; /* Alinha ícone e texto se tivesse */
+/* Botões de Compra: Design "Gorducho" e Clicável */
+.btn-buy { 
+    display: flex;            /* Centraliza o texto perfeitamente */
     justify-content: center;
     align-items: center;
-    font-weight: 700;
-    text-transform: uppercase;
-    font-size: 0.95em;
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 0 rgba(0,0,0,0.1); /* Efeito 3D sutil */
-    margin-bottom: 12px !important; /* Força espaçamento */
+    width: 100%;              /* Garante que ocupe a largura toda no celular */
+    box-sizing: border-box;   /* Evita que o padding estoure a tela */
+    
+    text-decoration: none; 
+    padding: 16px 20px;       /* Área de toque maior */
+    border-radius: 8px;       /* Cantos arredondados modernos */
+    
+    font-weight: 700;         /* Negrito */
+    font-size: 1em; 
+    text-transform: uppercase; /* Letras maiúsculas passam autoridade */
+    color: white;             /* Texto branco padrão */
+    
+    margin-bottom: 12px !important; /* Espaço entre os botões */
+    transition: all 0.2s ease;
+    
+    /* Efeito 3D sutil na parte de baixo do botão */
+    box-shadow: 0 4px 0 rgba(0,0,0,0.15); 
+    border-bottom: 2px solid rgba(0,0,0,0.1); 
 }
 
+/* Quando passa o mouse ou toca */
+.btn-buy:hover { 
+    transform: translateY(-2px); /* O botão "sobe" */
+    filter: brightness(1.1);     /* Fica levemente mais brilhante */
+    box-shadow: 0 6px 10px rgba(0,0,0,0.2);
+}
+
+/* Quando clica */
 .btn-buy:active {
-    transform: translateY(2px);
+    transform: translateY(2px);  /* O botão "afunda" */
     box-shadow: none;
+    border-bottom: none;
 }
 
-        .btn-buy:hover { transform: translateY(-2px); opacity: 0.9; }
+/* Ajuste Específico para o texto preto do Mercado Livre (para não sumir no amarelo) */
+/* O seu HTML já tem style="color:#000", isso garante que funcione, 
+   mas essa regra reforça caso o style falhe */
+a[href*="mercadolivre"] {
+    color: #2c3e50 !important;
+}
+
+/* --- FIM DO AJUSTE DOS BOTÕES --- */
 
         
 
