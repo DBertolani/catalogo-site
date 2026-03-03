@@ -237,14 +237,17 @@
         // --- SCRIPT ORIGINAL MANTIDO (COPIADO DO SEU ARQUIVO) ---
         let currentOffset = 0;
         const productsPerPage = 50;
-        let currentQuery = new URLSearchParams(window.location.search).get('query') || '';
         let totalProductsFound = 0;
         const MAX_DESC_LENGTH = 180;
         let currentProduct = null;
         let currentProductDescription = '';
-        let currentStoreFilter = '';
-        let currentCategoryFilter = '';
-        let currentBrandFilter = '';
+
+        // --- NOVO: LÊ FILTROS DA URL AO INICIAR ---
+        const urlParams = new URLSearchParams(window.location.search);
+        let currentQuery = urlParams.get('query') || '';
+        let currentStoreFilter = urlParams.get('store') || '';
+        let currentCategoryFilter = urlParams.get('category') || '';
+        let currentBrandFilter = urlParams.get('brand') || '';
 
         const productGrid = document.getElementById('productGrid');
         const loaderContainer = document.getElementById('loader-container');
@@ -334,6 +337,18 @@
             } catch (error) { console.error("Erro filtros:", error); }
         }
 
+        // --- NOVA FUNÇÃO: Atualiza a URL do navegador ---
+        function updateUrlParams() {
+            const url = new URL(window.location);
+            if (currentQuery) url.searchParams.set('query', currentQuery); else url.searchParams.delete('query');
+            if (currentStoreFilter) url.searchParams.set('store', currentStoreFilter); else url.searchParams.delete('store');
+            if (currentCategoryFilter) url.searchParams.set('category', currentCategoryFilter); else url.searchParams.delete('category');
+            if (currentBrandFilter) url.searchParams.set('brand', currentBrandFilter); else url.searchParams.delete('brand');
+            
+            // Atualiza a barra de endereço sem recarregar a página
+            window.history.pushState({}, '', url);
+        }
+
         function loadProducts(append) {
             append = typeof append === 'undefined' ? true : append;
             showLoader();
@@ -393,10 +408,40 @@
 
         filterButton.addEventListener('click', () => { filterModal.style.display = "flex"; });
         function closeFilterModal() { filterModal.style.display = "none"; }
-        applyFiltersButton.addEventListener('click', () => { currentStoreFilter = document.getElementById('storeFilterInput').value; currentCategoryFilter = document.getElementById('categoryFilterInput').value; currentBrandFilter = document.getElementById('brandFilterInput').value; closeFilterModal(); loadProducts(false); });
-        clearFiltersButton.addEventListener('click', () => { currentQuery = ''; currentStoreFilter = ''; currentCategoryFilter = ''; currentBrandFilter = ''; searchInput.value = ''; loadProducts(false); });
-        searchButton.addEventListener('click', () => { currentQuery = searchInput.value.trim(); loadProducts(false); });
-        searchInput.addEventListener('keypress', (e) => { if(e.key === 'Enter') { currentQuery = searchInput.value.trim(); loadProducts(false); } });
+        
+            applyFiltersButton.addEventListener('click', () => { 
+            currentStoreFilter = document.getElementById('storeFilterInput').value; 
+            currentCategoryFilter = document.getElementById('categoryFilterInput').value; 
+            currentBrandFilter = document.getElementById('brandFilterInput').value; 
+            closeFilterModal(); 
+            updateUrlParams(); // <--- ATUALIZA A URL
+            loadProducts(false); 
+        });
+
+        clearFiltersButton.addEventListener('click', () => { 
+            currentQuery = ''; 
+            currentStoreFilter = ''; 
+            currentCategoryFilter = ''; 
+            currentBrandFilter = ''; 
+            searchInput.value = ''; 
+            updateUrlParams(); // <--- LIMPA A URL
+            loadProducts(false); 
+        });
+
+        searchButton.addEventListener('click', () => { 
+            currentQuery = searchInput.value.trim(); 
+            updateUrlParams(); // <--- ATUALIZA A URL
+            loadProducts(false); 
+        });
+
+        searchInput.addEventListener('keypress', (e) => { 
+            if(e.key === 'Enter') { 
+                currentQuery = searchInput.value.trim(); 
+                updateUrlParams(); // <--- ATUALIZA A URL
+                loadProducts(false); 
+            } 
+        });
+        
         loadMoreBtn.addEventListener('click', () => loadProducts(true));
         window.addEventListener('click', (e) => { if (e.target === productModal) closeProductModal(); if (e.target === descriptionModal) closeDescriptionModal(); if (e.target === filterModal) closeFilterModal(); });
         window.onload = function() { loadGlobalFilters(); loadProducts(true); };
